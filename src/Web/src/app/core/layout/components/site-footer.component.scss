@@ -8,10 +8,31 @@
   margin: 0 auto;
   padding: 1.25rem 1.5rem 2rem;
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
   color: var(--yp-color-text-muted);
   font-size: 0.95rem;
+}
+
+.site-footer__brand {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.site-footer__brand p {
+  margin: 0;
+}
+
+.site-footer__nav {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.site-footer__nav a {
+  color: var(--yp-color-primary-dark);
+  font-weight: 700;
 }
 
 @media (max-width: 720px) {

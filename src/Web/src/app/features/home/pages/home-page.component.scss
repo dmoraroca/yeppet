@@ -4,13 +4,60 @@
 }
 
 .hero {
-  max-width: var(--yp-max-width);
-  margin: 0 auto;
-  padding: 4rem 1.5rem 3rem;
+  width: 100%;
+  margin: 0;
+  padding: 1.25rem 0 3rem;
+}
+
+.hero__stage {
+  position: relative;
+  overflow: hidden;
+  min-height: 42rem;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding: 4.25rem max(3rem, calc((100vw - var(--yp-max-width)) / 2 + 1.5rem)) 3rem;
+  border-radius: 0;
+  border-top: 1px solid rgba(209, 213, 219, 0.72);
+  border-bottom: 1px solid rgba(209, 213, 219, 0.72);
+  border-left: 0;
+  border-right: 0;
+  background:
+    linear-gradient(125deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.52)),
+    linear-gradient(180deg, rgba(243, 244, 246, 0.25), rgba(45, 212, 191, 0.08));
+  box-shadow: 0 32px 80px -42px rgba(6, 95, 70, 0.45);
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
   gap: 2rem;
   align-items: center;
+}
+
+.hero__backdrop,
+.hero__wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero__backdrop {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(250, 253, 252, 0.84) 0%,
+      rgba(250, 253, 252, 0.7) 33%,
+      rgba(250, 253, 252, 0.38) 58%,
+      rgba(250, 253, 252, 0.24) 100%
+    ),
+    url('/images/westie-hero-wide.jpg') center center / cover no-repeat;
+  opacity: 0.62;
+  transform: scale(1);
+}
+
+.hero__wash {
+  background:
+    radial-gradient(circle at 12% 22%, rgba(45, 212, 191, 0.28), transparent 28%),
+    radial-gradient(circle at 92% 12%, rgba(6, 95, 70, 0.15), transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(6, 95, 70, 0.04));
 }
 
 .hero__eyebrow {
@@ -24,8 +71,9 @@
 
 .hero h1 {
   margin: 0;
-  font-size: clamp(3rem, 8vw, 5.5rem);
-  line-height: 0.94;
+  max-width: 12ch;
+  font-size: clamp(3.35rem, 8vw, 6rem);
+  line-height: 0.9;
   letter-spacing: -0.06em;
 }
 
@@ -48,9 +96,9 @@
 .hero__copy {
   max-width: 42rem;
   margin: 1.5rem 0 0;
-  font-size: 1.1rem;
+  font-size: 1.08rem;
   line-height: 1.7;
-  color: var(--yp-color-text-muted);
+  color: rgba(31, 41, 55, 0.82);
   text-wrap: balance;
 }
 
@@ -64,11 +112,12 @@
 .hero__chip {
   padding: 0.72rem 0.95rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(45, 212, 191, 0.35);
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(45, 212, 191, 0.28);
   color: var(--yp-color-primary-dark);
   font-weight: 700;
   box-shadow: 0 14px 35px -28px rgba(6, 95, 70, 0.7);
+  backdrop-filter: blur(10px);
   animation: chip-float 5s ease-in-out infinite;
   white-space: nowrap;
 }
@@ -90,6 +139,11 @@
   gap: 1rem;
   flex-wrap: wrap;
   margin-top: 2rem;
+}
+
+.hero__content {
+  position: relative;
+  z-index: 1;
 }
 
 .hero__primary,
@@ -130,19 +184,21 @@
   position: relative;
   min-height: 28rem;
   min-width: 0;
+  z-index: 1;
 }
 
 .hero__map {
   position: absolute;
-  inset: 1.5rem 0 2rem 2rem;
+  inset: 3.25rem 0 2rem 2rem;
   border-radius: 2rem;
   border: 1px solid rgba(209, 213, 219, 0.8);
   background:
     radial-gradient(circle at 20% 20%, rgba(45, 212, 191, 0.18), transparent 22%),
     radial-gradient(circle at 80% 30%, rgba(45, 212, 191, 0.14), transparent 20%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(243, 244, 246, 0.92));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(243, 244, 246, 0.78));
   box-shadow: var(--yp-shadow-soft);
   overflow: hidden;
+  backdrop-filter: blur(18px);
 }
 
 .hero__map::before,
@@ -211,7 +267,7 @@
   max-width: 15rem;
   padding: 1rem 1.1rem;
   border-radius: 1.25rem;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.84);
   border: 1px solid rgba(209, 213, 219, 0.8);
   box-shadow: 0 20px 40px -30px rgba(6, 95, 70, 0.8);
   backdrop-filter: blur(12px);
@@ -269,16 +325,14 @@
 }
 
 .cities,
-.why,
-.overview {
+.why {
   max-width: var(--yp-max-width);
   margin: 0 auto;
   padding: 0 1.5rem 4rem;
 }
 
 .cities__grid,
-.why__grid,
-.overview {
+.why__grid {
   margin-top: 1.75rem;
 }
 
@@ -385,30 +439,6 @@
   text-wrap: pretty;
 }
 
-.overview {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.overview article {
-  padding: 1.5rem;
-  border-radius: 1.25rem;
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(209, 213, 219, 0.7);
-}
-
-.overview h2 {
-  margin: 0 0 0.75rem;
-  font-size: 1.1rem;
-}
-
-.overview p {
-  margin: 0;
-  color: var(--yp-color-text-muted);
-  line-height: 1.6;
-}
-
 @keyframes chip-float {
   0%,
   100% {
@@ -433,37 +463,67 @@
 
 @media (max-width: 900px) {
   .hero {
-    padding-top: 3rem;
+    padding-top: 1rem;
+  }
+
+  .hero__stage {
+    min-height: auto;
+    padding: 3rem 1.5rem 2rem;
+    grid-template-columns: 1fr;
     gap: 1.5rem;
   }
 
   .cities__grid,
-  .why__grid,
-  .overview {
+  .why__grid {
     grid-template-columns: 1fr;
   }
 
   .hero__visual {
-    min-height: 24rem;
+    min-height: 25rem;
   }
 
   .hero__map {
-    inset: 1rem 0 1rem 1rem;
+    inset: 1.5rem 0 1rem 0;
   }
 
   .hero__floating-card {
     max-width: 14rem;
   }
+
+  .hero__backdrop {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(250, 253, 252, 0.72) 0%,
+        rgba(250, 253, 252, 0.52) 38%,
+        rgba(250, 253, 252, 0.28) 100%
+      ),
+      url('/images/westie-hero-wide.jpg') center center / cover no-repeat;
+  }
 }
 
 @media (max-width: 720px) {
   .hero {
-    padding: 2.5rem 1rem 2rem;
+    padding: 1rem 0 2rem;
+  }
+
+  .hero__stage {
+    padding: 2rem 1rem 1.5rem;
+  }
+
+  .hero__backdrop {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(250, 253, 252, 0.66) 0%,
+        rgba(250, 253, 252, 0.44) 42%,
+        rgba(250, 253, 252, 0.22) 100%
+      ),
+      url('/images/westie-hero-wide.jpg') center center / cover no-repeat;
   }
 
   .cities,
-  .why,
-  .overview {
+  .why {
     padding: 0 1rem 3rem;
   }
 
@@ -495,7 +555,7 @@
   }
 
   .hero__map {
-    inset: 0.5rem;
+    inset: 1rem 0 0.5rem 0;
     border-radius: 1.5rem;
   }
 
@@ -524,7 +584,7 @@
 
 @media (max-width: 540px) {
   .hero h1 {
-    font-size: clamp(2.6rem, 14vw, 3.5rem);
+    font-size: clamp(2.75rem, 13vw, 3.7rem);
     line-height: 0.98;
   }
 
@@ -580,8 +640,7 @@
     font-size: 1.3rem;
   }
 
-  .why__card,
-  .overview article {
+  .why__card {
     padding: 1.1rem;
   }
 }
