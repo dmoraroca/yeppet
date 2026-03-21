@@ -1,0 +1,26 @@
+.place-map {
+  overflow: hidden;
+  border-radius: 1.6rem;
+  border: 1px solid rgba(209, 213, 219, 0.78);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--yp-shadow-soft);
+}
+
+.place-map__canvas {
+  width: 100%;
+}
+
+.place-map__empty {
+  padding: 1.5rem;
+}
+
+.place-map__empty h3,
+.place-map__empty p {
+  margin: 0;
+}
+
+.place-map__empty p {
+  margin-top: 0.55rem;
+  color: var(--yp-color-text-muted);
+  line-height: 1.6;
+}

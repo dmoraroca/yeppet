@@ -35,20 +35,6 @@
           Barcelona
         </a>
         <a
-          class="hero__pin hero__pin--madrid"
-          [routerLink]="['/places']"
-          [queryParams]="{ city: 'Madrid' }"
-        >
-          Madrid
-        </a>
-        <a
-          class="hero__pin hero__pin--lisboa"
-          [routerLink]="['/places']"
-          [queryParams]="{ city: 'Lisboa' }"
-        >
-          Lisboa
-        </a>
-        <a
           class="hero__pin hero__pin--berlin"
           [routerLink]="['/places']"
           [queryParams]="{ city: 'Berlin' }"
@@ -67,10 +53,17 @@
         <span>{{ content().quickMatchCopy }}</span>
       </a>
 
-      <div class="hero__floating-card hero__floating-card--bottom">
-        <p class="hero__card-label">Preparat per créixer</p>
-        <strong>{{ content().futureReadyTitle }}</strong>
-        <span>{{ content().futureReadyCopy }}</span>
+      <div class="hero__floating-card hero__floating-card--bottom hero__floating-card--stack">
+        <p class="hero__card-label">Favorits destacats</p>
+        <div class="hero__featured-list">
+          @for (place of content().featuredPlaces; track place.id) {
+            <a class="hero__featured-item" [routerLink]="['/places', place.id]">
+              <span class="hero__featured-badge">{{ place.badge }}</span>
+              <strong>{{ place.name }}</strong>
+              <span>{{ place.city }}</span>
+            </a>
+          }
+        </div>
       </div>
     </aside>
   </div>

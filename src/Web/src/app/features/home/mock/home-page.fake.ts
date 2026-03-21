@@ -11,7 +11,21 @@ export const HOME_HERO_FAKE: HomeHeroContent = {
   quickMatchTitle: 'Terrassa pet-friendly per fer brunch',
   quickMatchCopy: 'Gossos benvinguts · Seients exteriors',
   futureReadyTitle: 'Arquitectura basada en mocks',
-  futureReadyCopy: 'Preparada per canviar dades simulades per API real'
+  futureReadyCopy: 'Preparada per canviar dades simulades per API real',
+  featuredPlaces: [
+    {
+      id: 'barcelona-pawtel-gotic',
+      name: 'Pawtel Gotic',
+      city: 'Barcelona',
+      badge: 'Favorit'
+    },
+    {
+      id: 'berlin-grunhof',
+      name: 'Grunhof',
+      city: 'Berlin',
+      badge: 'Destacat'
+    }
+  ]
 };
 
 export const HOME_TRENDING_CITIES_FAKE: HomeCity[] = [

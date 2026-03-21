@@ -48,6 +48,24 @@
         </div>
       </article>
     </section>
+
+    <section class="place-detail-page__map-block">
+      <div class="place-detail-page__map-copy">
+        <h2>Ubicació aproximada</h2>
+        <p>
+          El mateix component de mapa utilitzat al llistat es reutilitza aquí per centrar el lloc
+          seleccionat amb coordenades simulades precises.
+        </p>
+      </div>
+
+      <app-place-map
+        [places]="placeAsArray"
+        [selectedPlaceId]="selectedPlace.id"
+        height="20rem"
+        emptyTitle="No hi ha ubicació disponible"
+        emptyCopy="Aquest lloc no té coordenades per mostrar al mapa."
+      />
+    </section>
   } @else {
     <section class="place-detail-page__missing">
       <h1>No hem trobat aquest lloc.</h1>

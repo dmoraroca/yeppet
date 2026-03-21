@@ -6,11 +6,18 @@ import { SiteFooterComponent } from '../../../../core/layout/components/site-foo
 import { SiteHeaderComponent } from '../../../../core/layout/components/site-header/site-header.component';
 import { FavoriteToggleButtonComponent } from '../../../../shared/components/favorite-toggle-button/favorite-toggle-button.component';
 import { FavoritesService } from '../../../favorites/services/favorites.service';
+import { PlaceMapComponent } from '../../components/place-map/place-map.component';
 import { PlaceService } from '../../services/place.service';
 
 @Component({
   selector: 'app-place-detail-page',
-  imports: [RouterLink, SiteHeaderComponent, SiteFooterComponent, FavoriteToggleButtonComponent],
+  imports: [
+    RouterLink,
+    SiteHeaderComponent,
+    SiteFooterComponent,
+    FavoriteToggleButtonComponent,
+    PlaceMapComponent
+  ],
   templateUrl: './place-detail-page.component.html',
   styleUrl: './place-detail-page.component.scss'
 })
@@ -36,5 +43,9 @@ export class PlaceDetailPageComponent {
 
   protected getTypeLabel(type: string): string {
     return this.placeService.getTypeLabel(type as never);
+  }
+
+  protected get placeAsArray() {
+    return this.place() ? [this.place()!] : [];
   }
 }

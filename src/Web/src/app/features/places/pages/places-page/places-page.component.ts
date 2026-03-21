@@ -8,6 +8,7 @@ import { SectionHeadingComponent } from '../../../../shared/components/section-h
 import { FavoritesService } from '../../../favorites/services/favorites.service';
 import { PlaceCardComponent } from '../../components/place-card/place-card.component';
 import { PlaceFiltersComponent } from '../../components/place-filters/place-filters.component';
+import { PlaceMapComponent } from '../../components/place-map/place-map.component';
 import { PlaceFilters } from '../../models/place.model';
 import { PlaceService } from '../../services/place.service';
 
@@ -19,6 +20,7 @@ import { PlaceService } from '../../services/place.service';
     SiteFooterComponent,
     SectionHeadingComponent,
     PlaceFiltersComponent,
+    PlaceMapComponent,
     PlaceCardComponent
   ],
   templateUrl: './places-page.component.html',
@@ -158,6 +160,14 @@ export class PlacesPageComponent {
       city: '',
       type: '',
       pet: 'all'
+    });
+  }
+
+  protected openPlaceFromMap(placeId: string): void {
+    void this.router.navigate(['/places', placeId], {
+      queryParams: {
+        fromMap: true
+      }
     });
   }
 

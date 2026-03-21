@@ -1,6 +1,11 @@
 export type PlaceType = 'restaurant' | 'hotel' | 'apartment' | 'park' | 'service';
 export type PetFilter = 'all' | 'dogs' | 'cats';
 
+export interface PlaceCoordinates {
+  lat: number;
+  lng: number;
+}
+
 export interface Place {
   id: string;
   name: string;
@@ -17,6 +22,7 @@ export interface Place {
   address: string;
   petNotes: string;
   features: string[];
+  coordinates: PlaceCoordinates;
 }
 
 export interface PlaceFilters {

@@ -4,6 +4,13 @@ export interface HomeCity {
   vibe: string;
 }
 
+export interface HomeHeroFeaturedPlace {
+  id: string;
+  name: string;
+  city: string;
+  badge: string;
+}
+
 export interface HomeHeroContent {
   eyebrow: string;
   titleStart: string;
@@ -15,6 +22,7 @@ export interface HomeHeroContent {
   quickMatchCopy: string;
   futureReadyTitle: string;
   futureReadyCopy: string;
+  featuredPlaces: HomeHeroFeaturedPlace[];
 }
 
 export interface HomeWhyContent {

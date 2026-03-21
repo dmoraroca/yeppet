@@ -26,7 +26,11 @@ export const PLACES_FAKE: Place[] = [
     tags: ['terrassa', 'brunch', 'centre'],
     address: 'Carrer de la Marina 118, Barcelona',
     petNotes: 'Gossos benvinguts a la terrassa i a l’interior en hores tranquil·les.',
-    features: ['Aigua per mascotes', 'Terrassa gran', 'Reserva online']
+    features: ['Aigua per mascotes', 'Terrassa gran', 'Reserva online'],
+    coordinates: {
+      lat: 41.390205,
+      lng: 2.191987
+    }
   },
   {
     id: 'barcelona-pawtel-gotic',
@@ -45,7 +49,11 @@ export const PLACES_FAKE: Place[] = [
     tags: ['hotel', 'boutique', 'ciutat'],
     address: 'Via Laietana 44, Barcelona',
     petNotes: 'Accepta gossos i gats petits. Suplement fix per nit.',
-    features: ['Habitacions pet-friendly', 'Recepció 24h', 'Late check-out']
+    features: ['Habitacions pet-friendly', 'Recepció 24h', 'Late check-out'],
+    coordinates: {
+      lat: 41.386602,
+      lng: 2.177442
+    }
   },
   {
     id: 'madrid-latido-park',
@@ -64,7 +72,11 @@ export const PLACES_FAKE: Place[] = [
     tags: ['parc', 'ombra', 'passeig'],
     address: 'Paseo del Prado, Madrid',
     petNotes: 'Millor franja al matí o cap al vespre quan hi ha menys calor.',
-    features: ['Zona verda', 'Bancs', 'Accés fàcil']
+    features: ['Zona verda', 'Bancs', 'Accés fàcil'],
+    coordinates: {
+      lat: 40.415363,
+      lng: -3.692145
+    }
   },
   {
     id: 'madrid-casa-larga',
@@ -83,7 +95,11 @@ export const PLACES_FAKE: Place[] = [
     tags: ['apartament', 'estades llargues', 'família'],
     address: 'Calle del Pez 17, Madrid',
     petNotes: 'Ideal per gossos tranquils i gats d’interior.',
-    features: ['Cuina equipada', 'Rentadora', 'Check-in autònom']
+    features: ['Cuina equipada', 'Rentadora', 'Check-in autònom'],
+    coordinates: {
+      lat: 40.423672,
+      lng: -3.705118
+    }
   },
   {
     id: 'lisboa-mar-calma',
@@ -102,7 +118,11 @@ export const PLACES_FAKE: Place[] = [
     tags: ['terrassa', 'sopar', 'barri'],
     address: 'Rua da Esperança 12, Lisboa',
     petNotes: 'Gossos de mida petita i mitjana sense problema a la terrassa.',
-    features: ['Terrassa', 'Reserves ràpides', 'Ambient tranquil']
+    features: ['Terrassa', 'Reserves ràpides', 'Ambient tranquil'],
+    coordinates: {
+      lat: 38.709847,
+      lng: -9.160219
+    }
   },
   {
     id: 'lisboa-siesta-stay',
@@ -121,7 +141,11 @@ export const PLACES_FAKE: Place[] = [
     tags: ['hotel', 'escapada', 'còmode'],
     address: 'Avenida 24 de Julho 81, Lisboa',
     petNotes: 'Accepta una mascota per habitació amb suplement moderat.',
-    features: ['Check-in ràpid', 'Habitacions grans', 'Servei amable']
+    features: ['Check-in ràpid', 'Habitacions grans', 'Servei amable'],
+    coordinates: {
+      lat: 38.706904,
+      lng: -9.153894
+    }
   },
   {
     id: 'berlin-kiez-cafe',
@@ -140,7 +164,11 @@ export const PLACES_FAKE: Place[] = [
     tags: ['cafè', 'serveis', 'barri'],
     address: 'Weserstraße 33, Berlin',
     petNotes: 'Gossos tranquils benvinguts, especialment entre setmana.',
-    features: ['Wi-Fi', 'Zona interior', 'Ambient local']
+    features: ['Wi-Fi', 'Zona interior', 'Ambient local'],
+    coordinates: {
+      lat: 52.490876,
+      lng: 13.424612
+    }
   },
   {
     id: 'berlin-grunhof',
@@ -159,6 +187,10 @@ export const PLACES_FAKE: Place[] = [
     tags: ['apartament', 'barri tranquil', 'llarga estada'],
     address: 'Oderberger Straße 70, Berlin',
     petNotes: 'Ideal per mascotes acostumades a espais interiors tranquils.',
-    features: ['Self check-in', 'Zona tranquil·la', 'Pet-friendly real']
+    features: ['Self check-in', 'Zona tranquil·la', 'Pet-friendly real'],
+    coordinates: {
+      lat: 52.541953,
+      lng: 13.402631
+    }
   }
 ];

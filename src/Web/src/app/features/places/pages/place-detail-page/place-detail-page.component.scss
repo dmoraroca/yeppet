@@ -70,6 +70,22 @@
   gap: 1rem;
 }
 
+.place-detail-page__map-block {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.place-detail-page__map-copy h2 {
+  margin: 0;
+}
+
+.place-detail-page__map-copy p {
+  max-width: 48rem;
+  margin: 0.45rem 0 0;
+  color: var(--yp-color-text-muted);
+  line-height: 1.7;
+}
+
 .place-detail-page__card h2 {
   margin-top: 0;
 }
