@@ -47,6 +47,7 @@ La fase I queda completada amb aquesta base:
 - dades simulades per a la `home`
 - feature `places`
 - llistat de llocs amb filtres
+- mapa funcional a `places`
 - detall de lloc
 - feature `favorites` amb estat fake
 - navegació funcional des de la `home`
@@ -64,6 +65,7 @@ Per a la fase I consolidem aquests components com a reutilitzables reals:
 - `app-generic-info-card`
 - `app-favorite-toggle-button`
 - `app-place-card`
+- `app-place-map`
 
 La resta de components es mantenen específics de cada `feature` mentre no tinguem una necessitat real de reutilització.
 
@@ -75,6 +77,7 @@ Queda validat:
 - `PlaceService` mock
 - navegació entre `home`, `places`, `place detail`, `favorites` i `permissions`
 - filtres i cerca sobre dades simulades
+- component de mapa centralitzat i reutilitzat a `places` i `place detail`
 - estat fake de favorits
 - base responsive per `home`, `places`, `detail` i `favorites`
 - coherència general de copies en català
@@ -97,13 +100,15 @@ Convertir la base funcional de la fase I en una aplicació frontend més complet
 
 ### Què entra dins la fase II
 
-- consolidar la feature `places` amb una UX de cerca més rica
-- afegir vista mapa a `places`, situada sota els filtres
-- sincronitzar mapa, filtres i resultats
+- **consolidar la feature `places` amb una UX de cerca més rica**
+- **polir la vista mapa ja existent a `places`**
+- **millorar la sincronització entre mapa, filtres i resultats**
 - decidir si `places` treballarà amb `llista`, `mapa` o mode mixt
+- **refinar la UX de marcadors, popups i selecció al mapa**
+- decidir com escalar la vista mapa quan hi hagi més densitat de dades
 - refinar `favorites` perquè el flux de guardar i revisar llocs sigui més natural
-- millorar el `place detail` amb millor jerarquia i més context
-- revisar empty states, filtres actius i textos de suport
+- **millorar el `place detail` amb millor jerarquia i més context**
+- **revisar empty states, filtres actius i textos de suport**
 - polir les seccions de la `home` que ara són correctes però encara provisionals
 - consolidar quins components compartits val la pena fixar definitivament
 - enriquir les dades simulades perquè siguin més realistes
@@ -121,14 +126,27 @@ Convertir la base funcional de la fase I en una aplicació frontend més complet
 
 La fase II s'hauria de poder resumir en aquests blocs:
 
-1. `Places` amb mapa sota filtres
-2. `Place detail` més complet i més clar
+1. **`Places` amb mapa sota filtres**
+2. **`Place detail` més complet i més clar**
 3. `Favorites` més polit
 4. `Home` més madura visualment
 5. Components compartits consolidats
 6. Mocks més rics i preparats per API
 7. Capa base de gestió d'errors
 8. Responsive i UX refinats
+
+### Estat parcial de la fase II
+
+Ara mateix, dins de la fase II, ja tenim avançat:
+
+- **mapa funcional integrat a `places` sota els filtres**
+- **component `app-place-map` centralitzat i parametritzable**
+- **coordenades simulades precises als `Place`**
+- **reutilització del mateix mapa a `place detail`**
+- **millora del context de filtres actius i títols dinàmics a `places`**
+- **preview del `hero` més orientada a contingut destacat i no només a ciutats**
+
+La resta de punts de la fase II continuen oberts fins que es marquin també en negreta.
 
 ### Resultat esperat
 
@@ -211,7 +229,7 @@ Ara mateix el focus correcte és aquest:
 
 1. donar per tancada la fase I
 2. entrar a fase II començant per `places`
-3. afegir mapa sota filtres i capa base d'errors
+3. polir el mapa ja integrat i afegir capa base d'errors
 4. no entrar encara ni en backend real ni en multiidioma complet
 
 ## Estat actual
@@ -222,5 +240,6 @@ La fase I ja queda tancada perquè la web permet:
 - treballar amb dades simulades però estructurades
 - reutilitzar components reals i no només markup repetit
 - validar fluxos de filtrat, detall i favorits sense backend
+- tenir una primera base de mapa funcional amb component centralitzat
 
 El següent tram de treball ja correspon a la fase II.

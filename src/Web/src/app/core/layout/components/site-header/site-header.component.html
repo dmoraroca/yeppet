@@ -27,19 +27,24 @@
       >
         Favorits
       </a>
-      <details class="site-header__dropdown">
+      <details class="site-header__dropdown" #helpDropdown>
         <summary class="site-header__nav-link">
           Ajuda
           <span class="site-header__caret" aria-hidden="true"></span>
         </summary>
         <div class="site-header__dropdown-menu">
-          <a class="site-header__dropdown-item" routerLink="/" fragment="why-yeppet">
+          <a
+            class="site-header__dropdown-item"
+            routerLink="/"
+            fragment="why-yeppet"
+            (click)="closeHelpDropdown()"
+          >
             <span class="site-header__dropdown-title">Com funciona</span>
             <span class="site-header__dropdown-copy">
               Entén la proposta de valor i la lògica de la home.
             </span>
           </a>
-          <a class="site-header__dropdown-item" routerLink="/contacte">
+          <a class="site-header__dropdown-item" routerLink="/contacte" (click)="closeHelpDropdown()">
             <span class="site-header__dropdown-title">Contacta'ns</span>
             <span class="site-header__dropdown-copy">
               Punt de contacte simulat per feedback, partnerships i noves ciutats.
