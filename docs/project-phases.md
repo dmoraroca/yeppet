@@ -97,11 +97,38 @@ Convertir la base funcional de la fase I en una aplicació frontend més complet
 
 ### Què entra dins la fase II
 
-- ampliar les features principals
-- refinar filtres, cerca i empty states
-- afinar navegació i continguts
-- revisar millor reutilització de components
-- preparar la web per substituir mocks per API sense reescriure UI
+- consolidar la feature `places` amb una UX de cerca més rica
+- afegir vista mapa a `places`, situada sota els filtres
+- sincronitzar mapa, filtres i resultats
+- decidir si `places` treballarà amb `llista`, `mapa` o mode mixt
+- refinar `favorites` perquè el flux de guardar i revisar llocs sigui més natural
+- millorar el `place detail` amb millor jerarquia i més context
+- revisar empty states, filtres actius i textos de suport
+- polir les seccions de la `home` que ara són correctes però encara provisionals
+- consolidar quins components compartits val la pena fixar definitivament
+- enriquir les dades simulades perquè siguin més realistes
+- preparar els serveis mock per substituir-los per API sense reescriure UI
+- introduir una capa base de gestió d'errors
+- afegir interceptor global per errors HTTP
+- afegir servei central d'errors o notificacions
+- definir una UI comuna per mostrar errors i missatges globals
+- reduir `try/catch` repetits als punts on el problema sigui transversal
+- revisar responsive fi de totes les pantalles
+- definir millor `Ajuda`, `Contacta'ns` i les pàgines informatives
+- afinar la navegació general perquè cada CTA tingui una funció clara
+
+### Entregables de la fase II
+
+La fase II s'hauria de poder resumir en aquests blocs:
+
+1. `Places` amb mapa sota filtres
+2. `Place detail` més complet i més clar
+3. `Favorites` més polit
+4. `Home` més madura visualment
+5. Components compartits consolidats
+6. Mocks més rics i preparats per API
+7. Capa base de gestió d'errors
+8. Responsive i UX refinats
 
 ### Resultat esperat
 
@@ -183,8 +210,8 @@ Preparar el producte per sortir a un entorn real.
 Ara mateix el focus correcte és aquest:
 
 1. donar per tancada la fase I
-2. consolidar i polir les pantalles ja creades
-3. preparar la transició cap a la fase II
+2. entrar a fase II començant per `places`
+3. afegir mapa sota filtres i capa base d'errors
 4. no entrar encara ni en backend real ni en multiidioma complet
 
 ## Estat actual
@@ -195,3 +222,5 @@ La fase I ja queda tancada perquè la web permet:
 - treballar amb dades simulades però estructurades
 - reutilitzar components reals i no només markup repetit
 - validar fluxos de filtrat, detall i favorits sense backend
+
+El següent tram de treball ja correspon a la fase II.
