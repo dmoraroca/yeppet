@@ -2,18 +2,19 @@
 
 ## 1. Introduccio
 
-Aquest document descriu l'estat tecnic actual de **YepPet** i com s'esta construint a nivell de frontend.
-Ara mateix el projecte treballa amb enfocament `mock-first`, Angular 21 i una arquitectura per `features`.
+Aquest document descriu com esta construida **YepPet** a nivell tecnic.
+En l'estat actual, el projecte es una web Angular 21 amb enfocament `mock-first`, arquitectura per `features`
+i una primera base funcional de mapa amb `Leaflet` i `OpenStreetMap`.
 
 Objectius:
 
-- explicar l'arquitectura actual de la web
-- deixar traçabilitat de les decisions tecniques preses
-- documentar l'estat real de la fase I i l'inici de la fase II
-- definir el model funcional actual de `places`, `favorites` i `home`
-- deixar una base UML clara, similar a la documentacio d'`Escoles Publiques`
+- documentar l'arquitectura actual del frontend
+- deixar traçabilitat de components, serveis i decisions tecniques
+- explicar el model de dades actual
+- descriure la implementacio del mapa
+- deixar una base UML tecnica clara i mantenible
 
-## 2. Esquema general de l'app
+## 2. Esquema tecnic general
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
   <span style="color:#93c5fd;">U[Usuari]</span> --&gt;|<span style="color:#fcd34d;">Navegador</span>| <span style="color:#c4b5fd;">W[YepPet Web Angular]</span>
@@ -34,42 +35,15 @@ Objectius:
 
 Resum del diagrama:
 
-- representa l'esquema general actual de YepPet a nivell de frontend
-- la web Angular delega la logica funcional a les `features`
-- les `features` es recolzen en `core`, `shared`, dades simulades i la capa de mapa
-- no hi ha backend real encara; el sistema actual treballa sobre mocks i integracio de mapa al client
+- la web Angular es el punt d'entrada de l'usuari
+- la logica es distribueix per `features`
+- `core` conté peces globals i `shared` peces reutilitzables
+- els serveis actuals treballen contra dades simulades
+- el mapa es tracta com una capacitat transversal reutilitzable
 
-Flux principal actual:
+## 3. Arquitectura aplicada
 
-1. l'usuari entra a la `home`
-2. navega cap a `places` des del menu, CTA, ciutats o chips
-3. `places` aplica filtres sobre dades simulades
-4. els resultats es pinten en llistat i al mapa
-5. l'usuari pot obrir el detall d'un lloc o guardar-lo com a favorit
-
-## 3. Estat actual del projecte
-
-Situacio actual:
-
-- fase I tancada
-- fase II iniciada
-- frontend Angular 21 a `src/Web`
-- sense backend real encara
-- dades simulades estructurades per models i serveis
-- mapa ja integrat com a component reutilitzable
-
-Pantalles actuals:
-
-- `home`
-- `places`
-- `place detail`
-- `favorites`
-- `contacte`
-- `permissions`
-
-## 4. Arquitectura aplicada
-
-### 4.1 Principis
+### 3.1 Principis
 
 - arquitectura per `features`
 - cada component dins la seva propia carpeta
@@ -79,7 +53,7 @@ Pantalles actuals:
 - dades simulades mentre validem UX i estructura
 - preparar UI i serveis per futura substitucio per API
 
-### 4.2 Estructura base
+### 3.2 Estructura base
 
 ```text
 src/app
@@ -102,7 +76,7 @@ src/app
     └── permissions/
 ```
 
-### 4.3 Components compartits consolidats
+### 3.3 Components compartits consolidats
 
 Els components compartits que ja considerem reutilitzables de veritat son:
 
@@ -112,33 +86,9 @@ Els components compartits que ja considerem reutilitzables de veritat son:
 - `app-place-card`
 - `app-place-map`
 
-## 5. UML funcional
+## 4. UML tecnic
 
-### 5.1 Casos d'us principals
-
-<pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart TD</span>
-  <span style="color:#93c5fd;">U[Usuari public]</span>
-
-  <span style="color:#93c5fd;">U</span> --&gt; <span style="color:#c4b5fd;">H[Veure portada]</span>
-  <span style="color:#93c5fd;">U</span> --&gt; <span style="color:#c4b5fd;">P[Cercar llocs]</span>
-  <span style="color:#93c5fd;">U</span> --&gt; <span style="color:#c4b5fd;">F[Guardar favorits]</span>
-  <span style="color:#93c5fd;">U</span> --&gt; <span style="color:#c4b5fd;">D[Veure detall d'un lloc]</span>
-  <span style="color:#93c5fd;">U</span> --&gt; <span style="color:#c4b5fd;">C[Contactar]</span>
-  <span style="color:#93c5fd;">U</span> --&gt; <span style="color:#c4b5fd;">A[Consultar ajuda]</span>
-
-  <span style="color:#c4b5fd;">P</span> --&gt; <span style="color:#86efac;">PF[Aplicar filtres]</span>
-  <span style="color:#c4b5fd;">P</span> --&gt; <span style="color:#67e8f9;">PM[Veure mapa]</span>
-  <span style="color:#c4b5fd;">P</span> --&gt; <span style="color:#fcd34d;">PC[Entrar per ciutat o chip]</span>
-  <span style="color:#c4b5fd;">D</span> --&gt; <span style="color:#f9a8d4;">DF[Guardar com a favorit]</span></code></pre>
-
-Resum del diagrama:
-
-- mostra els casos d'us principals de la web en l'estat actual
-- l'usuari public pot explorar la portada, cercar llocs, veure detall, guardar favorits i consultar ajuda o contacte
-- el nucli funcional actual gira al voltant de `places`, filtres, mapa i favorits
-- aquest diagrama descriu el comportament visible del producte, no l'arquitectura interna
-
-### 5.2 Components i relacions
+### 4.1 Components i relacions
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
   <span style="color:#c4b5fd;">HP[HomePage]</span>
@@ -179,12 +129,12 @@ Resum del diagrama:
 
 Resum del diagrama:
 
-- mostra com es relacionen les pantalles principals, els components clau i els serveis actuals
-- `PlacesPage` es recolza en filtres, mapa i cards per construir la cerca
-- `PlaceDetailPage` i `FavoritesPage` reutilitzen peces centrals en lloc de duplicar implementacions
-- `PlaceService` consumeix `PLACES_FAKE`, mentre `FavoritesService` governa l'estat fake de favorits
+- mostra les pantalles principals i com es recolzen en components i serveis
+- `PlacesPage` centralitza la cerca, filtres, mapa i llistat
+- `PlaceDetailPage` i `FavoritesPage` reutilitzen peces centrals
+- `PlaceService` treballa contra `PLACES_FAKE` i `FavoritesService` manté l'estat de favorits
 
-### 5.3 Model de domini actual
+### 4.2 Model de domini actual
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">classDiagram</span>
   <span style="color:#c4b5fd;">class</span> <span style="color:#93c5fd;">Place</span> {
@@ -222,22 +172,32 @@ Resum del diagrama:
 
 Resum del diagrama:
 
-- descriu el model de domini actual que ja fa servir la web per treballar amb llocs
-- `Place` es la peça central i concentra la informacio necessaria per llistat, detall, favorits i mapa
-- `PlaceCoordinates` permet situar els llocs al mapa amb coordenades simulades precises
-- `PlaceFilters` defineix la forma actual de filtrar els resultats a la pagina `places`
+- `Place` es el model central del frontend
+- aquest model ja cobreix llistat, detall, favorits i mapa
+- `PlaceCoordinates` permet representar el lloc sobre el mapa
+- `PlaceFilters` defineix el contracte actual de filtratge
 
-## 6. Features actuals
+### 4.3 UML del mapa
 
-### 6.1 Home
+<pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
+  <span style="color:#93c5fd;">PlacesPage</span> --&gt; <span style="color:#67e8f9;">PlaceMapComponent</span>
+  <span style="color:#f9a8d4;">PlaceDetailPage</span> --&gt; <span style="color:#67e8f9;">PlaceMapComponent</span>
+  <span style="color:#67e8f9;">PlaceMapComponent</span> --&gt; <span style="color:#fcd34d;">Leaflet</span>
+  <span style="color:#fcd34d;">Leaflet</span> --&gt; <span style="color:#86efac;">OpenStreetMap tiles</span>
+  <span style="color:#67e8f9;">PlaceMapComponent</span> --&gt; <span style="color:#c4b5fd;">Place.coordinates</span>
+  <span style="color:#67e8f9;">PlaceMapComponent</span> --&gt; <span style="color:#fca5a5;">placeSelected</span></code></pre>
 
-Responsabilitats actuals:
+Resum del diagrama:
 
-- presentar la proposta de valor
-- oferir navegacio cap a `places`
-- mostrar ciutats destacades
-- mostrar chips navegables
-- previsualitzar contingut destacat del producte
+- `PlaceMapComponent` es la peça central del mapa
+- el mateix component es reutilitza a `places` i al detall
+- el component pinta el mapa amb `Leaflet` i carrega tiles d'OpenStreetMap
+- les coordenades surten directament de `Place.coordinates`
+- en clicar un marcador, el component emet `placeSelected`
+
+## 5. Features actuals
+
+### 5.1 Home
 
 Peces principals:
 
@@ -245,15 +205,13 @@ Peces principals:
 - `trending-cities-section`
 - `why-yeppet-section`
 
-### 6.2 Places
+Decisions tecniques rellevants:
 
-Responsabilitats actuals:
+- la pagina es construeix a partir de dades fake tipades
+- el `hero` encapsula navegacio cap a `places`
+- els blocs grans de la `home` viuen en components separats
 
-- filtrar resultats per ciutat, tipus, mascota i cerca
-- mostrar resultats en llistat
-- mostrar resultats al mapa
-- mostrar filtres actius
-- permetre navegar al detall d'un lloc
+### 5.2 Places
 
 Peces principals:
 
@@ -263,17 +221,28 @@ Peces principals:
 - `places-page`
 - `place-detail-page`
 
-### 6.3 Favorites
+Decisions tecniques rellevants:
 
-Responsabilitats actuals:
+- `places-page` centralitza query params, filtres actius i resultats
+- `place-map` es reutilitzable i parametritzable
+- `place-card` es reutilitza a llistat i favorits
 
-- guardar i treure llocs de favorits
-- mostrar el llistat de favorits fake
-- reutilitzar el mateix `place-card`
+### 5.3 Favorites
 
-## 7. Serveis i dades simulades
+Peces principals:
 
-### 7.1 PlaceService
+- `favorites-page`
+- `favorite-toggle-button`
+- `favorites.service`
+
+Decisions tecniques rellevants:
+
+- l'estat es manté local i simulat
+- el flux es pot substituir despres per persistencia real
+
+## 6. Serveis i dades simulades
+
+### 6.1 PlaceService
 
 `PlaceService` es el servei principal de la feature `places`.
 
@@ -290,7 +259,7 @@ Font de dades:
 
 - `PLACES_FAKE`
 
-### 7.2 FavoritesService
+### 6.2 FavoritesService
 
 Responsabilitats:
 
@@ -298,41 +267,11 @@ Responsabilitats:
 - saber si un lloc esta guardat
 - afegir i treure favorits
 
-## 8. Mapa
+## 7. Implementacio del mapa
 
-### 8.1 Implementacio actual
+### 7.1 Llibreries utilitzades
 
-La implementacio actual del mapa es basa en:
-
-- `Leaflet`
-- dades d'OpenStreetMap
-- `app-place-map` com a component centralitzat
-- alimentacio per parametres
-- reutilitzacio en `places` i `place detail`
-
-### 8.2 UML del mapa
-
-<pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
-  <span style="color:#93c5fd;">PlacesPage</span> --&gt; <span style="color:#67e8f9;">PlaceMapComponent</span>
-  <span style="color:#f9a8d4;">PlaceDetailPage</span> --&gt; <span style="color:#67e8f9;">PlaceMapComponent</span>
-  <span style="color:#67e8f9;">PlaceMapComponent</span> --&gt; <span style="color:#fcd34d;">Leaflet</span>
-  <span style="color:#fcd34d;">Leaflet</span> --&gt; <span style="color:#86efac;">OpenStreetMap tiles</span>
-  <span style="color:#67e8f9;">PlaceMapComponent</span> --&gt; <span style="color:#c4b5fd;">Place.coordinates</span>
-  <span style="color:#67e8f9;">PlaceMapComponent</span> --&gt; <span style="color:#fca5a5;">placeSelected</span></code></pre>
-
-Resum del diagrama:
-
-- `PlaceMapComponent` es la peça central del mapa
-- tant `PlacesPage` com `PlaceDetailPage` reutilitzen el mateix component
-- el component pinta el mapa amb `Leaflet` i fa servir tiles d'OpenStreetMap
-- la posicio dels marcadors surt de `Place.coordinates`
-- quan es clica un marcador, el component emet `placeSelected`
-
-### 8.3 Passos seguits per muntar el mapa
-
-#### Pas 1. Afegir les llibreries
-
-Es van instal·lar aquestes dependències al projecte Angular:
+Es van instal·lar aquestes dependencies:
 
 ```bash
 cd src/Web
@@ -342,25 +281,23 @@ npm install leaflet @types/leaflet
 Motiu:
 
 - `leaflet` aporta el motor del mapa
-- `@types/leaflet` aporta tipus TypeScript per treballar bé al component
+- `@types/leaflet` aporta tipus TypeScript
 
-#### Pas 2. Importar els estils globals de Leaflet
+### 7.2 Estils globals del mapa
 
-Es va importar l'estil de Leaflet a nivell global perquè el mapa i els controls es pintessin correctament:
+Es va importar l'estil de Leaflet a nivell global:
 
 ```scss
 @import 'leaflet/dist/leaflet.css';
 ```
 
-Ubicacio actual:
+Ubicacio:
 
 - `src/Web/src/styles.scss`
 
-#### Pas 3. Estendre el model `Place`
+### 7.3 Extensio del model `Place`
 
-Per poder mostrar llocs al mapa, es va ampliar el model de domini de frontend amb coordenades.
-
-Fragment actual:
+El model de `Place` es va ampliar per incloure coordenades:
 
 ```ts
 export interface PlaceCoordinates {
@@ -388,15 +325,13 @@ export interface Place {
 }
 ```
 
-Ubicacio actual:
+Ubicacio:
 
 - `src/Web/src/app/features/places/models/place.model.ts`
 
-#### Pas 4. Afegir coordenades precises als mocks
+### 7.4 Coordenades als mocks
 
-Cada `Place` fake incorpora coordenades `lat` i `lng`.
-
-Exemple actual:
+Cada `Place` fake incorpora coordenades precises:
 
 ```ts
 coordinates: {
@@ -407,22 +342,20 @@ coordinates: {
 
 Decisio:
 
-- les coordenades s'han posat amb decimals suficients per donar una posicio precisa
-- el sistema no depèn d'un geocoder extern en aquesta fase
-- els punts es controlen manualment per mantenir el mock estable
+- les coordenades es controlen manualment
+- no depenem de geocoding extern en aquesta fase
+- la precisio es suficient per veure comportament realista
 
-Ubicacio actual:
+Ubicacio:
 
 - `src/Web/src/app/features/places/mock/places.fake.ts`
 
-#### Pas 5. Crear un component centralitzat i parametritzable
+### 7.5 Component centralitzat `app-place-map`
 
-El mapa no s'ha muntat directament dins `places-page` ni dins `place-detail-page`.
-S'ha encapsulat a un component reutilitzable:
+El mapa no s'ha implementat directament dins les pagines.
+S'ha encapsulat en un component reutilitzable.
 
-- `app-place-map`
-
-Inputs principals:
+Inputs:
 
 - `places`
 - `selectedPlaceId`
@@ -430,11 +363,11 @@ Inputs principals:
 - `emptyTitle`
 - `emptyCopy`
 
-Output principal:
+Output:
 
 - `placeSelected`
 
-Definicio actual simplificada:
+Fragment simplificat:
 
 ```ts
 readonly places = input.required<Place[]>();
@@ -445,15 +378,13 @@ readonly emptyCopy = input('Ajusta els filtres per veure llocs al mapa.');
 readonly placeSelected = output<string>();
 ```
 
-Ubicacio actual:
+Ubicacio:
 
 - `src/Web/src/app/features/places/components/place-map/place-map.component.ts`
 
-#### Pas 6. Inicialitzar Leaflet de manera lazy
+### 7.6 Carrega lazy de Leaflet
 
-Leaflet no es carrega abans d'hora. El component fa `import('leaflet')` quan el mapa realment es necessita.
-
-Fragment actual:
+Leaflet es carrega de forma lazy quan el component necessita pintar el mapa:
 
 ```ts
 private async ensureMap(): Promise<void> {
@@ -471,13 +402,13 @@ private async ensureMap(): Promise<void> {
 
 Motiu:
 
-- reduir càrrega inicial
-- evitar inicialitzar mapa si no hi ha llocs a mostrar
-- mantenir el component reutilitzable i més eficient
+- evitar carregar la llibreria massa aviat
+- no inicialitzar mapa si no hi ha resultats
+- mantenir el component mes eficient
 
-#### Pas 7. Connectar els tiles d'OpenStreetMap
+### 7.7 Tiles d'OpenStreetMap
 
-El component pinta el mapa amb un `tileLayer` públic d'OpenStreetMap:
+El mapa es pinta amb un `tileLayer` public d'OpenStreetMap:
 
 ```ts
 this.leaflet
@@ -488,17 +419,9 @@ this.leaflet
   .addTo(this.map);
 ```
 
-Motiu:
+### 7.8 Marcadors i seleccio
 
-- per fase actual no cal Google Maps
-- no cal billing per validar UX
-- és suficient per mostrar llocs, ciutat i context geogràfic
-
-#### Pas 8. Pintar marcadors a partir dels llocs filtrats
-
-Cada `Place` es converteix en un `circleMarker`.
-
-Fragment actual:
+Cada `Place` es transforma en un `circleMarker`:
 
 ```ts
 const marker = this.leaflet.circleMarker([place.coordinates.lat, place.coordinates.lng], {
@@ -510,14 +433,21 @@ const marker = this.leaflet.circleMarker([place.coordinates.lat, place.coordinat
 });
 ```
 
-Decisio:
+Quan es clica un marcador:
 
-- s'han usat `circleMarker` en lloc d'icones clàssiques per mantenir una estètica més neta
-- el marcador seleccionat es pinta diferent per millorar lectura visual
+```ts
+marker.on('click', () => this.placeSelected.emit(place.id));
+```
 
-#### Pas 9. Ajustar la vista automàticament
+### 7.9 Ajust de vista
 
-El component calcula `bounds` i ajusta el mapa segons els resultats:
+Si hi ha un lloc seleccionat:
+
+```ts
+this.map.setView([selectedPlace.coordinates.lat, selectedPlace.coordinates.lng], 15);
+```
+
+Si no, el mapa s'ajusta al conjunt de resultats:
 
 ```ts
 this.map.fitBounds(bounds, {
@@ -526,22 +456,9 @@ this.map.fitBounds(bounds, {
 });
 ```
 
-Si hi ha un `selectedPlaceId`, el component centra directament aquell lloc:
+### 7.10 Reutilitzacio a les pantalles
 
-```ts
-this.map.setView([selectedPlace.coordinates.lat, selectedPlace.coordinates.lng], 15);
-```
-
-Motiu:
-
-- a `places` el mapa s'adapta al conjunt de resultats
-- al detall, el mapa ha d'obrir centrat en el lloc seleccionat
-
-#### Pas 10. Reutilitzar el component a les pantalles
-
-##### A `places`
-
-El component es passa la llista filtrada de llocs:
+A `places`:
 
 ```html
 <app-place-map
@@ -553,29 +470,21 @@ El component es passa la llista filtrada de llocs:
 />
 ```
 
-##### A `place detail`
-
-El mateix component es reutilitza, però amb un sol lloc i `selectedPlaceId`:
+A `place detail`:
 
 ```html
 <app-place-map
   [places]="placeAsArray"
   [selectedPlaceId]="selectedPlace.id"
   height="20rem"
-  emptyTitle="No hi ha ubicació disponible"
-  emptyCopy="Aquest lloc no té coordenades per mostrar al mapa."
+  emptyTitle="No hi ha ubicacio disponible"
+  emptyCopy="Aquest lloc no te coordenades per mostrar al mapa."
 />
 ```
 
-Benefici:
+### 7.11 Estat buit del component
 
-- una sola implementacio
-- dues pantalles diferents
-- comportament consistent
-
-#### Pas 11. Gestionar l'estat buit
-
-El component no intenta inicialitzar Leaflet si no hi ha llocs. En aquest cas mostra un bloc buit controlat:
+Quan no hi ha llocs, el component no inicialitza el mapa i mostra un bloc buit controlat:
 
 ```html
 @if (hasPlaces) {
@@ -588,13 +497,7 @@ El component no intenta inicialitzar Leaflet si no hi ha llocs. En aquest cas mo
 }
 ```
 
-Motiu:
-
-- evitar errors innecessaris
-- donar feedback clar a l'usuari
-- mantenir el component segur també quan els filtres no retornen dades
-
-### 8.4 Fitxers implicats en la implementacio del mapa
+### 7.12 Fitxers implicats
 
 ```text
 src/Web/package.json
@@ -608,46 +511,28 @@ src/Web/src/app/features/places/pages/places-page/places-page.component.html
 src/Web/src/app/features/places/pages/place-detail-page/place-detail-page.component.html
 ```
 
-### 8.5 Decisions actuals
+## 8. Decisions actuals
 
 - el mapa viu a `places`, no a la portada
 - el mapa es tracta com una part funcional de cerca
 - el component ha de ser parametritzable
 - els llocs tenen coordenades simulades precises
+- la `home` no concentra la logica de resultats
 
-### 8.6 Punts pendents de refinament
+## 9. Punts pendents de refinament
 
 - millor UX de marcadors
 - popups mes bons
 - mes criteri quan hi hagi moltes dades
 - possible mode `llista / mapa / mixt`
+- capa base de gestio d'errors a fase II
 
-## 9. Fase I tancada
+## 10. Referencia documental
 
-La fase I queda tancada amb:
+Document funcional:
 
-- `home` funcional
-- `places` funcional
-- `place detail` funcional
-- `favorites` funcional
-- `contacte` i `permissions`
-- mapa base funcional
-- navegacio real amb dades simulades
+- [`funcional-ca.md`](/home/dmoraroca/Documents/_DATA/repos/yeppet/docs/ca/funcional-ca.md)
 
-## 10. Proper pas tecnic
-
-La feina activa ara mateix correspon a la fase II:
-
-- polir la UX de `places`
-- refinar el mapa ja integrat
-- millorar el `place detail`
-- polir `favorites`
-- enriquir els mocks
-- introduir capa base de gestio d'errors
-- afegir interceptor global per errors HTTP
-
-## 11. Referencia de fases
-
-La planificacio detallada i l'estat viu de les fases es manté a:
+Document de fases:
 
 - [`project-phases.md`](/home/dmoraroca/Documents/_DATA/repos/yeppet/docs/project-phases.md)
