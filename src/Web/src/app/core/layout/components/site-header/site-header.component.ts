@@ -29,7 +29,7 @@ export class SiteHeaderComponent {
   protected logout(): void {
     this.authService.logout();
     this.notifications.notify('Sessió tancada', 'Has sortit de YepPet en mode fake.');
-    void this.router.navigateByUrl('/');
+    void this.router.navigateByUrl('/login');
   }
 
   @HostListener('document:click', ['$event'])

@@ -11,6 +11,12 @@ export class PlaceFiltersComponent {
   readonly filters = input.required<PlaceFilters>();
   readonly cities = input.required<string[]>();
   readonly types = input.required<{ value: string; label: string }[]>();
+  readonly showSearch = input(true);
+  readonly showCity = input(true);
+  readonly showType = input(true);
+  readonly showPet = input(true);
+  readonly showClearButton = input(true);
+  readonly typeLabel = input('Tipus');
   readonly filtersChanged = output<Partial<PlaceFilters>>();
 
   protected onSearch(event: Event): void {

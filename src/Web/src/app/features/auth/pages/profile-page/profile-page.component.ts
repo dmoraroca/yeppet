@@ -72,6 +72,6 @@ export class ProfilePageComponent {
   protected logout(): void {
     this.authService.logout();
     this.notifications.notify('Sessió tancada', 'Has sortit del perfil de proves.');
-    void this.router.navigateByUrl('/');
+    void this.router.navigateByUrl('/login');
   }
 }

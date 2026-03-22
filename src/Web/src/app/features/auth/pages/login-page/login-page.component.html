@@ -58,34 +58,25 @@
       </p>
     </div>
 
-    <div class="login-page__search-shell">
-      <a
-        [routerLink]="['/login']"
-        [queryParams]="{ redirectTo: loginPreviewRoute }"
-        aria-label="Buscar llocs a Barcelona"
-      >
-        Barcelona
-      </a>
-      <a
-        [routerLink]="['/login']"
-        [queryParams]="{ redirectTo: loginPreviewRoute }"
-        aria-label="Filtrar per hotel"
-      >
-        hotel
-      </a>
-      <a
-        [routerLink]="['/login']"
-        [queryParams]="{ redirectTo: loginPreviewRoute }"
-        aria-label="Filtrar per gossos"
-      >
-        gossos
-      </a>
-      <button type="button" (click)="goToPreviewSearch()">Buscar</button>
+    <app-place-filters
+      [filters]="previewFilters()"
+      [cities]="previewCities"
+      [types]="previewTypes"
+      [showCity]="false"
+      [showClearButton]="false"
+      typeLabel="Tipus de local"
+      (filtersChanged)="updatePreviewFilters($event)"
+    />
+
+    <div class="login-page__search-actions">
+      <button type="button" class="login-page__search-button" (click)="goToPreviewSearch()">
+        Buscar amb aquests filtres
+      </button>
     </div>
 
     <app-place-map
       [places]="samplePlaces()"
-      height="20rem"
+      height="40rem"
       emptyTitle="Sense ubicacions"
       emptyCopy="Quan hi hagi dades, aquí apareixeran les primeres coincidències."
     />

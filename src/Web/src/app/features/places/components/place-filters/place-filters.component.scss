@@ -1,6 +1,6 @@
 .place-filters {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
   gap: 1rem;
   padding: 1rem;
   border-radius: 1.5rem;
@@ -11,6 +11,7 @@
 .place-filters label {
   display: grid;
   gap: 0.4rem;
+  min-width: 0;
 }
 
 .place-filters span {
@@ -22,6 +23,8 @@
 .place-filters input,
 .place-filters select,
 .place-filters button {
+  width: 100%;
+  min-width: 0;
   min-height: 2.9rem;
   padding: 0.75rem 0.9rem;
   border-radius: 0.95rem;
@@ -34,16 +37,4 @@
   font-weight: 800;
   color: var(--yp-color-primary-dark);
   cursor: pointer;
-}
-
-@media (max-width: 980px) {
-  .place-filters {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 560px) {
-  .place-filters {
-    grid-template-columns: 1fr;
-  }
 }
