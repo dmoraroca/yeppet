@@ -40,7 +40,11 @@ export class PlaceService {
   }
 
   getFavoritePlaces(): Place[] {
-    return PLACES_FAKE.filter((place) => this.favoritesService.isFavorite(place.id));
+    const ids = this.favoritesService.favoriteIds();
+
+    return ids
+      .map((id) => this.getPlaceById(id))
+      .filter((place): place is Place => place !== undefined);
   }
 
   getAvailableCities(): string[] {

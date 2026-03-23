@@ -25,9 +25,23 @@ export class FavoritesPageComponent {
   private readonly favoritesService = inject(FavoritesService);
 
   protected readonly places = computed(() => this.placeService.getFavoritePlaces());
+  protected readonly favoritesCount = this.favoritesService.count;
+  protected readonly latestFavorite = computed(() => this.places()[0] ?? null);
+  protected readonly favoriteCities = computed(() =>
+    [...new Set(this.places().map((place) => place.city))].sort((left, right) => left.localeCompare(right))
+  );
+  protected readonly favoriteTypes = computed(() =>
+    [...new Set(this.places().map((place) => this.getTypeLabel(place.type)))].sort((left, right) =>
+      left.localeCompare(right)
+    )
+  );
 
   protected toggleFavorite(placeId: string): void {
     this.favoritesService.toggle(placeId);
+  }
+
+  protected clearFavorites(): void {
+    this.favoritesService.clear();
   }
 
   protected isFavorite(placeId: string): boolean {

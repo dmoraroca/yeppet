@@ -1,12 +1,63 @@
 <app-site-header />
 
 <main class="favorites-page">
-  <section>
-    <app-section-heading eyebrow="Favorits" title="Els teus llocs guardats a la fase I" />
+  <section class="favorites-page__hero">
+    <app-section-heading eyebrow="Favorits" title="Els teus llocs guardats" />
     <p class="favorites-page__copy">
-      Aquesta vista funciona amb estat simulat i et permet validar el flux de guardar i revisar llocs.
+      Guarda llocs mentre explores, torna-hi des d'aquí i revisa ràpidament què tens més a mà.
     </p>
+
+    @if (places().length) {
+      <div class="favorites-page__summary">
+        <article class="favorites-page__summary-card">
+          <span class="favorites-page__summary-label">Guardats ara mateix</span>
+          <strong>{{ favoritesCount() }}</strong>
+          <p>Accés ràpid als llocs que t'interessen més sense tornar a filtrar tota la llista.</p>
+        </article>
+
+        <article class="favorites-page__summary-card">
+          <span class="favorites-page__summary-label">Ciutats presents</span>
+          <strong>{{ favoriteCities().join(' · ') }}</strong>
+          <p>Veus d'un cop d'ull on ja tens opcions marcades.</p>
+        </article>
+
+        <article class="favorites-page__summary-card">
+          <span class="favorites-page__summary-label">Tipologies guardades</span>
+          <strong>{{ favoriteTypes().join(' · ') }}</strong>
+          <p>Ajuda a validar si estàs equilibrant hotels, restaurants, serveis o altres llocs.</p>
+        </article>
+      </div>
+
+      <div class="favorites-page__actions">
+        <a routerLink="/places">Continuar explorant</a>
+        <button type="button" class="favorites-page__ghost-button" (click)="clearFavorites()">
+          Buidar favorits
+        </button>
+      </div>
+    }
   </section>
+
+  @if (latestFavorite(); as latestPlace) {
+    <section class="favorites-page__spotlight">
+      <div class="favorites-page__spotlight-copy">
+        <p class="favorites-page__spotlight-eyebrow">Guardat més recent</p>
+        <h2>{{ latestPlace.name }}</h2>
+        <p>
+          {{ latestPlace.city }}, {{ latestPlace.country }} · {{ getTypeLabel(latestPlace.type) }}
+        </p>
+        <p>{{ latestPlace.shortDescription }}</p>
+
+        <div class="favorites-page__actions">
+          <a [routerLink]="['/places', latestPlace.id]">Veure detall</a>
+          <a class="favorites-page__ghost-link" routerLink="/places" [queryParams]="{ city: latestPlace.city }">
+            Més llocs a {{ latestPlace.city }}
+          </a>
+        </div>
+      </div>
+
+      <img [src]="latestPlace.imageUrl" [alt]="latestPlace.name" />
+    </section>
+  }
 
   <section class="favorites-page__grid">
     @for (place of places(); track place.id) {
@@ -19,7 +70,10 @@
     } @empty {
       <article class="favorites-page__empty">
         <h3>Encara no tens favorits.</h3>
-        <p>Quan guardis llocs des de Llocs, t’apareixeran aquí.</p>
+        <p>
+          Comença des de Llocs, guarda hotels, restaurants o serveis, i quan tornis aquí ja tindràs
+          un resum més útil del que t'interessa.
+        </p>
         <a routerLink="/places">Explorar llocs</a>
       </article>
     }
