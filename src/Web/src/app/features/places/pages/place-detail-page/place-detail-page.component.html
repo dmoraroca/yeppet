@@ -2,6 +2,14 @@
 
 <main class="place-detail-page">
   @if (place(); as selectedPlace) {
+    <nav class="place-detail-page__breadcrumbs" aria-label="Breadcrumb">
+      <a routerLink="/">Inici</a>
+      <span>/</span>
+      <a routerLink="/places" [queryParams]="backToPlacesQueryParams()">Llocs</a>
+      <span>/</span>
+      <span>{{ selectedPlace.name }}</span>
+    </nav>
+
     <section class="place-detail-page__hero">
       <img [src]="selectedPlace.imageUrl" [alt]="selectedPlace.name" />
 
@@ -12,26 +20,49 @@
         <h1>{{ selectedPlace.name }}</h1>
         <p class="place-detail-page__copy">{{ selectedPlace.description }}</p>
 
+        <div class="place-detail-page__hero-metrics">
+          <article>
+            <span>Valoració</span>
+            <strong>{{ selectedPlace.rating }}</strong>
+          </article>
+          <article>
+            <span>Compatibilitat</span>
+            <strong>{{ petAccessLabel() }}</strong>
+          </article>
+          <article>
+            <span>Ubicació</span>
+            <strong>{{ selectedPlace.city }}</strong>
+          </article>
+        </div>
+
+        <div class="place-detail-page__trust-copy">
+          <p class="place-detail-page__lead">{{ getPetMatchSummary() }}</p>
+          <p>{{ visitContext() }}</p>
+        </div>
+
         <div class="place-detail-page__actions">
           <app-favorite-toggle-button
             [active]="isFavorite(selectedPlace.id)"
             (toggled)="toggleFavorite(selectedPlace.id)"
           />
-          <a routerLink="/places">Tornar al llistat</a>
+          <a routerLink="/places" [queryParams]="backToPlacesQueryParams()">Tornar al llistat</a>
+          @if (cameFromMap()) {
+            <span class="place-detail-page__from-map">Has arribat des del mapa</span>
+          }
         </div>
       </div>
     </section>
 
     <section class="place-detail-page__grid">
       <article class="place-detail-page__card">
-        <h2>Detalls</h2>
+        <h2>Abans d'anar-hi</h2>
         <p><strong>Adreça:</strong> {{ selectedPlace.address }}</p>
         <p><strong>Valoració:</strong> {{ selectedPlace.rating }}</p>
         <p><strong>Notes per mascotes:</strong> {{ selectedPlace.petNotes }}</p>
       </article>
 
       <article class="place-detail-page__card">
-        <h2>Característiques</h2>
+        <h2>Què hi trobaràs</h2>
         <div class="place-detail-page__tags">
           @for (feature of selectedPlace.features; track feature) {
             <span>{{ feature }}</span>
@@ -40,7 +71,7 @@
       </article>
 
       <article class="place-detail-page__card">
-        <h2>Tags</h2>
+        <h2>Context ràpid</h2>
         <div class="place-detail-page__tags">
           @for (tag of selectedPlace.tags; track tag) {
             <span>{{ tag }}</span>
@@ -66,6 +97,33 @@
         emptyCopy="Aquest lloc no té coordenades per mostrar al mapa."
       />
     </section>
+
+    @if (relatedPlaces().length) {
+      <section class="place-detail-page__related">
+        <div class="place-detail-page__map-copy">
+          <h2>Més llocs a {{ selectedPlace.city }}</h2>
+          <p>
+            Si aquest lloc t'interessa, aquí tens altres opcions properes per continuar el recorregut
+            sense tornar a començar des de zero.
+          </p>
+        </div>
+
+        <div class="place-detail-page__related-grid">
+          @for (relatedPlace of relatedPlaces(); track relatedPlace.id) {
+            <a class="place-detail-page__related-card" [routerLink]="['/places', relatedPlace.id]">
+              <img [src]="relatedPlace.imageUrl" [alt]="relatedPlace.name" />
+              <div>
+                <p class="place-detail-page__related-eyebrow">
+                  {{ getTypeLabel(relatedPlace.type) }} · {{ relatedPlace.rating }}
+                </p>
+                <h3>{{ relatedPlace.name }}</h3>
+                <p>{{ relatedPlace.shortDescription }}</p>
+              </div>
+            </a>
+          }
+        </div>
+      </section>
+    }
   } @else {
     <section class="place-detail-page__missing">
       <h1>No hem trobat aquest lloc.</h1>
