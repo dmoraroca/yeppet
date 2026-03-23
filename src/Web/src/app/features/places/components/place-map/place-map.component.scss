@@ -6,8 +6,54 @@
   box-shadow: var(--yp-shadow-soft);
 }
 
+.place-map__toolbar {
+  padding: 1rem 1rem 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.place-map__summary {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.place-map__summary strong {
+  font-size: 0.98rem;
+}
+
+.place-map__summary span {
+  color: var(--yp-color-text-muted);
+  line-height: 1.5;
+}
+
+.place-map__actions {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.place-map__actions button {
+  border: 0;
+  border-radius: 999px;
+  background: var(--yp-color-primary-dark);
+  color: #fff;
+  padding: 0.7rem 1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.place-map__actions .place-map__ghost-button {
+  background: rgba(15, 118, 110, 0.08);
+  color: var(--yp-color-primary-dark);
+  border: 1px solid rgba(15, 118, 110, 0.18);
+}
+
 .place-map__canvas {
   width: 100%;
+  margin-top: 0.9rem;
 }
 
 .place-map__empty {
@@ -23,4 +69,54 @@
   margin-top: 0.55rem;
   color: var(--yp-color-text-muted);
   line-height: 1.6;
+}
+
+:host ::ng-deep .place-map__popup-shell .leaflet-popup-content-wrapper {
+  border-radius: 1rem;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16);
+}
+
+:host ::ng-deep .place-map__popup-shell .leaflet-popup-content {
+  margin: 0;
+}
+
+:host ::ng-deep .place-map__popup {
+  min-width: 11rem;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.15rem;
+  color: var(--yp-color-text);
+}
+
+:host ::ng-deep .place-map__popup strong {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+:host ::ng-deep .place-map__popup span {
+  color: var(--yp-color-text-muted);
+  line-height: 1.45;
+}
+
+:host ::ng-deep .place-map__popup-type {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--yp-color-primary-dark);
+}
+
+@media (max-width: 720px) {
+  .place-map__toolbar {
+    padding: 0.9rem 0.9rem 0;
+  }
+
+  .place-map__actions {
+    width: 100%;
+  }
+
+  .place-map__actions button {
+    flex: 1 1 12rem;
+  }
 }

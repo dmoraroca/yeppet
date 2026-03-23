@@ -14,6 +14,7 @@ export class PlaceCardComponent {
   readonly place = input.required<Place>();
   readonly typeLabel = input.required<string>();
   readonly favorite = input(false);
+  readonly selected = input(false);
   readonly favoriteToggled = output<string>();
 
   protected onFavoriteToggle(): void {

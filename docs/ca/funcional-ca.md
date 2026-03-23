@@ -11,6 +11,8 @@ El focus funcional actual es:
 - navegacio clara entre portada, resultats, detall i favorits
 - filtratge per ciutat, tipus, mascota i text de cerca
 - suport inicial a mapa dins la feature `places`
+- autenticacio fake amb redireccio i manteniment de sessio
+- perfil fake amb consentiment de manteniment de dades
 - ajuda i contacte com a capes informatives
 
 ## 2. Abast actual
@@ -18,10 +20,14 @@ El focus funcional actual es:
 Inclou:
 
 - portada funcional
+- login fake
+- redireccio automatica a login si no hi ha sessio
+- redireccio a la ruta demanada despres del login
 - navegacio per `places`
 - llistat de llocs amb filtres
 - detall d'un lloc
 - favorits fake
+- perfil fake
 - `Ajuda`
 - `Contacta'ns`
 - `permissions` com a vista separada i fora del flux public principal
@@ -31,8 +37,8 @@ Fora d'abast a data d'aquest document:
 
 - backend real
 - persistencia de favorits
-- usuaris autenticats reals
-- permisos reals
+- autenticacio real contra API
+- permisos reals persistits
 - integracions externes de tercers
 - multiidioma complet
 
@@ -40,14 +46,11 @@ Fora d'abast a data d'aquest document:
 
 Actors actuals:
 
-- `Usuari public`
-
-Actors previstos mes endavant:
-
+- `Usuari sense sessio`
 - `Usuari autenticat`
-- `Usuari amb permisos interns`
+- `Administrador`
 
-Rols previstos per a la fase II:
+Rols funcionals actuals:
 
 - `USER`
 - `ADMIN`
@@ -88,60 +91,66 @@ Resum del diagrama:
 ### 5.2 Actors i accessos
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
-  <span style="color:#93c5fd;">PUB[[Usuari public]]</span>
-  <span style="color:#f9a8d4;">AUTH[[Usuari autenticat]]</span>
-  <span style="color:#fcd34d;">DEV[[Usuari amb permisos]]</span>
+  <span style="color:#93c5fd;">PUB[[Usuari sense sessio]]</span>
+  <span style="color:#86efac;">USR[[USER]]</span>
+  <span style="color:#fcd34d;">ADM[[ADMIN]]</span>
 
-  <span style="color:#93c5fd;">PUB</span> --&gt; <span style="color:#c4b5fd;">HOME[Home]</span>
-  <span style="color:#93c5fd;">PUB</span> --&gt; <span style="color:#c4b5fd;">PLACES[Places]</span>
-  <span style="color:#93c5fd;">PUB</span> --&gt; <span style="color:#c4b5fd;">DETAIL[Place detail]</span>
-  <span style="color:#93c5fd;">PUB</span> --&gt; <span style="color:#c4b5fd;">FAV[Favorites fake]</span>
-  <span style="color:#93c5fd;">PUB</span> --&gt; <span style="color:#c4b5fd;">HELP[Ajuda / Contacte]</span>
-
-  <span style="color:#f9a8d4;">AUTH</span> -. futur .-&gt; <span style="color:#c4b5fd;">FAV</span>
-  <span style="color:#fcd34d;">DEV</span> -. futur .-&gt; <span style="color:#c4b5fd;">PERM[Del desenvolupador / Permissions]</span></code></pre>
+  <span style="color:#93c5fd;">PUB</span> --&gt; <span style="color:#c4b5fd;">LOGIN[Login]</span>
+  <span style="color:#86efac;">USR</span> --&gt; <span style="color:#c4b5fd;">HOME[Home]</span>
+  <span style="color:#86efac;">USR</span> --&gt; <span style="color:#c4b5fd;">PLACES[Places]</span>
+  <span style="color:#86efac;">USR</span> --&gt; <span style="color:#c4b5fd;">DETAIL[Place detail]</span>
+  <span style="color:#86efac;">USR</span> --&gt; <span style="color:#c4b5fd;">FAV[Favorites fake]</span>
+  <span style="color:#86efac;">USR</span> --&gt; <span style="color:#c4b5fd;">PROFILE[Perfil]</span>
+  <span style="color:#86efac;">USR</span> --&gt; <span style="color:#c4b5fd;">HELP[Ajuda / Contacte]</span>
+  <span style="color:#fcd34d;">ADM</span> --&gt; <span style="color:#f9a8d4;">PERM[Del desenvolupador / Permissions]</span></code></pre>
 
 Resum del diagrama:
 
-- reflecteix l'estat funcional actual i el futur immediat
-- avui el flux principal es public
-- `favorites` existeix amb estat fake, pero a futur quedara lligat a usuari autenticat
-- la zona `permissions` queda reservada a usuaris interns o amb permisos
+- reflecteix l'estat funcional actual despres d'incorporar el login fake
+- sense sessio, l'entrada funcional passa per `Login`
+- el rol `USER` te acces a les pantalles de producte i al seu `Perfil`
+- el rol `ADMIN` te acces addicional a `Del desenvolupador / Permissions`
 
 ### 5.3 Casos d'us principals
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
-  <span style="color:#93c5fd;">U[[Usuari public]]</span>
+  <span style="color:#93c5fd;">U[[Usuari autenticat]]</span>
 
+  <span style="color:#93c5fd;">U</span> --&gt; <span style="color:#c4b5fd;">UC00([UC-00 Iniciar sessio])</span>
   <span style="color:#93c5fd;">U</span> --&gt; <span style="color:#c4b5fd;">UC01([UC-01 Veure portada])</span>
   <span style="color:#93c5fd;">U</span> --&gt; <span style="color:#c4b5fd;">UC02([UC-02 Cercar llocs])</span>
   <span style="color:#93c5fd;">U</span> --&gt; <span style="color:#c4b5fd;">UC03([UC-03 Veure detall d'un lloc])</span>
   <span style="color:#93c5fd;">U</span> --&gt; <span style="color:#c4b5fd;">UC04([UC-04 Guardar favorits])</span>
   <span style="color:#93c5fd;">U</span> --&gt; <span style="color:#c4b5fd;">UC05([UC-05 Consultar ajuda])</span>
-  <span style="color:#93c5fd;">U</span> --&gt; <span style="color:#c4b5fd;">UC06([UC-06 Contactar])</span></code></pre>
+  <span style="color:#93c5fd;">U</span> --&gt; <span style="color:#c4b5fd;">UC06([UC-06 Contactar])</span>
+  <span style="color:#93c5fd;">U</span> --&gt; <span style="color:#c4b5fd;">UC07([UC-07 Mantenir perfil])</span></code></pre>
 
 Resum del diagrama:
 
-- resumeix les funcionalitats visibles per a l'usuari public
-- els casos d'us actuals se centren en descoberta, detall i guardat de llocs
+- resumeix les funcionalitats visibles un cop hi ha sessio activa
+- els casos d'us actuals se centren en login, descoberta, detall, favorits i perfil
 - `Ajuda` i `Contacta'ns` son vies informatives, no fluxos de negoci principals
 
 ### 5.4 Navegacio principal del producte
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
-  <span style="color:#93c5fd;">HOME[Home]</span> --&gt; <span style="color:#c4b5fd;">PLACES[Places]</span>
-  <span style="color:#93c5fd;">HOME</span> --&gt; <span style="color:#c4b5fd;">HELP[Com funciona]</span>
-  <span style="color:#93c5fd;">HOME</span> --&gt; <span style="color:#c4b5fd;">CONTACT[Contacta'ns]</span>
+  <span style="color:#93c5fd;">LOGIN[Login]</span> --&gt; <span style="color:#c4b5fd;">HOME[Home]</span>
+  <span style="color:#93c5fd;">LOGIN</span> --&gt; <span style="color:#c4b5fd;">PROFILE[Perfil]</span>
+  <span style="color:#93c5fd;">LOGIN</span> --&gt; <span style="color:#c4b5fd;">PERM[Del desenvolupador]</span>
+  <span style="color:#c4b5fd;">HOME</span> --&gt; <span style="color:#c4b5fd;">PLACES[Places]</span>
+  <span style="color:#c4b5fd;">HOME</span> --&gt; <span style="color:#c4b5fd;">HELP[Com funciona]</span>
+  <span style="color:#c4b5fd;">HOME</span> --&gt; <span style="color:#c4b5fd;">CONTACT[Contacta'ns]</span>
   <span style="color:#c4b5fd;">PLACES</span> --&gt; <span style="color:#67e8f9;">DETAIL[Place detail]</span>
   <span style="color:#c4b5fd;">PLACES</span> --&gt; <span style="color:#86efac;">FAV[Favorites]</span>
-  <span style="color:#67e8f9;">DETAIL</span> --&gt; <span style="color:#86efac;">FAV</span></code></pre>
+  <span style="color:#67e8f9;">DETAIL</span> --&gt; <span style="color:#86efac;">FAV</span>
+  <span style="color:#86efac;">PROFILE</span> --&gt; <span style="color:#93c5fd;">LOGIN</span></code></pre>
 
 Resum del diagrama:
 
 - representa la navegacio funcional principal que ja es pot provar
-- `Home` actua com a porta d'entrada
+- `Login` es ara la porta d'entrada si no hi ha sessio
 - `Places` es el nucli del producte
-- `Place detail` i `Favorites` tanquen el cicle funcional
+- `Place detail`, `Favorites` i `Perfil` tanquen el cicle funcional d'usuari
 
 ### 5.5 Flux funcional de descoberta
 
@@ -228,7 +237,7 @@ Resum del diagrama:
 
 Actor:
 
-- `Usuari public`
+- `Usuari autenticat`
 
 Flux principal:
 
@@ -240,7 +249,7 @@ Flux principal:
 
 Actor:
 
-- `Usuari public`
+- `Usuari autenticat`
 
 Flux principal:
 
@@ -253,7 +262,7 @@ Flux principal:
 
 Actor:
 
-- `Usuari public`
+- `Usuari autenticat`
 
 Flux principal:
 
@@ -265,7 +274,7 @@ Flux principal:
 
 Actor:
 
-- `Usuari public`
+- `Usuari autenticat`
 
 Flux principal:
 
@@ -281,7 +290,7 @@ Nota:
 
 Actor:
 
-- `Usuari public`
+- `Usuari autenticat`
 
 Flux principal:
 
@@ -293,13 +302,42 @@ Flux principal:
 
 Actor:
 
-- `Usuari public`
+- `Usuari autenticat`
 
 Flux principal:
 
 1. l'usuari obre el desplegable `Ajuda`
 2. escull `Contacta'ns`
 3. el sistema mostra la pagina de contacte
+
+### UC-07 Mantenir perfil
+
+Actor:
+
+- `Usuari autenticat`
+
+Flux principal:
+
+1. l'usuari entra a `Perfil`
+2. edita nom, ciutat, pais, bio i foto
+3. si no hi ha foto, veu el placeholder `NONE`
+4. si el rol es `USER`, ha d'acceptar el consentiment de manteniment de dades
+5. el sistema guarda els canvis en mode fake
+
+### UC-00 Iniciar sessio
+
+Actor:
+
+- `Usuari sense sessio`
+
+Flux principal:
+
+1. l'usuari intenta entrar a una ruta protegida
+2. el sistema el redirigeix a `Login`
+3. introdueix email i password
+4. el sistema valida les credencials fake
+5. s'obre sessio i es carrega el rol
+6. el sistema redirigeix a la ruta demanada o a la ruta per defecte del rol
 
 ## 7. Regles funcionals actuals
 
@@ -310,18 +348,22 @@ Flux principal:
 - el mateix lloc pot aparèixer al llistat, al detall, a favorits i al mapa
 - `permissions` no forma part del flux public principal
 - el preview del `hero` no ha d'escalar amb totes les ciutats; nomes ha de mostrar contingut destacat
+- si no hi ha sessio, les rutes protegides redirigeixen a `Login`
+- si hi ha `redirectTo`, el login hi ha de tornar despres d'autenticar
+- si el rol es `ADMIN`, `Del desenvolupador` nomes ha de ser visible i accessible per aquest rol
+- el consentiment de manteniment de dades es obligatori per a `USER`
 
-## 8. Extensio funcional prevista · Login i perfil
+## 8. Login i perfil · Estat actual i futur immediat
 
-La fase II incorporara una base funcional d'autenticacio i manteniment de perfil.
+La fase II ja ha incorporat una base funcional d'autenticacio i manteniment de perfil.
 No es planteja encara com a seguretat final de produccio, sino com a base de producte per:
 
-- separar usuari public i usuari autenticat
+- separar usuari sense sessio i usuari autenticat
 - preparar favorits persistits
 - preparar permisos
 - preparar la futura area interna d'administracio
 
-Punts funcionals previstos:
+Punts funcionals ja implementats:
 
 - login estandard amb email
 - rols `USER` i `ADMIN`
@@ -331,8 +373,16 @@ Punts funcionals previstos:
 - manteniment basic de perfil
 - foto de perfil opcional
 - placeholder si no hi ha foto
+- redireccio automatica a `Login` des de rutes protegides
+- redireccio a la ruta demanada despres del login
+- visibilitat de `Del desenvolupador` nomes per a `ADMIN`
 - consentiments LGPD/GDPR en updates o insercions de perfil, excepte `ADMIN`
-- base preparada per login social posterior
+
+Punts encara previstos:
+
+- login social posterior
+- persistencia real de sessio contra backend
+- favorits persistits per usuari autenticat
 
 ### 8.1 Actors i accessos de login
 
@@ -364,9 +414,9 @@ Resum del diagrama:
 
 Resum del diagrama:
 
-- el primer pas sera un login estandard, no social
-- el sistema validara credencials, obrira sessio i carregara rol i perfil
-- la redireccio dependra del context i del rol de l'usuari
+- el primer pas ja es un login estandard, no social
+- el sistema valida credencials fake, obre sessio i carrega rol i perfil
+- la redireccio depen del context i del rol de l'usuari
 
 ### 8.3 Flux funcional de manteniment de perfil
 
@@ -381,9 +431,9 @@ Resum del diagrama:
 
 Resum del diagrama:
 
-- el perfil incloura manteniment basic de dades i foto
+- el perfil ja inclou manteniment basic de dades i foto
 - si no hi ha foto, la UI mostrara un placeholder clar i visible
-- aquesta base permet validar UX abans de connectar persistencia real
+- aquesta base ja permet validar UX abans de connectar persistencia real
 
 ### 8.4 Flux funcional de consentiment
 
@@ -398,7 +448,7 @@ Resum del diagrama:
 
 Resum del diagrama:
 
-- el consentiment es planteja com a part funcional del manteniment de perfil
+- el consentiment ja forma part funcional del manteniment de perfil
 - `ADMIN` queda exempt segons el criteri actual acordat
 - la resta d'usuaris no podran desar canvis sense acceptacio valida
 
@@ -426,6 +476,11 @@ Resum del diagrama:
 - aquesta capa encaixara despres sobre la base del login estandard
 ## 9. Criteris d'acceptacio actuals
 
+- es pot iniciar sessio amb usuaris fake
+- si no hi ha sessio, les rutes protegides redirigeixen a `Login`
+- si hi ha `redirectTo`, despres del login es torna a la ruta demanada
+- el `USER` pot entrar a `Perfil` i mantenir les seves dades
+- l'`ADMIN` pot veure i obrir `Del desenvolupador`
 - es pot navegar de `home` a `places`
 - es pot filtrar per ciutat, tipus, mascota i cerca
 - el mapa es sincronitza amb els resultats visibles

@@ -69,9 +69,7 @@
     />
 
     <div class="login-page__search-actions">
-      <button type="button" class="login-page__search-button" (click)="goToPreviewSearch()">
-        Buscar amb aquests filtres
-      </button>
+      <button type="button" class="login-page__search-button" (click)="goToPreviewSearch()">Filtrar</button>
     </div>
 
     <app-place-map
@@ -79,6 +77,7 @@
       height="40rem"
       emptyTitle="Sense ubicacions"
       emptyCopy="Quan hi hagi dades, aquí apareixeran les primeres coincidències."
+      [showToolbarActions]="false"
     />
   </section>
 </main>

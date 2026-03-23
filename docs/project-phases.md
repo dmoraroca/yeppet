@@ -128,7 +128,7 @@ La fase II s'hauria de poder resumir en aquests blocs:
 
 1. **`Places` amb mapa sota filtres**
 2. **`Place detail` més complet i més clar**
-3. `Favorites` més polit
+3. **Base d'autenticació i perfil**
 4. `Home` més madura visualment
 5. Components compartits consolidats
 6. Mocks més rics i preparats per API
@@ -144,7 +144,19 @@ Ara mateix, dins de la fase II, ja tenim avançat:
 - **coordenades simulades precises als `Place`**
 - **reutilització del mateix mapa a `place detail`**
 - **millora del context de filtres actius i títols dinàmics a `places`**
+- **poliment real de la UX del mapa a `places`**
+- **selecció de marcador amb resum contextual del lloc**
+- **accions de mapa per veure tots els resultats o treure la selecció**
+- **highlight visual del `place-card` associat al marcador seleccionat**
+- **header corregit perquè el mapa no el sobreposi en scroll**
 - **preview del `hero` més orientada a contingut destacat i no només a ciutats**
+- **login fake amb email i password**
+- **rols `USER` i `ADMIN` ja operatius**
+- **sessió fake mantinguda amb redirecció automàtica a `login`**
+- **guards de `auth`, `guest` i `admin` ja aplicats a les rutes**
+- **pàgina de `Perfil` fake amb manteniment bàsic de dades**
+- **consentiment LGPD/GDPR obligatori per `USER` al manteniment de perfil**
+- **visibilitat i accés de `Del desenvolupador` només per `ADMIN`**
 - **interceptor HTTP global per capturar errors de backend**
 - **servei centralitzat de notificacions d'error**
 - **UI global de notificacions per mostrar errors sense repetir lògica a les pàgines**
@@ -232,7 +244,7 @@ Ara mateix el focus correcte és aquest:
 
 1. donar per tancada la fase I
 2. entrar a fase II començant per `places`
-3. polir el mapa ja integrat i afegir capa base d'errors
+3. consolidar `auth/profile`, polir el mapa ja integrat i afegir capa base d'errors
 4. no entrar encara ni en backend real ni en multiidioma complet
 
 ## Estat actual

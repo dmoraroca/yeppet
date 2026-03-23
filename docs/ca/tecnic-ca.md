@@ -11,6 +11,7 @@ Objectius:
 - documentar l'arquitectura actual del frontend
 - deixar traçabilitat de components, serveis i decisions tecniques
 - explicar el model de dades actual
+- descriure la base d'autenticacio fake i control d'acces
 - descriure la implementacio del mapa
 - deixar una base UML tecnica clara i mantenible
 
@@ -58,10 +59,13 @@ Resum del diagrama:
 ```text
 src/app
 ├── core/
+│   ├── guards/
+│   ├── interceptors/
 │   └── layout/
 │       └── components/
 │           ├── site-header/
-│           └── site-footer/
+│           ├── site-footer/
+│           └── error-notifications/
 ├── shared/
 │   └── components/
 │       ├── section-heading/
@@ -69,6 +73,7 @@ src/app
 │       ├── favorite-toggle-button/
 │       └── ...
 └── features/
+    ├── auth/
     ├── home/
     ├── places/
     ├── favorites/
@@ -85,6 +90,7 @@ Els components compartits que ja considerem reutilitzables de veritat son:
 - `app-favorite-toggle-button`
 - `app-place-card`
 - `app-place-map`
+- `app-error-notifications`
 
 ## 4. UML tecnic
 
@@ -195,6 +201,28 @@ Resum del diagrama:
 - les coordenades surten directament de `Place.coordinates`
 - en clicar un marcador, el component emet `placeSelected`
 
+### 4.4 UML d'autenticacio i control d'acces
+
+<pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
+  <span style="color:#93c5fd;">LOGIN[LoginPage]</span> --&gt; <span style="color:#c4b5fd;">AUTH[AuthService]</span>
+  <span style="color:#c4b5fd;">AUTH</span> --&gt; <span style="color:#86efac;">MOCK[(AUTH_USERS_FAKE)]</span>
+  <span style="color:#c4b5fd;">AUTH</span> --&gt; <span style="color:#67e8f9;">LS[localStorage]</span>
+  <span style="color:#f9a8d4;">ROUTES[app.routes]</span> --&gt; <span style="color:#fcd34d;">AG[authGuard]</span>
+  <span style="color:#f9a8d4;">ROUTES</span> --&gt; <span style="color:#fcd34d;">GG[guestGuard]</span>
+  <span style="color:#f9a8d4;">ROUTES</span> --&gt; <span style="color:#fcd34d;">ADG[adminGuard]</span>
+  <span style="color:#fcd34d;">AG</span> --&gt; <span style="color:#c4b5fd;">AUTH</span>
+  <span style="color:#fcd34d;">GG</span> --&gt; <span style="color:#c4b5fd;">AUTH</span>
+  <span style="color:#fcd34d;">ADG</span> --&gt; <span style="color:#c4b5fd;">AUTH</span>
+  <span style="color:#86efac;">PROFILE[ProfilePage]</span> --&gt; <span style="color:#c4b5fd;">AUTH</span>
+  <span style="color:#93c5fd;">HEADER[SiteHeader]</span> --&gt; <span style="color:#c4b5fd;">AUTH</span></code></pre>
+
+Resum del diagrama:
+
+- `AuthService` centralitza la sessio fake, el rol actual i l'actualitzacio de perfil
+- `authGuard`, `guestGuard` i `adminGuard` governen l'acces a les rutes
+- la sessio es manté a `localStorage` per simular persistencia bàsica
+- `LoginPage`, `ProfilePage` i `SiteHeader` consumeixen el mateix estat d'autenticacio
+
 ## 5. Features actuals
 
 ### 5.1 Home
@@ -240,6 +268,24 @@ Decisions tecniques rellevants:
 - l'estat es manté local i simulat
 - el flux es pot substituir despres per persistencia real
 
+### 5.4 Auth
+
+Peces principals:
+
+- `login-page`
+- `profile-page`
+- `auth.service`
+- `authGuard`
+- `guestGuard`
+- `adminGuard`
+
+Decisions tecniques rellevants:
+
+- la sessio actual es fake i es manté a `localStorage`
+- el login treballa contra `AUTH_USERS_FAKE`
+- `USER` i `ADMIN` comparteixen base de sessio però divergeixen en permisos i rutes
+- `Perfil` funciona com a pantalla de manteniment fake abans de connectar backend real
+
 ## 6. Serveis i dades simulades
 
 ### 6.1 PlaceService
@@ -267,6 +313,118 @@ Responsabilitats:
 - saber si un lloc esta guardat
 - afegir i treure favorits
 
+### 6.3 AuthService
+
+Responsabilitats:
+
+- validar credencials fake
+- obrir i tancar sessio
+- exposar usuari actual, rol i estat autenticat
+- decidir la ruta per defecte despres del login
+- actualitzar el perfil fake de l'usuari actiu
+
+Fonts de dades:
+
+- `AUTH_USERS_FAKE`
+- `localStorage`
+
+Notes tecniques:
+
+- `login` valida `email` i `password` contra usuaris simulats
+- `logout` esborra la sessio local
+- `updateProfile` actualitza l'usuari actual i persisteix l'estat simulat
+
+## 8. Implementacio de l'autenticacio fake
+
+### 8.1 Usuaris mock
+
+Els accessos de prova actuals son:
+
+```text
+ADMIN
+email: admin@admin.adm
+password: Admin123
+
+USER
+email: user@user.com
+password: Admin123
+```
+
+Ubicacio:
+
+- `src/Web/src/app/features/auth/mock/auth-users.fake.ts`
+
+### 8.2 Persistencia de sessio
+
+La sessio fake es guarda a `localStorage` amb una clau fixa:
+
+```ts
+const STORAGE_KEY = 'yeppet-auth-user';
+```
+
+Comportament:
+
+- si hi ha usuari guardat, l'app restaura la sessio en carregar
+- si no hi ha sessio, les rutes protegides redirigeixen a `login`
+- en `logout`, la clau s'elimina
+
+### 8.3 Guards de navegacio
+
+L'app aplica tres guards:
+
+```text
+- authGuard
+- guestGuard
+- adminGuard
+```
+
+Responsabilitats:
+
+- `authGuard`: protegeix rutes que requereixen sessio
+- `guestGuard`: evita entrar a `login` si ja hi ha sessio
+- `adminGuard`: restringeix `permissions` a rol `ADMIN`
+
+### 8.4 Flux de redireccio
+
+Quan una ruta protegida es demana sense sessio, el sistema construeix:
+
+```text
+/login?redirectTo=/ruta-original
+```
+
+Despres del login:
+
+- si existeix `redirectTo`, s'usa aquesta ruta
+- si no existeix:
+  - `USER` va a `/perfil`
+  - `ADMIN` va a `/permissions`
+
+### 8.5 Perfil i consentiment
+
+La pagina `Perfil` permet mantenir:
+
+- nom
+- ciutat
+- pais
+- bio
+- foto de perfil opcional
+- consentiment de manteniment de dades
+
+Regles actuals:
+
+- si no hi ha foto, es mostra un placeholder `NONE`
+- `USER` ha d'acceptar el consentiment per poder guardar
+- `ADMIN` queda exempt segons el criteri funcional actual
+
+### 8.6 Punts pendents
+
+La base actual prepara pero no implementa encara:
+
+- autenticacio real contra API
+- refresh tokens o expiracio real de sessio
+- recuperacio real de contrasenya
+- login social
+- persistencia real de perfil i favorits per usuari
 ## 7. Implementacio del mapa
 
 ### 7.1 Llibreries utilitzades

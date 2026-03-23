@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
@@ -31,6 +31,7 @@ export class PlacesPageComponent {
   private readonly router = inject(Router);
   private readonly placeService = inject(PlaceService);
   private readonly favoritesService = inject(FavoritesService);
+  private readonly selectedPlaceIdState = signal<string | null>(null);
   private readonly queryParams = toSignal(this.route.queryParamMap, {
     initialValue: this.route.snapshot.queryParamMap
   });
@@ -45,6 +46,12 @@ export class PlacesPageComponent {
   protected readonly cities = this.placeService.getAvailableCities();
   protected readonly types = this.placeService.getAvailableTypes();
   protected readonly places = computed(() => this.placeService.getPlaces(this.filters()));
+  protected readonly selectedPlaceId = this.selectedPlaceIdState.asReadonly();
+  protected readonly selectedPlace = computed(() => {
+    const selectedPlaceId = this.selectedPlaceId();
+
+    return selectedPlaceId ? this.places().find((place) => place.id === selectedPlaceId) ?? null : null;
+  });
   protected readonly activeFilterLabels = computed(() => {
     const { city, type, pet, search } = this.filters();
     const labels: string[] = [];
@@ -132,6 +139,7 @@ export class PlacesPageComponent {
 
   protected updateFilters(partial: Partial<PlaceFilters>): void {
     const next = { ...this.filters(), ...partial };
+    this.selectedPlaceIdState.set(null);
     void this.router.navigate(['/places'], {
       queryParams: {
         search: next.search || null,
@@ -155,6 +163,7 @@ export class PlacesPageComponent {
   }
 
   protected clearAllFilters(): void {
+    this.selectedPlaceIdState.set(null);
     this.updateFilters({
       search: '',
       city: '',
@@ -164,7 +173,21 @@ export class PlacesPageComponent {
   }
 
   protected openPlaceFromMap(placeId: string): void {
-    void this.router.navigate(['/places', placeId], {
+    this.selectedPlaceIdState.set(placeId);
+  }
+
+  protected clearMapSelection(): void {
+    this.selectedPlaceIdState.set(null);
+  }
+
+  protected openSelectedPlaceDetail(): void {
+    const selectedPlaceId = this.selectedPlaceId();
+
+    if (!selectedPlaceId) {
+      return;
+    }
+
+    void this.router.navigate(['/places', selectedPlaceId], {
       queryParams: {
         fromMap: true
       }

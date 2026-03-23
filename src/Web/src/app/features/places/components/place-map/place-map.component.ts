@@ -29,11 +29,14 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
   readonly height = input('24rem');
   readonly emptyTitle = input('No hi ha ubicacions per mostrar');
   readonly emptyCopy = input('Ajusta els filtres per veure llocs al mapa.');
+  readonly showToolbarActions = input(true);
   readonly placeSelected = output<string>();
+  readonly selectionCleared = output<void>();
 
   private leaflet?: LeafletModule;
   private map?: LeafletMap;
   private markersLayer?: LeafletLayerGroup;
+  private readonly markers = new Map<string, import('leaflet').CircleMarker>();
 
   async ngAfterViewInit(): Promise<void> {
     await this.ensureMap();
@@ -50,6 +53,25 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   protected get hasPlaces(): boolean {
     return this.places().length > 0;
+  }
+
+  protected get placesCountLabel(): string {
+    return this.places().length === 1 ? '1 ubicació visible' : `${this.places().length} ubicacions visibles`;
+  }
+
+  protected get selectedPlace() {
+    const selectedPlaceId = this.selectedPlaceId();
+
+    return selectedPlaceId ? this.places().find((place) => place.id === selectedPlaceId) ?? null : null;
+  }
+
+  protected focusAllPlaces(): void {
+    this.fitMapToPlaces();
+  }
+
+  protected clearSelection(): void {
+    this.selectionCleared.emit();
+    this.fitMapToPlaces();
   }
 
   private async ensureMap(): Promise<void> {
@@ -85,6 +107,7 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
       }
 
       this.markersLayer.clearLayers();
+      this.markers.clear();
       const bounds = this.leaflet.latLngBounds([]);
       const selectedPlaceId = this.selectedPlaceId();
 
@@ -99,10 +122,22 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
         });
 
         marker.bindPopup(
-          `<strong>${place.name}</strong><br>${place.city}, ${place.country}<br>${place.address}`
+          `
+            <div class="place-map__popup">
+              <p class="place-map__popup-type">${place.type}</p>
+              <strong>${place.name}</strong>
+              <span>${place.city}, ${place.country}</span>
+              <span>${place.address}</span>
+              <span>Valoració ${place.rating}</span>
+            </div>
+          `,
+          {
+            className: 'place-map__popup-shell'
+          }
         );
         marker.on('click', () => this.placeSelected.emit(place.id));
         marker.addTo(this.markersLayer);
+        this.markers.set(place.id, marker);
         bounds.extend([place.coordinates.lat, place.coordinates.lng]);
       }
 
@@ -111,14 +146,31 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
 
         if (selectedPlace) {
           this.map.setView([selectedPlace.coordinates.lat, selectedPlace.coordinates.lng], 15);
+          this.markers.get(selectedPlace.id)?.openPopup();
           return;
         }
       }
 
-      this.map.fitBounds(bounds, {
-        padding: [28, 28],
-        maxZoom: this.places().length === 1 ? 15 : 13
-      });
+      this.fitMapToPlaces(bounds);
+    });
+  }
+
+  private fitMapToPlaces(existingBounds?: import('leaflet').LatLngBounds): void {
+    if (!this.leaflet || !this.map || !this.hasPlaces) {
+      return;
+    }
+
+    const bounds =
+      existingBounds ??
+      this.places().reduce((accumulator, place) => {
+        accumulator.extend([place.coordinates.lat, place.coordinates.lng]);
+
+        return accumulator;
+      }, this.leaflet.latLngBounds([]));
+
+    this.map.fitBounds(bounds, {
+      padding: [28, 28],
+      maxZoom: this.places().length === 1 ? 15 : 13
     });
   }
 }

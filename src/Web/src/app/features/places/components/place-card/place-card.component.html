@@ -1,9 +1,13 @@
-<article class="place-card">
+<article class="place-card" [class.place-card--selected]="selected()">
   <a class="place-card__image-wrap" [routerLink]="['/places', place().id]">
     <img [src]="place().imageUrl" [alt]="place().name" />
   </a>
 
   <div class="place-card__content">
+    @if (selected()) {
+      <span class="place-card__selected-badge">Seleccionat al mapa</span>
+    }
+
     <div class="place-card__meta">
       <span class="place-card__type">{{ typeLabel() }}</span>
       <span class="place-card__rating">{{ place().rating }}</span>
