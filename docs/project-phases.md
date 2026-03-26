@@ -20,7 +20,19 @@ YepPet ha de créixer com una plataforma pet-friendly per descobrir llocs, estad
 - Reutilització real abans que duplicació
 - Internacionalització al final, no al principi
 
-## Fase I · Frontend base funcional amb dades simulades
+## Criteris actius de treball
+
+- Quan es consulti l'`estat`, la referència principal és aquest document
+- Cada fase i cada punt rellevant s'han de marcar explícitament com a (**PENDENT**), (**EN CURS**) o (**FET**)
+- Els punts marcats en negreta compten com a fets o consolidats mentre no estiguin normalitzats amb etiqueta explícita
+- Els punts sense negreta compten com a pendents o oberts mentre no estiguin normalitzats amb etiqueta explícita
+- Si no queden punts objectiu pendents dins d'una fase, la fase es considera acabada
+- La Fase III s'ha de construir amb `DDD` com a base arquitectònica
+- El disseny i la implementació han de seguir `SOLID` de manera estricta
+- Es prioritzaran patrons de disseny quan aportin mantenibilitat, claredat i facilitat d'evolució
+- Si apareix una solució més moderna, més simple o tecnològicament millor, s'ha de plantejar abans d'implementar-la
+
+## Fase I · Frontend base funcional amb dades simulades (**FET**)
 
 ### Objectiu
 
@@ -28,13 +40,13 @@ Construir una web Angular funcional, visualment coherent i preparada per créixe
 
 ### Què entra dins la fase I
 
-- estructura base del projecte
-- web Angular actual
-- disseny i UX de la `home`
-- navegació inicial
-- dades fake
-- components reutilitzables
-- base de `features`, `shared` i `core`
+- estructura base del projecte (**FET**)
+- web Angular actual (**FET**)
+- disseny i UX de la `home` (**FET**)
+- navegació inicial (**FET**)
+- dades fake (**FET**)
+- components reutilitzables (**FET**)
+- base de `features`, `shared` i `core` (**FET**)
 
 ### Estat actual de la fase I
 
@@ -73,26 +85,26 @@ La resta de components es mantenen específics de cada `feature` mentre no tingu
 
 Queda validat:
 
-- model TypeScript de `Place`
-- `PlaceService` mock
-- navegació entre `home`, `places`, `place detail`, `favorites` i `permissions`
-- filtres i cerca sobre dades simulades
-- component de mapa centralitzat i reutilitzat a `places` i `place detail`
-- estat fake de favorits
-- base responsive per `home`, `places`, `detail` i `favorites`
-- coherència general de copies en català
+- model TypeScript de `Place` (**FET**)
+- `PlaceService` mock (**FET**)
+- navegació entre `home`, `places`, `place detail`, `favorites` i `permissions` (**FET**)
+- filtres i cerca sobre dades simulades (**FET**)
+- component de mapa centralitzat i reutilitzat a `places` i `place detail` (**FET**)
+- estat fake de favorits (**FET**)
+- base responsive per `home`, `places`, `detail` i `favorites` (**FET**)
+- coherència general de copies en català (**FET**)
 
 ### Criteri de finalització de la fase I
 
 La fase I es considerarà acabada quan:
 
-- es pugui navegar per `home`, `places`, `place detail` i `favorites`
-- la navegació funcioni sense backend
-- totes les dades surtin de mocks estructurats
-- la UI sigui responsive
-- la base de components sigui prou neta per créixer
+- es pugui navegar per `home`, `places`, `place detail` i `favorites` (**FET**)
+- la navegació funcioni sense backend (**FET**)
+- totes les dades surtin de mocks estructurats (**FET**)
+- la UI sigui responsive (**FET**)
+- la base de components sigui prou neta per créixer (**FET**)
 
-## Fase II · Consolidació funcional i refinament
+## Fase II · Consolidació funcional i refinament (**FET**)
 
 ### Objectiu
 
@@ -100,84 +112,84 @@ Convertir la base funcional de la fase I en una aplicació frontend més complet
 
 ### Què entra dins la fase II
 
-- **consolidar la feature `places` amb una UX de cerca més rica**
-- **polir la vista mapa ja existent a `places`**
-- **millorar la sincronització entre mapa, filtres i resultats**
-- **decidir si `places` treballarà amb `llista`, `mapa` o mode mixt**
-- **refinar la UX de marcadors, popups i selecció al mapa**
-- **decidir com escalar la vista mapa quan hi hagi més densitat de dades**
-- **refinar `favorites` perquè el flux de guardar i revisar llocs sigui més natural**
-- **millorar el `place detail` amb millor jerarquia i més context**
-- **revisar empty states, filtres actius i textos de suport**
-- **polir les seccions de la `home` que ara són correctes però encara provisionals**
-- **consolidar quins components compartits val la pena fixar definitivament**
-- **enriquir les dades simulades perquè siguin més realistes**
-- **preparar els serveis mock per substituir-los per API sense reescriure UI**
-- **introduir una capa base de gestió d'errors**
-- **afegir interceptor global per errors HTTP**
-- **afegir servei central d'errors o notificacions**
-- **definir una UI comuna per mostrar errors i missatges globals**
-- **reduir `try/catch` repetits als punts on el problema sigui transversal**
-- **revisar responsive fi de totes les pantalles**
-- **definir millor `Ajuda`, `Contacta'ns` i les pàgines informatives**
-- **afinar la navegació general perquè cada CTA tingui una funció clara**
+- consolidar la feature `places` amb una UX de cerca més rica (**FET**)
+- polir la vista mapa ja existent a `places` (**FET**)
+- millorar la sincronització entre mapa, filtres i resultats (**FET**)
+- decidir si `places` treballarà amb `llista`, `mapa` o mode mixt (**FET**)
+- refinar la UX de marcadors, popups i selecció al mapa (**FET**)
+- decidir com escalar la vista mapa quan hi hagi més densitat de dades (**FET**)
+- refinar `favorites` perquè el flux de guardar i revisar llocs sigui més natural (**FET**)
+- millorar el `place detail` amb millor jerarquia i més context (**FET**)
+- revisar empty states, filtres actius i textos de suport (**FET**)
+- polir les seccions de la `home` que ara són correctes però encara provisionals (**FET**)
+- consolidar quins components compartits val la pena fixar definitivament (**FET**)
+- enriquir les dades simulades perquè siguin més realistes (**FET**)
+- preparar els serveis mock per substituir-los per API sense reescriure UI (**FET**)
+- introduir una capa base de gestió d'errors (**FET**)
+- afegir interceptor global per errors HTTP (**FET**)
+- afegir servei central d'errors o notificacions (**FET**)
+- definir una UI comuna per mostrar errors i missatges globals (**FET**)
+- reduir `try/catch` repetits als punts on el problema sigui transversal (**FET**)
+- revisar responsive fi de totes les pantalles (**FET**)
+- definir millor `Ajuda`, `Contacta'ns` i les pàgines informatives (**FET**)
+- afinar la navegació general perquè cada CTA tingui una funció clara (**FET**)
 
 ### Entregables de la fase II
 
 La fase II s'hauria de poder resumir en aquests blocs:
 
-1. **`Places` amb mapa sota filtres**
-2. **`Place detail` més complet i més clar**
-3. **Base d'autenticació i perfil**
-4. **`Home` més madura visualment**
-5. **Components compartits consolidats**
-6. **Mocks més rics i preparats per API**
-7. **Capa base de gestió d'errors**
-8. **Responsive i UX refinats**
+1. `Places` amb mapa sota filtres (**FET**)
+2. `Place detail` més complet i més clar (**FET**)
+3. Base d'autenticació i perfil (**FET**)
+4. `Home` més madura visualment (**FET**)
+5. Components compartits consolidats (**FET**)
+6. Mocks més rics i preparats per API (**FET**)
+7. Capa base de gestió d'errors (**FET**)
+8. Responsive i UX refinats (**FET**)
 
 ### Estat parcial de la fase II
 
 Ara mateix, dins de la fase II, ja tenim avançat:
 
-- **mapa funcional integrat a `places` sota els filtres**
-- **component `app-place-map` centralitzat i parametritzable**
-- **coordenades simulades precises als `Place`**
-- **reutilització del mateix mapa a `place detail`**
-- **millora del context de filtres actius i títols dinàmics a `places`**
-- **decisió de producte fixada: `places` treballa en mode mixt amb mapa sota filtres i llistat sincronitzat com a base principal de comparació**
-- **poliment real de la UX del mapa a `places`**
-- **decisió d'escalat del mapa fixada per aquesta fase: mostrar tots els marcadors sense clustering mentre el volum segueixi sent assumible**
-- **selecció de marcador amb resum contextual del lloc**
-- **accions de mapa per veure tots els resultats o treure la selecció**
-- **highlight visual del `place-card` associat al marcador seleccionat**
-- **header corregit perquè el mapa no el sobreposi en scroll**
-- **preview del `hero` més orientada a contingut destacat i no només a ciutats**
-- **`home` polida amb millor direcció de producte: hero menys provisional, bloc de recorregut funcional, ciutats amb CTA més clar i tancament orientat a `places` i `favorites`**
-- **catàleg de compartits fixat definitivament: `app-section-heading`, `app-generic-info-card`, `app-favorite-toggle-button`, `app-place-card`, `app-place-map` i `app-error-notifications`**
-- **mocks de `places` enriquits amb barri, volum de ressenyes, preu orientatiu i política pet per fer més creïbles el llistat i el detall**
-- **serveis mock desacoblats de la font de dades amb ports i tokens injectables perquè més endavant es puguin substituir per API sense tocar la UI**
-- **login fake amb email i password**
-- **rols `USER` i `ADMIN` ja operatius**
-- **sessió fake mantinguda amb redirecció automàtica a `login`**
-- **guards de `auth`, `guest` i `admin` ja aplicats a les rutes**
-- **pàgina de `Perfil` fake amb manteniment bàsic de dades**
-- **consentiment LGPD/GDPR obligatori per `USER` al manteniment de perfil**
-- **visibilitat i accés de `Del desenvolupador` només per `ADMIN`**
-- **revisió de `favorites` més natural amb resum, guardat recent, filtres locals i ordenació per reprendre la cerca sense tornar a començar**
-- **interceptor HTTP global per capturar errors de backend**
-- **servei centralitzat de notificacions d'error**
-- **UI global de notificacions per mostrar errors sense repetir lògica a les pàgines**
-- **ajust responsive fi aplicat a `header`, `footer`, `login`, `profile`, `contact`, `places`, `place detail`, `favorites`, `place-card` i `place-filters` per millorar pantalles estretes**
-- **`Ajuda` consolidada com a pàgina pròpia per explicar el flux real de producte i `Contacta'ns` definida amb canals més clars per suport i col·laboracions**
-- **CTA afinats perquè cada acció principal tingui una intenció clara: descobrir a `places`, entendre el flux a `ajuda`, reprendre a `favorites` i mantenir navegació base també des del `footer`**
+- mapa funcional integrat a `places` sota els filtres (**FET**)
+- component `app-place-map` centralitzat i parametritzable (**FET**)
+- coordenades simulades precises als `Place` (**FET**)
+- reutilització del mateix mapa a `place detail` (**FET**)
+- millora del context de filtres actius i títols dinàmics a `places` (**FET**)
+- decisió de producte fixada: `places` treballa en mode mixt amb mapa sota filtres i llistat sincronitzat com a base principal de comparació (**FET**)
+- poliment real de la UX del mapa a `places` (**FET**)
+- decisió d'escalat del mapa fixada per aquesta fase: mostrar tots els marcadors sense clustering mentre el volum segueixi sent assumible (**FET**)
+- selecció de marcador amb resum contextual del lloc (**FET**)
+- accions de mapa per veure tots els resultats o treure la selecció (**FET**)
+- highlight visual del `place-card` associat al marcador seleccionat (**FET**)
+- header corregit perquè el mapa no el sobreposi en scroll (**FET**)
+- preview del `hero` més orientada a contingut destacat i no només a ciutats (**FET**)
+- `home` polida amb millor direcció de producte: hero menys provisional, bloc de recorregut funcional, ciutats amb CTA més clar i tancament orientat a `places` i `favorites` (**FET**)
+- catàleg de compartits fixat definitivament: `app-section-heading`, `app-generic-info-card`, `app-favorite-toggle-button`, `app-place-card`, `app-place-map` i `app-error-notifications` (**FET**)
+- mocks de `places` enriquits amb barri, volum de ressenyes, preu orientatiu i política pet per fer més creïbles el llistat i el detall (**FET**)
+- serveis mock desacoblats de la font de dades amb ports i tokens injectables perquè més endavant es puguin substituir per API sense tocar la UI (**FET**)
+- login fake amb email i password (**FET**)
+- rols `USER` i `ADMIN` ja operatius (**FET**)
+- sessió fake mantinguda amb redirecció automàtica a `login` (**FET**)
+- guards de `auth`, `guest` i `admin` ja aplicats a les rutes (**FET**)
+- pàgina de `Perfil` fake amb manteniment bàsic de dades (**FET**)
+- consentiment LGPD/GDPR obligatori per `USER` al manteniment de perfil (**FET**)
+- visibilitat i accés de `Del desenvolupador` només per `ADMIN` (**FET**)
+- revisió de `favorites` més natural amb resum, guardat recent, filtres locals i ordenació per reprendre la cerca sense tornar a començar (**FET**)
+- interceptor HTTP global per capturar errors de backend (**FET**)
+- servei centralitzat de notificacions d'error (**FET**)
+- UI global de notificacions per mostrar errors sense repetir lògica a les pàgines (**FET**)
+- ajust responsive fi aplicat a `header`, `footer`, `login`, `profile`, `contact`, `places`, `place detail`, `favorites`, `place-card` i `place-filters` per millorar pantalles estretes (**FET**)
+- `Ajuda` consolidada com a pàgina pròpia per explicar el flux real de producte i `Contacta'ns` definida amb canals més clars per suport i col·laboracions (**FET**)
+- CTA afinats perquè cada acció principal tingui una intenció clara: descobrir a `places`, entendre el flux a `ajuda`, reprendre a `favorites` i mantenir navegació base també des del `footer` (**FET**)
 
-La resta de punts de la fase II continuen oberts fins que es marquin també en negreta.
+La Fase II queda donada per acabada segons aquest criteri d'etiquetes explícites.
 
 ### Resultat esperat
 
 Una aplicació frontend sòlida que simula millor el comportament real del producte i està llesta per començar a parlar amb backend.
 
-## Fase III · Backend real i persistència
+## Fase III · Backend real i persistència (**EN CURS**)
 
 ### Objectiu
 
@@ -185,17 +197,19 @@ Passar de frontend mock-first a un sistema real amb backend i base de dades.
 
 ### Què entra dins la fase III
 
-- disseny d'entitats reals
-- backend `.NET`
-- PostgreSQL
-- API per `places`, `favorites`, `users`, `reviews`
-- substitució progressiva de serveis mock per serveis reals
+- disseny del model de domini real (**PENDENT**)
+- persistència amb `Entity Framework` última versió (**PENDENT**)
+- configuració de mapatge i repositoris (**PENDENT**)
+- backend `.NET` (**PENDENT**)
+- PostgreSQL (**PENDENT**)
+- API per `places`, `favorites`, `users`, `reviews` (**PENDENT**)
+- substitució progressiva de serveis mock per serveis reals (**PENDENT**)
 
 ### Resultat esperat
 
-YepPet deixa de ser una simulació i passa a tenir dades persistides i fluxos reals.
+YepPet deixa de ser una simulació i passa a tenir dades persistides i fluxos reals (**PENDENT**).
 
-## Fase IV · Permisos, administració i operativa
+## Fase IV · Permisos, administració i operativa (**PENDENT**)
 
 ### Objectiu
 
@@ -203,17 +217,17 @@ Separar clarament les zones públiques de les zones internes o controlades per p
 
 ### Què entra dins la fase IV
 
-- autenticació
-- rols i permisos
-- pàgines internes
-- gestió de contingut o dades
-- accessos restringits a determinades funcionalitats
+- autenticació (**PENDENT**)
+- rols i permisos (**PENDENT**)
+- pàgines internes (**PENDENT**)
+- gestió de contingut o dades (**PENDENT**)
+- accessos restringits a determinades funcionalitats (**PENDENT**)
 
 ### Resultat esperat
 
-La plataforma ja diferencia entre usuaris públics, usuaris autenticats i àrees internes.
+La plataforma ja diferencia entre usuaris públics, usuaris autenticats i àrees internes (**PENDENT**).
 
-## Fase V · Internacionalització
+## Fase V · Internacionalització (**PENDENT**)
 
 ### Objectiu
 
@@ -221,19 +235,19 @@ Fer el producte multiidioma de manera seriosa, un cop el contingut i l'estructur
 
 ### Què entra dins la fase V
 
-- estratègia d'i18n
-- idiomes d'Europa
-- àrab
-- xinès
-- suport RTL
-- revisió de longituds de text
-- SEO per idioma
+- estratègia d'i18n (**PENDENT**)
+- idiomes d'Europa (**PENDENT**)
+- àrab (**PENDENT**)
+- xinès (**PENDENT**)
+- suport RTL (**PENDENT**)
+- revisió de longituds de text (**PENDENT**)
+- SEO per idioma (**PENDENT**)
 
 ### Resultat esperat
 
-YepPet pot operar en diversos idiomes sense haver d'improvisar textos dispersos dins components.
+YepPet pot operar en diversos idiomes sense haver d'improvisar textos dispersos dins components (**PENDENT**).
 
-## Fase VI · Poliment i desplegament
+## Fase VI · Poliment i desplegament (**PENDENT**)
 
 ### Objectiu
 
@@ -241,12 +255,12 @@ Preparar el producte per sortir a un entorn real.
 
 ### Què entra dins la fase VI
 
-- optimització visual final
-- revisió de responsive complet
-- revisió de rendiment
-- QA
-- desplegament
-- observabilitat mínima
+- optimització visual final (**PENDENT**)
+- revisió de responsive complet (**PENDENT**)
+- revisió de rendiment (**PENDENT**)
+- QA (**PENDENT**)
+- desplegament (**PENDENT**)
+- observabilitat mínima (**PENDENT**)
 
 ## Decisió actual
 

@@ -17,7 +17,24 @@ El focus funcional actual es:
 - perfil fake amb consentiment de manteniment de dades
 - ajuda i contacte com a capes informatives
 
-## 2. Abast actual
+Aquest document funcional es llegeix conjuntament amb `project-phases.md`, que fixa el criteri oficial d'estat, i amb aquests principis de treball actius:
+
+- els punts en negreta dins de cada fase compten com a fets o consolidats
+- una fase es considera acabada quan no queden punts objectiu pendents
+- la Fase III s'ha de fer amb `DDD`, `SOLID` estricte i patrons de disseny orientats a mantenibilitat
+- si hi ha una opcio mes moderna, mes simple o tecnologicament millor, s'ha de proposar abans d'implementar-la
+
+## 2. Eines i tecnologia previstes
+
+La base funcional actual i la fase que s'obre a partir d'ara es recolzen en aquest stack:
+
+- `Angular 21` per la web
+- `Leaflet` i `OpenStreetMap` per la capa de mapa
+- backend amb `.NET`
+- persistencia amb `PostgreSQL`
+- persistencia ORM amb `Entity Framework` ultima versio
+
+## 3. Abast actual
 
 Inclou:
 
@@ -44,7 +61,7 @@ Fora d'abast a data d'aquest document:
 - integracions externes de tercers
 - multiidioma complet
 
-## 2.1 Relacio amb les fases del projecte
+## 3.1 Relacio amb les fases del projecte
 
 Aquest document funcional i el document de fases es mantenen separats expressament:
 
@@ -54,12 +71,12 @@ Aquest document funcional i el document de fases es mantenen separats expressame
 En l'estat actual:
 
 - la Fase I ja queda tancada com a base funcional inicial
-- el producte treballa dins la Fase II de consolidacio i refinament
-- el focus funcional visible avui se centra sobretot en `places`, `place detail`, `favorites`, `auth/profile` i la capa base d'errors
+- la Fase II queda recollida com a base funcional ja consolidada segons els punts marcats en negreta a `project-phases.md`
+- el focus funcional visible avui se centra sobretot en `places`, `place detail`, `favorites`, `auth/profile`, la capa base d'errors i les pagines informatives ja refinades
 
 Per tant, aquest document no substitueix el de fases, sino que el complementa des del punt de vista d'us, navegacio i comportament funcional.
 
-## 3. Actors
+## 4. Actors
 
 Actors actuals:
 
@@ -72,7 +89,7 @@ Rols funcionals actuals:
 - `USER`
 - `ADMIN`
 
-## 4. Domini funcional actual
+## 5. Domini funcional actual
 
 Elements principals:
 
@@ -88,7 +105,7 @@ Relacions funcionals:
 - un usuari podra tenir molts favorits
 - un filtre pot restringir llocs per ciutat, tipus, mascota i cerca
 
-## 5. UML funcional
+## 6. UML funcional
 
 ### 5.1 Context del sistema
 
