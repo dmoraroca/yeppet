@@ -413,6 +413,23 @@ Criteri tecnic aplicat:
 - reutilitzar compartits ja consolidats com `app-section-heading` i `app-generic-info-card`
 - donar forma de producte a la navegacio informativa sense afegir dependències noves ni backend
 
+## 8.1 Afinat de CTA i navegacio base
+
+En aquesta iteracio s'ha tancat també el criteri de CTA per evitar accions ambigües o redundants.
+
+Aplicacio actual:
+
+- `home-hero-section` separa CTA de descoberta (`/places`) i CTA d'explicacio (`/ajuda`)
+- `help-page` separa CTA per reprendre (`/favorites`) del cami de descoberta (`/places`)
+- `contact-page` ofereix retorn clar a `ajuda` o `places` segons si l'usuari necessita context o producte
+- `site-footer` incorpora navegacio base a `Inici`, `Llocs`, `Favorits`, `Ajuda` i `Contacta'ns`
+
+Criteri tecnic:
+
+- cada CTA principal ha de correspondre a una sola intencio funcional
+- els accessos de recuperacio no han de dependre nomes del `site-header`
+- s'evita duplicar CTA amb copies diferents cap a la mateixa intencio si no aporten context
+
 ## 9. Implementacio de l'autenticacio fake
 
 ### 9.1 Usuaris mock

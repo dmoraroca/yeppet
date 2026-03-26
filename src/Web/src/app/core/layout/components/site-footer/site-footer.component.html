@@ -6,6 +6,11 @@
     </div>
 
     <nav class="site-footer__nav" aria-label="Footer navigation">
+      <a routerLink="/">Inici</a>
+      <a routerLink="/places">Llocs</a>
+      <a routerLink="/favorites">Favorits</a>
+      <a routerLink="/ajuda">Ajuda</a>
+      <a routerLink="/contacte">Contacta'ns</a>
       @if (isAdmin()) {
         <a routerLink="/permissions">Del desenvolupador</a>
       }

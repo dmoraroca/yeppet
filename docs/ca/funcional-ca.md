@@ -375,6 +375,7 @@ Flux principal:
 - el preview del `hero` no ha d'escalar amb totes les ciutats; nomes ha de mostrar contingut destacat
 - `Ajuda` ha d'explicar el recorregut real de producte sense dependre de la `home`
 - `Contacta'ns` ha d'oferir un canal principal de suport i vies diferenciades per col·laboracions
+- els CTA principals han de separar clarament quatre intencions: descobrir, entendre, reprendre i contactar
 - si no hi ha sessio, les rutes protegides redirigeixen a `Login`
 - si hi ha `redirectTo`, el login hi ha de tornar despres d'autenticar
 - si el rol es `ADMIN`, `Del desenvolupador` nomes ha de ser visible i accessible per aquest rol
@@ -509,6 +510,9 @@ Resum del diagrama:
 - el `USER` pot entrar a `Perfil` i mantenir les seves dades
 - l'`ADMIN` pot veure i obrir `Del desenvolupador`
 - es pot navegar de `home` a `places`
+- el `hero` diferencia entre explorar `places` i entendre el flux a `Ajuda`
+- `Ajuda` ofereix sortides clares cap a `places`, `favorites` i `contacte`
+- el `footer` permet recuperar `Inici`, `Llocs`, `Favorits`, `Ajuda` i `Contacta'ns`
 - es pot filtrar per ciutat, tipus, mascota i cerca
 - el mapa es sincronitza amb els resultats visibles
 - el detall mostra el lloc correcte

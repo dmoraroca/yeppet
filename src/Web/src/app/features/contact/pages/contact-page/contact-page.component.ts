@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { SiteFooterComponent } from '../../../../core/layout/components/site-footer/site-footer.component';
 import { SiteHeaderComponent } from '../../../../core/layout/components/site-header/site-header.component';
@@ -7,7 +8,13 @@ import { SectionHeadingComponent } from '../../../../shared/components/section-h
 
 @Component({
   selector: 'app-contact-page',
-  imports: [SiteHeaderComponent, SiteFooterComponent, SectionHeadingComponent, GenericInfoCardComponent],
+  imports: [
+    RouterLink,
+    SiteHeaderComponent,
+    SiteFooterComponent,
+    SectionHeadingComponent,
+    GenericInfoCardComponent
+  ],
   templateUrl: './contact-page.component.html',
   styleUrl: './contact-page.component.scss'
 })
