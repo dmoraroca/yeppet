@@ -10,7 +10,7 @@ El focus funcional actual es:
 - descoberta de llocs pet-friendly
 - navegacio clara entre portada, resultats, detall i favorits
 - filtratge per ciutat, tipus, mascota i text de cerca
-- suport inicial a mapa dins la feature `places`
+- suport de mapa dins la feature `places` en mode mixt amb llistat sincronitzat
 - autenticacio fake amb redireccio i manteniment de sessio
 - perfil fake amb consentiment de manteniment de dades
 - ajuda i contacte com a capes informatives
@@ -26,7 +26,7 @@ Inclou:
 - navegacio per `places`
 - llistat de llocs amb filtres
 - detall d'un lloc
-- favorits fake
+- favorits fake amb revisio local
 - perfil fake
 - `Ajuda`
 - `Contacta'ns`
@@ -196,6 +196,7 @@ Resum del diagrama:
 
 - el flux de favorits ja es pot provar de punta a punta
 - l'estat encara no es persisteix, pero la UX ja simula el comportament real
+- `favorites` permet revisar millor el que s'ha guardat amb cerca local, filtre per ciutat, filtre per tipologia i ordenacio
 - el mateix patró es pot reutilitzar mes endavant amb backend autenticat
 
 ### 5.8 Flux funcional d'ajuda
@@ -280,7 +281,8 @@ Flux principal:
 
 1. l'usuari guarda un lloc des del llistat o des del detall
 2. el lloc apareix a `favorites`
-3. l'usuari el pot treure posteriorment
+3. l'usuari pot revisar els guardats amb cerca, ciutat, tipologia i ordre
+4. l'usuari el pot treure posteriorment
 
 Nota:
 
@@ -346,6 +348,7 @@ Flux principal:
 - els chips de la `home` han de ser navegables
 - els filtres escollits han de quedar visibles
 - el mateix lloc pot aparèixer al llistat, al detall, a favorits i al mapa
+- `favorites` ha de permetre reprendre la revisio sense tornar a `places`
 - `permissions` no forma part del flux public principal
 - el preview del `hero` no ha d'escalar amb totes les ciutats; nomes ha de mostrar contingut destacat
 - si no hi ha sessio, les rutes protegides redirigeixen a `Login`

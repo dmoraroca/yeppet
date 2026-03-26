@@ -3,7 +3,45 @@
 <main class="home-page">
   <app-home-hero-section [content]="heroContent" />
   <app-trending-cities-section [cities]="cities" />
+
+  <section class="home-page__journey">
+    <div class="home-page__journey-copy">
+      <p class="home-page__eyebrow">Com es fa servir</p>
+      <h2>Una portada que ja orienta cap al flux real del producte</h2>
+      <p>
+        La `home` deixa de ser només una entrada visual: ara explica millor com passar de descobrir
+        llocs a validar-los al mapa i acabar guardant els que valen la pena.
+      </p>
+    </div>
+
+    <div class="home-page__journey-grid">
+      @for (step of journeySteps; track step.step) {
+        <article class="home-page__journey-card">
+          <span class="home-page__journey-step">{{ step.step }}</span>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.copy }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
   <app-why-yeppet-section [content]="whyContent" />
+
+  <section class="home-page__closing">
+    <div>
+      <p class="home-page__eyebrow">Preparat per provar-ho</p>
+      <h2>Explora llocs o reprèn els teus favorits sense tornar a començar.</h2>
+      <p>
+        La portada ja queda alineada amb el que el producte fa avui: descoberta, context i
+        continuïtat.
+      </p>
+    </div>
+
+    <div class="home-page__closing-actions">
+      <a class="home-page__primary" routerLink="/places">Anar a llocs</a>
+      <a class="home-page__secondary" routerLink="/favorites">Revisar favorits</a>
+    </div>
+  </section>
 </main>
 
 <app-site-footer />

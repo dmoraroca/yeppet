@@ -1,17 +1,17 @@
 import { HomeCity, HomeHeroContent, HomeWhyContent } from '../models/home-content.model';
 
 export const HOME_HERO_FAKE: HomeHeroContent = {
-  eyebrow: 'YepPet · Fase 1',
+  eyebrow: 'YepPet · Descoberta pet-friendly',
   titleStart: 'Llocs que diuen',
   titleHighlight: 'SÍ',
   titleEnd: 'a les mascotes.',
   copy:
-    'Plataforma pet-friendly per descobrir llocs, estades i serveis que realment accepten mascotes, amb una experiència més visual i més clara des de la primera pantalla.',
+    'Descobreix llocs, estades i serveis que realment accepten mascotes amb una experiència més clara: filtres útils, mapa contextual i favorits pensats per reprendre la cerca sense fricció.',
   chips: ['Gossos benvinguts', 'Gats benvinguts', 'Terrassa exterior', 'Estades llargues'],
   quickMatchTitle: 'Terrassa pet-friendly per fer brunch',
   quickMatchCopy: 'Gossos benvinguts · Seients exteriors',
-  futureReadyTitle: 'Arquitectura basada en mocks',
-  futureReadyCopy: 'Preparada per canviar dades simulades per API real',
+  futureReadyTitle: 'Mock-first amb criteri de producte',
+  futureReadyCopy: 'La UI ja està pensada per passar a API real sense reescriure el flux',
   featuredPlaces: [
     {
       id: 'barcelona-pawtel-gotic',

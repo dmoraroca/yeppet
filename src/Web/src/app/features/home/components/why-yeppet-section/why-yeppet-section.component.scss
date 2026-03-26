@@ -11,6 +11,13 @@
   gap: 1rem;
 }
 
+.why__copy {
+  max-width: 46rem;
+  margin: 0.95rem 0 0;
+  color: var(--yp-color-text-muted);
+  line-height: 1.7;
+}
+
 @media (max-width: 900px) {
   .why__grid {
     grid-template-columns: 1fr;

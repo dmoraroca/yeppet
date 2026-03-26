@@ -266,6 +266,8 @@ Peces principals:
 Decisions tecniques rellevants:
 
 - l'estat es manté local i simulat
+- `favorites-page` afegeix una capa local de revisio amb cerca, filtres i ordenacio sense tocar el model base
+- el guardat mes recent queda al davant i actua com a punt de reentrada rapida
 - el flux es pot substituir despres per persistencia real
 
 ### 5.4 Auth
@@ -312,6 +314,13 @@ Responsabilitats:
 - mantenir estat fake de favorits
 - saber si un lloc esta guardat
 - afegir i treure favorits
+- mantenir l'ordre de recencia dels llocs guardats
+
+Notes tecniques:
+
+- els `id` es persisteixen a `localStorage`
+- en afegir un favorit, aquest puja al primer lloc de la llista
+- `favorites-page` construeix la revisio local a partir del conjunt de favorits recuperat per `PlaceService`
 
 ### 6.3 AuthService
 
