@@ -1,0 +1,52 @@
+<app-site-header />
+
+<main class="help-page">
+  <section class="help-page__hero">
+    <div class="help-page__copy">
+      <app-section-heading
+        eyebrow="Ajuda"
+        title="Com funciona YepPet avui i què pots esperar d’aquesta fase."
+      />
+      <p>
+        Aquesta pàgina deixa `Ajuda` més definida: explica el flux real de producte, resol dubtes
+        bàsics i orienta cap a `places`, `favorites` o `contacte` segons el que necessitis.
+      </p>
+
+      <div class="help-page__actions">
+        <a class="help-page__primary" routerLink="/places">Anar a llocs</a>
+        <a class="help-page__secondary" routerLink="/contacte">Contacta'ns</a>
+      </div>
+    </div>
+
+    <aside class="help-page__panel">
+      <p class="help-page__panel-label">Resposta curta</p>
+      <h2>Descobreix, valida i guarda.</h2>
+      <p>
+        YepPet està pensat perquè la cerca no sigui només un llistat: filtres, mapa, detall i
+        favorits formen un mateix recorregut.
+      </p>
+    </aside>
+  </section>
+
+  <section class="help-page__section">
+    <app-section-heading eyebrow="Flux" title="El recorregut principal en tres passos" />
+
+    <div class="help-page__grid">
+      @for (step of steps; track step.badge) {
+        <app-generic-info-card [badge]="step.badge" [body]="step.body" />
+      }
+    </div>
+  </section>
+
+  <section class="help-page__section">
+    <app-section-heading eyebrow="Dubtes habituals" title="El que avui ja està validat funcionalment" />
+
+    <div class="help-page__grid">
+      @for (faq of faqs; track faq.badge) {
+        <app-generic-info-card [badge]="faq.badge" [body]="faq.body" />
+      }
+    </div>
+  </section>
+</main>
+
+<app-site-footer />

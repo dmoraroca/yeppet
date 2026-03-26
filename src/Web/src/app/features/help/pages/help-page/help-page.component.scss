@@ -1,0 +1,119 @@
+.help-page {
+  max-width: var(--yp-max-width);
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.help-page__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.help-page__copy,
+.help-page__panel,
+.help-page__section {
+  padding: 1.5rem;
+  border-radius: 1.6rem;
+  border: 1px solid rgba(209, 213, 219, 0.8);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.help-page__copy p,
+.help-page__panel p {
+  margin: 0.9rem 0 0;
+  line-height: 1.7;
+  color: var(--yp-color-text-muted);
+}
+
+.help-page__actions {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.help-page__primary,
+.help-page__secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.9rem 1.2rem;
+  border-radius: 999px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.help-page__primary {
+  background: var(--yp-color-primary-dark);
+  color: #fff;
+}
+
+.help-page__secondary {
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  color: var(--yp-color-primary-dark);
+}
+
+.help-page__panel {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top right, rgba(45, 212, 191, 0.2), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(243, 244, 246, 0.94));
+}
+
+.help-page__panel-label {
+  margin: 0;
+  color: var(--yp-color-primary-dark);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.82rem;
+}
+
+.help-page__panel h2 {
+  margin: 0.8rem 0 0;
+  font-size: clamp(1.7rem, 4vw, 2.6rem);
+  line-height: 0.95;
+}
+
+.help-page__grid {
+  margin-top: 1.25rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 980px) {
+  .help-page__hero,
+  .help-page__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .help-page {
+    padding: 1.5rem 1rem 3rem;
+  }
+}
+
+@media (max-width: 540px) {
+  .help-page__copy,
+  .help-page__panel,
+  .help-page__section {
+    padding: 1rem;
+    border-radius: 1.15rem;
+  }
+
+  .help-page__actions {
+    flex-direction: column;
+  }
+
+  .help-page__actions > * {
+    width: 100%;
+  }
+}

@@ -119,7 +119,7 @@ Convertir la base funcional de la fase I en una aplicació frontend més complet
 - **definir una UI comuna per mostrar errors i missatges globals**
 - **reduir `try/catch` repetits als punts on el problema sigui transversal**
 - **revisar responsive fi de totes les pantalles**
-- definir millor `Ajuda`, `Contacta'ns` i les pàgines informatives
+- **definir millor `Ajuda`, `Contacta'ns` i les pàgines informatives**
 - afinar la navegació general perquè cada CTA tingui una funció clara
 
 ### Entregables de la fase II
@@ -168,6 +168,7 @@ Ara mateix, dins de la fase II, ja tenim avançat:
 - **servei centralitzat de notificacions d'error**
 - **UI global de notificacions per mostrar errors sense repetir lògica a les pàgines**
 - **ajust responsive fi aplicat a `header`, `footer`, `login`, `profile`, `contact`, `places`, `place detail`, `favorites`, `place-card` i `place-filters` per millorar pantalles estretes**
+- **`Ajuda` consolidada com a pàgina pròpia per explicar el flux real de producte i `Contacta'ns` definida amb canals més clars per suport i col·laboracions**
 
 La resta de punts de la fase II continuen oberts fins que es marquin també en negreta.
 

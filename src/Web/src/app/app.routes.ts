@@ -60,6 +60,12 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'ajuda',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/help/pages/help-page/help-page.component').then((m) => m.HelpPageComponent)
+  },
+  {
     path: 'permissions',
     canActivate: [adminGuard],
     loadComponent: () =>

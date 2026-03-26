@@ -396,9 +396,26 @@ Criteri aplicat:
 - reduir paddings i radis en pantalles estretes
 - evitar que targetes i mètriques depenguin d'una composicio de desktop
 
-## 8. Implementacio de l'autenticacio fake
+## 8. Ajuda, contacte i pagines informatives
 
-### 8.1 Usuaris mock
+En aquesta iteracio s'ha deixat de tractar `Ajuda` i `Contacta'ns` com a peces massa provisionals.
+
+Canvis principals:
+
+- nova ruta `'/ajuda'` protegida amb `authGuard`
+- nova `HelpPageComponent` com a pagina dedicada per explicar el flux actual de producte
+- el desplegable `Ajuda` del `site-header` ja navega a `'/ajuda'` per `Com funciona`
+- `ContactPageComponent` redefineix canals i missatge per separar suport de producte, col·laboracions i noves ciutats
+
+Criteri tecnic aplicat:
+
+- mantenir `Ajuda` i `Contacta'ns` com a pagines lleugeres, sense lògica de negoci
+- reutilitzar compartits ja consolidats com `app-section-heading` i `app-generic-info-card`
+- donar forma de producte a la navegacio informativa sense afegir dependències noves ni backend
+
+## 9. Implementacio de l'autenticacio fake
+
+### 9.1 Usuaris mock
 
 Els accessos de prova actuals son:
 
@@ -416,7 +433,7 @@ Ubicacio:
 
 - `src/Web/src/app/features/auth/mock/auth-users.fake.ts`
 
-### 8.2 Persistencia de sessio
+### 9.2 Persistencia de sessio
 
 La sessio fake es guarda a `localStorage` amb una clau fixa:
 
@@ -430,7 +447,7 @@ Comportament:
 - si no hi ha sessio, les rutes protegides redirigeixen a `login`
 - en `logout`, la clau s'elimina
 
-### 8.3 Guards de navegacio
+### 9.3 Guards de navegacio
 
 L'app aplica tres guards:
 
@@ -446,7 +463,7 @@ Responsabilitats:
 - `guestGuard`: evita entrar a `login` si ja hi ha sessio
 - `adminGuard`: restringeix `permissions` a rol `ADMIN`
 
-### 8.4 Flux de redireccio
+### 9.4 Flux de redireccio
 
 Quan una ruta protegida es demana sense sessio, el sistema construeix:
 
@@ -461,7 +478,7 @@ Despres del login:
   - `USER` va a `/perfil`
   - `ADMIN` va a `/permissions`
 
-### 8.5 Perfil i consentiment
+### 9.5 Perfil i consentiment
 
 La pagina `Perfil` permet mantenir:
 
@@ -478,7 +495,7 @@ Regles actuals:
 - `USER` ha d'acceptar el consentiment per poder guardar
 - `ADMIN` queda exempt segons el criteri funcional actual
 
-### 8.6 Punts pendents
+### 9.6 Punts pendents
 
 La base actual prepara pero no implementa encara:
 

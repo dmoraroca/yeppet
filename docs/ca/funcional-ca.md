@@ -104,6 +104,7 @@ Resum del diagrama:
 - l'usuari consumeix una web que actualment treballa amb dades simulades
 - el mapa forma part de l'experiencia de cerca, no d'un sistema separat
 - `Ajuda` i `Contacta'ns` son suports informatius del producte
+- `Ajuda` ja no es limita a una seccio de la portada: explica el flux real actual i orienta cap a `places`, `favorites` o `contacte`
 
 ### 5.2 Actors i accessos
 
@@ -220,7 +221,7 @@ Resum del diagrama:
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart TD</span>
   <span style="color:#93c5fd;">A[Obrir menu Ajuda]</span> --&gt; <span style="color:#c4b5fd;">B{Opcio}</span>
-  <span style="color:#c4b5fd;">B</span> --&gt;|Com funciona| <span style="color:#86efac;">C[Anar a la seccio explicativa de la home]</span>
+  <span style="color:#c4b5fd;">B</span> --&gt;|Com funciona| <span style="color:#86efac;">C[Anar a la pagina d'ajuda]</span>
   <span style="color:#c4b5fd;">B</span> --&gt;|Contacta'ns| <span style="color:#67e8f9;">D[Anar a la pagina de contacte]</span>
   <span style="color:#86efac;">C</span> --&gt; <span style="color:#f9a8d4;">E[Tancar desplegable]</span>
   <span style="color:#67e8f9;">D</span> --&gt; <span style="color:#f9a8d4;">E</span></code></pre>
@@ -230,6 +231,7 @@ Resum del diagrama:
 - `Ajuda` actua com a entrada secundaria d'informacio
 - el desplegable no competeix amb el CTA principal de la portada
 - funcionalment ja es comporta com s'espera: navegar i tancar-se
+- `Com funciona` entra a una pagina propia i `Contacta'ns` ja diferencia millor suport de producte i col·laboracions
 
 ### 5.9 Domini funcional actual
 
@@ -316,7 +318,7 @@ Flux principal:
 
 1. l'usuari obre el desplegable `Ajuda`
 2. escull `Com funciona`
-3. el sistema el porta a la seccio explicativa de la `home`
+3. el sistema el porta a la pagina `Ajuda`
 
 ### UC-06 Contactar
 
@@ -328,7 +330,7 @@ Flux principal:
 
 1. l'usuari obre el desplegable `Ajuda`
 2. escull `Contacta'ns`
-3. el sistema mostra la pagina de contacte
+3. el sistema mostra la pagina de contacte amb canal recomanat i vies separades segons necessitat
 
 ### UC-07 Mantenir perfil
 
@@ -371,6 +373,8 @@ Flux principal:
 - el llistat i el detall han de mostrar prou context fake per ajudar a decidir sense backend real
 - `permissions` no forma part del flux public principal
 - el preview del `hero` no ha d'escalar amb totes les ciutats; nomes ha de mostrar contingut destacat
+- `Ajuda` ha d'explicar el recorregut real de producte sense dependre de la `home`
+- `Contacta'ns` ha d'oferir un canal principal de suport i vies diferenciades per col·laboracions
 - si no hi ha sessio, les rutes protegides redirigeixen a `Login`
 - si hi ha `redirectTo`, el login hi ha de tornar despres d'autenticar
 - si el rol es `ADMIN`, `Del desenvolupador` nomes ha de ser visible i accessible per aquest rol

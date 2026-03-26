@@ -15,15 +15,15 @@ export class ContactPageComponent {
   protected readonly channels = [
     {
       title: 'Col·laboracions',
-      body: 'Per partnerships, contingut o noves ciutats: hola@yeppet.fake'
+      body: 'Per col·laboracions, contingut o noves ciutats: partnerships@yeppet.fake'
     },
     {
       title: 'Suport de producte',
-      body: 'Per dubtes de navegació o feedback de la fase I: suport@yeppet.fake'
+      body: 'Per dubtes de navegació, favorits, perfil o cerca: suport@yeppet.fake'
     },
     {
-      title: 'Horari orientatiu',
-      body: 'Resposta simulada en dies laborables de 9:00 a 18:00 CET.'
+      title: 'Temps de resposta',
+      body: 'Resposta simulada en 24-48 h laborables per validar el flux informatiu del producte.'
     }
   ];
 }
