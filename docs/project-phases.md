@@ -105,14 +105,14 @@ Convertir la base funcional de la fase I en una aplicació frontend més complet
 - **millorar la sincronització entre mapa, filtres i resultats**
 - **decidir si `places` treballarà amb `llista`, `mapa` o mode mixt**
 - **refinar la UX de marcadors, popups i selecció al mapa**
-- decidir com escalar la vista mapa quan hi hagi més densitat de dades
+- **decidir com escalar la vista mapa quan hi hagi més densitat de dades**
 - **refinar `favorites` perquè el flux de guardar i revisar llocs sigui més natural**
 - **millorar el `place detail` amb millor jerarquia i més context**
 - **revisar empty states, filtres actius i textos de suport**
 - **polir les seccions de la `home` que ara són correctes però encara provisionals**
 - **consolidar quins components compartits val la pena fixar definitivament**
 - **enriquir les dades simulades perquè siguin més realistes**
-- preparar els serveis mock per substituir-los per API sense reescriure UI
+- **preparar els serveis mock per substituir-los per API sense reescriure UI**
 - **introduir una capa base de gestió d'errors**
 - **afegir interceptor global per errors HTTP**
 - **afegir servei central d'errors o notificacions**
@@ -146,6 +146,7 @@ Ara mateix, dins de la fase II, ja tenim avançat:
 - **millora del context de filtres actius i títols dinàmics a `places`**
 - **decisió de producte fixada: `places` treballa en mode mixt amb mapa sota filtres i llistat sincronitzat com a base principal de comparació**
 - **poliment real de la UX del mapa a `places`**
+- **decisió d'escalat del mapa fixada per aquesta fase: mostrar tots els marcadors sense clustering mentre el volum segueixi sent assumible**
 - **selecció de marcador amb resum contextual del lloc**
 - **accions de mapa per veure tots els resultats o treure la selecció**
 - **highlight visual del `place-card` associat al marcador seleccionat**
@@ -154,6 +155,7 @@ Ara mateix, dins de la fase II, ja tenim avançat:
 - **`home` polida amb millor direcció de producte: hero menys provisional, bloc de recorregut funcional, ciutats amb CTA més clar i tancament orientat a `places` i `favorites`**
 - **catàleg de compartits fixat definitivament: `app-section-heading`, `app-generic-info-card`, `app-favorite-toggle-button`, `app-place-card`, `app-place-map` i `app-error-notifications`**
 - **mocks de `places` enriquits amb barri, volum de ressenyes, preu orientatiu i política pet per fer més creïbles el llistat i el detall**
+- **serveis mock desacoblats de la font de dades amb ports i tokens injectables perquè més endavant es puguin substituir per API sense tocar la UI**
 - **login fake amb email i password**
 - **rols `USER` i `ADMIN` ja operatius**
 - **sessió fake mantinguda amb redirecció automàtica a `login`**

@@ -325,6 +325,12 @@ Font de dades:
 
 - `PLACES_FAKE`
 
+Preparacio per API:
+
+- `PlaceService` ja no depen directament del mock
+- consumeix un port injectable (`PLACE_SOURCE`)
+- el mock actual entra per `MockPlaceSourceService`
+
 ### 6.2 FavoritesService
 
 Responsabilitats:
@@ -339,6 +345,8 @@ Notes tecniques:
 - els `id` es persisteixen a `localStorage`
 - en afegir un favorit, aquest puja al primer lloc de la llista
 - `favorites-page` construeix la revisio local a partir del conjunt de favorits recuperat per `PlaceService`
+- `FavoritesService` treballa contra un port injectable (`FAVORITES_STORE`)
+- el mock actual entra per `MockFavoritesStoreService`
 
 ### 6.3 AuthService
 
@@ -360,6 +368,9 @@ Notes tecniques:
 - `login` valida `email` i `password` contra usuaris simulats
 - `logout` esborra la sessio local
 - `updateProfile` actualitza l'usuari actual i persisteix l'estat simulat
+- `AuthService` ja no depen directament de `AUTH_USERS_FAKE` ni de `localStorage`
+- treballa contra un port injectable (`AUTH_STORE`)
+- el mock actual entra per `MockAuthStoreService`
 
 ## 8. Implementacio de l'autenticacio fake
 

@@ -1,16 +1,18 @@
-import { Injectable, computed, signal } from '@angular/core';
-
-import { AUTH_USERS_FAKE } from '../mock/auth-users.fake';
+import { Inject, Injectable, computed, signal } from '@angular/core';
 import { AuthCredentials, AuthProfileUpdate, AuthRole, AuthUser } from '../models/auth-user.model';
-
-const STORAGE_KEY = 'yeppet-auth-user';
+import { AUTH_STORE, AuthStore } from './auth-store.token';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly usersState = signal<AuthUser[]>(AUTH_USERS_FAKE);
-  private readonly currentUserState = signal<AuthUser | null>(this.restoreUser());
+  private readonly usersState: ReturnType<typeof signal<AuthUser[]>>;
+  private readonly currentUserState: ReturnType<typeof signal<AuthUser | null>>;
+
+  constructor(@Inject(AUTH_STORE) private readonly authStore: AuthStore) {
+    this.usersState = signal<AuthUser[]>(this.authStore.loadUsers());
+    this.currentUserState = signal<AuthUser | null>(this.authStore.loadCurrentUser());
+  }
 
   readonly currentUser = computed(() => this.currentUserState());
   readonly isAuthenticated = computed(() => this.currentUserState() !== null);
@@ -29,14 +31,14 @@ export class AuthService {
     }
 
     this.currentUserState.set(user);
-    this.persistUser(user);
+    this.authStore.saveCurrentUser(user);
 
     return { ok: true, user };
   }
 
   logout(): void {
     this.currentUserState.set(null);
-    localStorage.removeItem(STORAGE_KEY);
+    this.authStore.saveCurrentUser(null);
   }
 
   updateProfile(update: AuthProfileUpdate): AuthUser | null {
@@ -52,37 +54,14 @@ export class AuthService {
     };
 
     this.usersState.update((users) => users.map((user) => (user.id === current.id ? nextUser : user)));
+    this.authStore.saveUsers(this.usersState());
     this.currentUserState.set(nextUser);
-    this.persistUser(nextUser);
+    this.authStore.saveCurrentUser(nextUser);
 
     return nextUser;
   }
 
   getPostLoginRoute(): string {
     return this.isAdmin() ? '/permissions' : '/perfil';
-  }
-
-  private restoreUser(): AuthUser | null {
-    if (typeof localStorage === 'undefined') {
-      return null;
-    }
-
-    const raw = localStorage.getItem(STORAGE_KEY);
-
-    if (!raw) {
-      return null;
-    }
-
-    try {
-      return JSON.parse(raw) as AuthUser;
-    } catch {
-      localStorage.removeItem(STORAGE_KEY);
-
-      return null;
-    }
-  }
-
-  private persistUser(user: AuthUser): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
   }
 }

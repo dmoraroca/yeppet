@@ -12,6 +12,7 @@ El focus funcional actual es:
 - filtratge per ciutat, tipus, mascota i text de cerca
 - suport de mapa dins la feature `places` en mode mixt amb llistat sincronitzat
 - dades simulades més riques per entendre millor context, preu i política pet
+- serveis preparats per canviar la font de dades sense reescriure pantalles
 - autenticacio fake amb redireccio i manteniment de sessio
 - perfil fake amb consentiment de manteniment de dades
 - ajuda i contacte com a capes informatives
@@ -42,6 +43,21 @@ Fora d'abast a data d'aquest document:
 - permisos reals persistits
 - integracions externes de tercers
 - multiidioma complet
+
+## 2.1 Relacio amb les fases del projecte
+
+Aquest document funcional i el document de fases es mantenen separats expressament:
+
+- `funcional-ca.md` descriu el producte tal com avui es pot fer servir
+- `project-phases.md` descriu l'ordre de treball, el criteri de tancament i l'estat per fases
+
+En l'estat actual:
+
+- la Fase I ja queda tancada com a base funcional inicial
+- el producte treballa dins la Fase II de consolidacio i refinament
+- el focus funcional visible avui se centra sobretot en `places`, `place detail`, `favorites`, `auth/profile` i la capa base d'errors
+
+Per tant, aquest document no substitueix el de fases, sino que el complementa des del punt de vista d'us, navegacio i comportament funcional.
 
 ## 3. Actors
 
