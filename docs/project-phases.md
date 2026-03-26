@@ -129,11 +129,11 @@ La fase II s'hauria de poder resumir en aquests blocs:
 1. **`Places` amb mapa sota filtres**
 2. **`Place detail` més complet i més clar**
 3. **Base d'autenticació i perfil**
-4. `Home` més madura visualment
-5. Components compartits consolidats
-6. Mocks més rics i preparats per API
+4. **`Home` més madura visualment**
+5. **Components compartits consolidats**
+6. **Mocks més rics i preparats per API**
 7. **Capa base de gestió d'errors**
-8. Responsive i UX refinats
+8. **Responsive i UX refinats**
 
 ### Estat parcial de la fase II
 
