@@ -78,11 +78,15 @@ En l'estat actual:
 - els contractes de repositori i les necessitats de persistencia ja queden definits com a base del backend
 - el model relacional a `PostgreSQL` ja queda tancat
 - la persistencia amb `Entity Framework` ja queda tancada com a capa ORM base
-- el punt actiu actual de la Fase III es `configuracio de mapatge, migracions i repositoris`
+- la configuracio de mapatge, migracions i repositoris ja queda tancada com a capa de persistencia operativa
+- el backend `.NET` ja queda tancat com a base de serveis i casos d'us
+- el punt actiu actual de la Fase III es `API per places, favorites, users i reviews`
 - la traduccio inicial cap a persistencia relacional es documenta a `database-model-ca.md`
 - la base de dades de desenvolupament ja queda validada amb `Docker`, exposant-se localment pel port `5433`
 - la base de dades local ja te schema governat per `Entity Framework` i historial de migracions real
-- la capa de persistencia ORM ja existeix a `Infrastructure`, pero encara no esta connectada funcionalment a la web
+- la capa de persistencia ORM ja existeix a `Infrastructure` i ja inclou mapatge manual i repositoris EF
+- el mapatge cap al domini ja es fa manualment per agregat, prioritzant claredat i control de negoci abans que automatismes
+- la capa `Application` ja existeix amb serveis i contractes per les principals funcionalitats del producte
 - el focus funcional visible avui se centra sobretot en `places`, `place detail`, `favorites`, `auth/profile`, la capa base d'errors i les pagines informatives ja refinades, mentre backend i persistencia real entren en construccio
 
 Per tant, aquest document no substitueix el de fases, sino que el complementa des del punt de vista d'us, navegacio i comportament funcional.
@@ -98,7 +102,10 @@ Per tant, aquest document no substitueix el de fases, sino que el complementa de
   <span style="color:#f9a8d4;">P</span> -.-> <span style="color:#86efac;">EF[Entity Framework tancat]</span>
   <span style="color:#86efac;">EF</span> -.-> <span style="color:#fcd34d;">SC[Schema governat per migracions]</span>
   <span style="color:#86efac;">EF</span> -.-> <span style="color:#a7f3d0;">INF[Infrastructure]</span>
-  <span style="color:#86efac;">EF</span> -.-> <span style="color:#67e8f9;">HIST[__EFMigrationsHistory]</span></code></pre>
+  <span style="color:#86efac;">EF</span> -.-> <span style="color:#67e8f9;">HIST[__EFMigrationsHistory]</span>
+  <span style="color:#a7f3d0;">INF</span> -.-> <span style="color:#fde68a;">MAP[Mapatge manual per agregat]</span>
+  <span style="color:#a7f3d0;">INF</span> -.-> <span style="color:#fca5a5;">REP[Repositoris EF]</span>
+  <span style="color:#fca5a5;">REP</span> -.-> <span style="color:#c4b5fd;">APP[Application Services]</span></code></pre>
 
 Resum del diagrama:
 
@@ -109,7 +116,9 @@ Resum del diagrama:
 - la BBDD de desenvolupament ja es pot aixecar sense sortir del repo
 - l'equip ja pot inspeccionar taules reals des de DBeaver sense esperar al backend complet
 - `Entity Framework` ja governa l'esquema local amb migracio inicial aplicada
-- el seguent moviment funcional-tecnic es definir mapatges domini-persistencia i repositoris reals
+- el mapatge manual i els repositoris reals ja estan muntats a `Infrastructure`
+- el backend `.NET` ja te capa `Application`
+- el seguent moviment funcional-tecnic es exposar API real per `places`, `favorites`, `users` i `reviews`
 
 ## 4. Actors
 

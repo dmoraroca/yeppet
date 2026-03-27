@@ -89,9 +89,9 @@ Peces creades:
 
 - `docker-compose.yml`
 - `.env.example`
-- carpeta `sql/init/` reservada per bootstrap SQL futur
+- carpeta `sql/init/` reservada per bootstrap mínim no governat per ORM
 - port extern `5433` per conviure amb altres stacks locals que ja usen `5432`
-- script `sql/init/010-schema.sql` amb l'estructura fisica inicial del model
+- fitxers `sql/init/*` reduits a suport de bootstrap i no a creacio de schema
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
   <span style="color:#93c5fd;">DEV[Desenvolupament local]</span> --&gt; <span style="color:#c4b5fd;">DC[docker-compose.yml]</span>
@@ -104,11 +104,11 @@ Resum del diagrama:
 
 - el desenvolupament local arrenca la BBDD a traves de `docker-compose`
 - la configuracio sensible queda externalitzada a variables d'entorn
-- `sql/init` queda preparada per scripts inicials futurs
+- `sql/init` queda reservada per bootstrap auxiliar i no per crear l'esquema principal
 - la BBDD es un suport operatiu del punt actual, no el centre de l'arquitectura
 - el port `5433` evita conflictes amb altres repos locals que ja fan servir `5432`
 - la validacio del contenidor confirma que la base de dades local de `yepppet` ja esta operativa
-- l'script inicial permet veure les taules reals abans de tenir encara el `DbContext` d'`Entity Framework`
+- l'esquema real ja queda governat per migracions d'`Entity Framework`
 
 ## 2.4 Persistencia ORM en Infrastructure
 
@@ -131,6 +131,7 @@ Decisio tecnica clau:
 - el domini continua net de dependències ORM
 - la creacio d'esquema es governa per migracions EF i no per SQL manual
 - el mapping domini <-> persistencia queda reservat per al punt de mapatges i repositoris
+- aquest mapping es fara manualment i per agregat, sense `AutoMapper`
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
   <span style="color:#93c5fd;">DOM[Domain]</span> -.-> <span style="color:#c4b5fd;">APP[Application]</span>
@@ -139,7 +140,8 @@ Decisio tecnica clau:
   <span style="color:#fcd34d;">CTX</span> --&gt; <span style="color:#f9a8d4;">CFG[EF Configurations]</span>
   <span style="color:#fcd34d;">CTX</span> --&gt; <span style="color:#67e8f9;">REC[Persistence Records]</span>
   <span style="color:#fcd34d;">CTX</span> --&gt; <span style="color:#a7f3d0;">PG[(PostgreSQL :5433)]</span>
-  <span style="color:#fcd34d;">CTX</span> --&gt; <span style="color:#fde68a;">MIG[EF Migrations]</span></code></pre>
+  <span style="color:#fcd34d;">CTX</span> --&gt; <span style="color:#fde68a;">MIG[EF Migrations]</span>
+  <span style="color:#86efac;">INF</span> -.-> <span style="color:#fca5a5;">MAP[Manual Aggregate Mappers]</span></code></pre>
 
 Resum del diagrama:
 
@@ -148,6 +150,103 @@ Resum del diagrama:
 - les migracions passen a ser la font de veritat de l'esquema
 - l'arquitectura continua coherent amb `DDD` i evita acoblar negoci i ORM
 - el següent tram ja no és muntar EF, sinó mapar domini i implementar repositoris
+- el mapatge serà manual per agregat per mantenir control explícit sobre `value objects`, col·leccions i regles de conversió
+
+## 2.5 Estrategia de mapatge i repositoris
+
+Per al punt actiu, el backend treballara amb aquesta estrategia:
+
+- un mapper manual per agregat
+- mappers ubicats a `Infrastructure/Persistence/Mappings`
+- repositoris EF a `Infrastructure/Persistence/Repositories`
+- cada repositori utilitza `YepPetDbContext` + mapper del seu agregat
+- el domini no coneix ni EF ni els records de persistencia
+
+Distribucio prevista:
+
+- `PlacePersistenceMapper`
+- `UserPersistenceMapper`
+- `FavoriteListPersistenceMapper`
+- `PlaceReviewPersistenceMapper`
+
+<pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
+  <span style="color:#93c5fd;">REP[EF Repository]</span> --&gt; <span style="color:#c4b5fd;">CTX[YepPetDbContext]</span>
+  <span style="color:#93c5fd;">REP</span> --&gt; <span style="color:#86efac;">MAP[Aggregate Mapper]</span>
+  <span style="color:#86efac;">MAP</span> --&gt; <span style="color:#fcd34d;">DOM[Aggregate Domain]</span>
+  <span style="color:#86efac;">MAP</span> --&gt; <span style="color:#f9a8d4;">REC[Persistence Record]</span>
+  <span style="color:#c4b5fd;">CTX</span> --&gt; <span style="color:#67e8f9;">DB[(PostgreSQL)]</span></code></pre>
+
+Resum del diagrama:
+
+- el repositori EF coordina lectura i escriptura
+- el mapper transforma entre agregat de domini i model de persistencia
+- la conversio es explícita i no amagada en eines automàtiques
+- aquesta via facilita mantenir `DDD` i controlar millor l'evolucio dels `value objects`
+
+## 2.6 Estat tancat de mapatge i repositoris
+
+Aquest punt ja queda completat dins de `Infrastructure`.
+
+Peces creades:
+
+- `Persistence/Mappings/PlacePersistenceMapper.cs`
+- `Persistence/Mappings/UserPersistenceMapper.cs`
+- `Persistence/Mappings/FavoriteListPersistenceMapper.cs`
+- `Persistence/Mappings/PlaceReviewPersistenceMapper.cs`
+- `Persistence/Repositories/PlaceRepository.cs`
+- `Persistence/Repositories/UserRepository.cs`
+- `Persistence/Repositories/FavoriteListRepository.cs`
+- `Persistence/Repositories/PlaceReviewRepository.cs`
+
+<pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
+  <span style="color:#93c5fd;">IPlaceRepository</span> --&gt; <span style="color:#c4b5fd;">PlaceRepository</span>
+  <span style="color:#93c5fd;">IUserRepository</span> --&gt; <span style="color:#c4b5fd;">UserRepository</span>
+  <span style="color:#93c5fd;">IFavoriteListRepository</span> --&gt; <span style="color:#c4b5fd;">FavoriteListRepository</span>
+  <span style="color:#93c5fd;">IPlaceReviewRepository</span> --&gt; <span style="color:#c4b5fd;">PlaceReviewRepository</span>
+  <span style="color:#c4b5fd;">PlaceRepository</span> --&gt; <span style="color:#86efac;">PlacePersistenceMapper</span>
+  <span style="color:#c4b5fd;">UserRepository</span> --&gt; <span style="color:#86efac;">UserPersistenceMapper</span>
+  <span style="color:#c4b5fd;">FavoriteListRepository</span> --&gt; <span style="color:#86efac;">FavoriteListPersistenceMapper</span>
+  <span style="color:#c4b5fd;">PlaceReviewRepository</span> --&gt; <span style="color:#86efac;">PlaceReviewPersistenceMapper</span>
+  <span style="color:#c4b5fd;">PlaceRepository</span> --&gt; <span style="color:#fcd34d;">YepPetDbContext</span>
+  <span style="color:#c4b5fd;">UserRepository</span> --&gt; <span style="color:#fcd34d;">YepPetDbContext</span>
+  <span style="color:#c4b5fd;">FavoriteListRepository</span> --&gt; <span style="color:#fcd34d;">YepPetDbContext</span>
+  <span style="color:#c4b5fd;">PlaceReviewRepository</span> --&gt; <span style="color:#fcd34d;">YepPetDbContext</span></code></pre>
+
+Resum del diagrama:
+
+- cada contracte de domini ja te una implementacio EF concreta
+- cada repositori depen del seu mapper i del `DbContext`
+- el punt queda tancat sense trencar la separacio entre domini i infraestructura
+- el següent pas ja és pujar de nivell cap al backend `.NET` i els casos d'ús
+
+## 2.7 Estat tancat del backend `.NET`
+
+El backend `.NET` ja queda estructurat amb les quatre capes base:
+
+- `Domain`
+- `Application`
+- `Infrastructure`
+- `Api`
+
+Peces creades a `Application`:
+
+- `DependencyInjection.cs`
+- serveis d'aplicacio per `places`, `favorites`, `users` i `reviews`
+- DTOs/contractes d'entrada i sortida
+
+<pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
+  <span style="color:#93c5fd;">API[Api]</span> --&gt; <span style="color:#c4b5fd;">APP[Application]</span>
+  <span style="color:#c4b5fd;">APP</span> --&gt; <span style="color:#86efac;">DOM[Domain]</span>
+  <span style="color:#c4b5fd;">APP</span> --&gt; <span style="color:#fcd34d;">ABS[Repository Abstractions]</span>
+  <span style="color:#fcd34d;">ABS</span> --&gt; <span style="color:#f9a8d4;">INF[Infrastructure]</span>
+  <span style="color:#f9a8d4;">INF</span> --&gt; <span style="color:#67e8f9;">DB[(PostgreSQL)]</span></code></pre>
+
+Resum del diagrama:
+
+- `Application` ja coordina el negoci entre domini i persistencia
+- `Api` encara és mínima, però ja pot consumir serveis d'aplicacio
+- el backend deixa de ser només infraestructura i passa a tenir capa d'ús real
+- el següent pas natural és exposar aquests serveis com a API HTTP
 
 ## 3. Arquitectura aplicada
 

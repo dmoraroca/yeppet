@@ -1,0 +1,140 @@
+using YepPet.Domain.Places;
+using YepPet.Domain.Places.ValueObjects;
+using YepPet.Infrastructure.Persistence.Entities;
+
+namespace YepPet.Infrastructure.Persistence.Mappings;
+
+internal static class PlacePersistenceMapper
+{
+    public static Place ToDomain(PlaceRecord record)
+    {
+        var place = new Place(
+            record.Id,
+            record.Name,
+            Enum.Parse<PlaceType>(record.Type, ignoreCase: true),
+            record.ShortDescription,
+            record.Description,
+            record.CoverImageUrl,
+            new PostalAddress(
+                record.AddressLine1,
+                record.City,
+                record.Country,
+                record.Neighborhood ?? string.Empty),
+            new GeoLocation(record.Latitude, record.Longitude),
+            new PetPolicy(
+                record.AcceptsDogs,
+                record.AcceptsCats,
+                record.PetPolicyLabel,
+                record.PetPolicyNotes ?? string.Empty),
+            new Pricing(record.PricingLabel),
+            new RatingSnapshot(record.RatingAverage, record.ReviewCount));
+
+        place.ReplaceTags(
+            record.PlaceTags
+                .Select(placeTag => placeTag.Tag.DisplayName));
+
+        place.ReplaceFeatures(
+            record.PlaceFeatures
+                .Select(placeFeature => placeFeature.Feature.DisplayName));
+
+        return place;
+    }
+
+    public static PlaceRecord ToRecord(Place place)
+    {
+        var record = new PlaceRecord();
+        Apply(place, record);
+        return record;
+    }
+
+    public static void Apply(Place place, PlaceRecord record)
+    {
+        record.Id = place.Id;
+        record.Name = place.Name;
+        record.Type = place.Type.ToString();
+        record.ShortDescription = place.ShortDescription;
+        record.Description = place.Description;
+        record.CoverImageUrl = place.CoverImageUrl;
+        record.AddressLine1 = place.Address.Line1;
+        record.City = place.Address.City;
+        record.Country = place.Address.Country;
+        record.Neighborhood = place.Address.Neighborhood;
+        record.Latitude = place.Location.Latitude;
+        record.Longitude = place.Location.Longitude;
+        record.AcceptsDogs = place.PetPolicy.AcceptsDogs;
+        record.AcceptsCats = place.PetPolicy.AcceptsCats;
+        record.PetPolicyLabel = place.PetPolicy.Label;
+        record.PetPolicyNotes = place.PetPolicy.Notes;
+        record.PricingLabel = place.Pricing.DisplayLabel;
+        record.RatingAverage = place.Rating.Average;
+        record.ReviewCount = place.Rating.ReviewCount;
+    }
+
+    public static void SyncCollections(Place place, PlaceRecord record)
+    {
+        var desiredTags = Normalize(place.Tags);
+        var desiredFeatures = Normalize(place.Features);
+
+        var tagsToRemove = record.PlaceTags
+            .Where(placeTag => !desiredTags.Contains(placeTag.Tag.Code))
+            .ToArray();
+
+        foreach (var placeTag in tagsToRemove)
+        {
+            record.PlaceTags.Remove(placeTag);
+        }
+
+        foreach (var tagValue in desiredTags)
+        {
+            if (record.PlaceTags.Any(placeTag => placeTag.Tag.Code == tagValue))
+            {
+                continue;
+            }
+
+            record.PlaceTags.Add(new PlaceTagRecord
+            {
+                PlaceId = record.Id,
+                Tag = new TagRecord
+                {
+                    Code = tagValue,
+                    DisplayName = tagValue
+                }
+            });
+        }
+
+        var featuresToRemove = record.PlaceFeatures
+            .Where(placeFeature => !desiredFeatures.Contains(placeFeature.Feature.Code))
+            .ToArray();
+
+        foreach (var placeFeature in featuresToRemove)
+        {
+            record.PlaceFeatures.Remove(placeFeature);
+        }
+
+        foreach (var featureValue in desiredFeatures)
+        {
+            if (record.PlaceFeatures.Any(placeFeature => placeFeature.Feature.Code == featureValue))
+            {
+                continue;
+            }
+
+            record.PlaceFeatures.Add(new PlaceFeatureRecord
+            {
+                PlaceId = record.Id,
+                Feature = new FeatureRecord
+                {
+                    Code = featureValue,
+                    DisplayName = featureValue
+                }
+            });
+        }
+    }
+
+    private static HashSet<string> Normalize(IEnumerable<string> values)
+    {
+        return values
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .Select(value => value.Trim())
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+    }
+}

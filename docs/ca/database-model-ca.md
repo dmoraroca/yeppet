@@ -173,9 +173,12 @@ L'estructura relacional ja existeix a la BBDD local `yeppet` amb:
 - claus externes
 - indexes principals
 
-Aquesta materialitzacio es fa amb:
+La materialitzacio actual es governa amb:
 
-- `sql/init/010-schema.sql`
+- migracio `InitialCreate`
+- `__EFMigrationsHistory`
+
+El bootstrap SQL queda reduit a suport auxiliar i ja no crea l'esquema principal.
 
 ## Traduccio domini -> model relacional
 

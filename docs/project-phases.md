@@ -202,9 +202,9 @@ Passar de frontend mock-first a un sistema real amb backend i base de dades.
 - contractes de repositori i necessitats de persistència (**FET**)
 - model relacional a `PostgreSQL` (**FET**)
 - persistència amb `Entity Framework` última versió (**FET**)
-- configuració de mapatge, migracions i repositoris (**EN CURS**)
-- backend `.NET` (**PENDENT**)
-- API per `places`, `favorites`, `users`, `reviews` (**PENDENT**)
+- configuració de mapatge, migracions i repositoris (**FET**)
+- backend `.NET` (**FET**)
+- API per `places`, `favorites`, `users`, `reviews` (**EN CURS**)
 - substitució progressiva de serveis mock per serveis reals (**PENDENT**)
 
 ### Resultat esperat
@@ -240,11 +240,31 @@ El punt `persistència amb Entity Framework` queda tancat amb:
 - historial de migracions validat amb la taula `__EFMigrationsHistory`
 - `sql/init` reduit a bootstrap mínim perquè l'esquema el governi EF i no SQL manual
 
+### Estat actual del punt tancat
+
+El punt `configuració de mapatge, migracions i repositoris` queda tancat amb:
+
+- mappers manuals creats per `Place`, `User`, `FavoriteList` i `PlaceReview`
+- conversions explícites entre agregats de domini i records de persistència
+- repositoris EF creats per `IPlaceRepository`, `IUserRepository`, `IFavoriteListRepository` i `IPlaceReviewRepository`
+- registre dels repositoris a `DependencyInjection`
+- compilació del backend validada amb `dotnet build YepPet.sln`
+
+### Estat actual del punt tancat
+
+El punt `backend .NET` queda tancat amb:
+
+- projecte `Application` deixat operatiu
+- capa d'aplicacio amb DTOs i serveis per `places`, `favorites`, `users` i `reviews`
+- registre d'`Application` a la DI del backend
+- integracio de `Application` + `Infrastructure` + `Api` validada en compilacio
+- `dotnet build YepPet.sln` correcte amb les quatre capes del backend
+
 ### Nou punt actiu
 
 Ara mateix, el punt actiu passa a ser:
 
-- configuració de mapatge, migracions i repositoris (**EN CURS**)
+- API per `places`, `favorites`, `users`, `reviews` (**EN CURS**)
 
 ## Fase IV · Permisos, administració i operativa (**PENDENT**)
 

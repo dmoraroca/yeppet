@@ -61,12 +61,31 @@ Ja queda implementat:
 - migracio inicial `InitialCreate`
 - aplicacio real de la migracio sobre PostgreSQL local
 
-Encara pendent dins de Fase III:
+Aquest document deixa tancat el punt d'`Entity Framework` i cedeix el següent pas a:
 
-- mapatge domini -> persistencia
-- repositoris concrets
-- `DbContext` usat des de casos d'us reals
+- `mapping-repositories-ca.md`
 
-Per tant, el següent punt actiu passa a ser:
+## Estrategia del punt següent
 
-- `configuracio de mapatge, migracions i repositoris`
+El mapatge no es fara amb eines automatiques. La decisio tecnica es:
+
+- mapatge manual per agregat
+- mappers dins de `Infrastructure`
+- un repositori EF per contracte de domini
+- conversions explícites per `value objects`, col·leccions i relacions
+
+<pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
+  <span style="color:#93c5fd;">R[Repository]</span> --&gt; <span style="color:#c4b5fd;">M[Manual Mapper]</span>
+  <span style="color:#c4b5fd;">M</span> --&gt; <span style="color:#86efac;">A[Aggregate]</span>
+  <span style="color:#c4b5fd;">M</span> --&gt; <span style="color:#fcd34d;">P[Persistence Record]</span>
+  <span style="color:#93c5fd;">R</span> --&gt; <span style="color:#67e8f9;">C[YepPetDbContext]</span></code></pre>
+
+Resum del diagrama:
+
+- el repositori no retorna records EF al domini
+- el mapper manual controla tota la conversio
+- `DDD` es manté net i explícit
+
+Aquest punt següent ja queda també resolt al document:
+
+- `mapping-repositories-ca.md`
