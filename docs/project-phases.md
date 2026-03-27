@@ -286,7 +286,7 @@ El punt `substitució progressiva de serveis mock per serveis reals` queda tanca
 - stack local complet de desenvolupament disponible amb `Docker Compose` per `db`, `api` i `web`
 - perfils de `Run and Debug` de `VS Code` disponibles per aixecar la stack completa o cada servei per separat sobre `Docker`
 
-## Fase IV · Permisos, administració i operativa (**PENDENT**)
+## Fase IV · Permisos, administració i operativa (**EN CURS**)
 
 ### Objectiu
 

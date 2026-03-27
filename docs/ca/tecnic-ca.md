@@ -324,7 +324,7 @@ Resum del diagrama:
 - la web ja no depen del `PlaceSource` mock per al cataleg principal
 - favorits i perfil ja escriuen sobre dades persistides
 - el login es manté local però crea o recupera usuari real al backend
-- la Fase III es pot donar per tancada sense obrir encara l'autenticacio completa de Fase IV
+- la Fase III queda tancada i la Fase IV s'obre com a següent focus tècnic
 
 ## 2.10 Stack Docker local complet
 
@@ -387,6 +387,30 @@ Resum del diagrama:
 - el workspace pot aixecar la stack completa o només el servei que toqui
 
 ## 3. Arquitectura aplicada
+
+### 2.11 Obertura tècnica de Fase IV
+
+Amb la Fase III tancada, el nou focus tècnic passa a ser la seguretat operativa del producte:
+
+- autenticació real
+- rols i permisos
+- diferenciació entre zones públiques i internes
+- control d'accessos per funcionalitat
+
+<pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
+  <span style="color:#93c5fd;">WEB[Frontend Angular]</span> --&gt; <span style="color:#c4b5fd;">API[Backend API]</span>
+  <span style="color:#fcd34d;">AUTH[Autenticacio]</span> -.-> <span style="color:#c4b5fd;">API</span>
+  <span style="color:#86efac;">RBAC[Rols i permisos]</span> -.-> <span style="color:#c4b5fd;">API</span>
+  <span style="color:#f9a8d4;">INTERNAL[Àrees internes]</span> -.-> <span style="color:#93c5fd;">WEB</span>
+  <span style="color:#c4b5fd;">API</span> --&gt; <span style="color:#67e8f9;">APP[Application]</span>
+  <span style="color:#67e8f9;">APP</span> --&gt; <span style="color:#fde68a;">INF[Infrastructure]</span>
+  <span style="color:#fde68a;">INF</span> --&gt; <span style="color:#a7f3d0;">DB[(PostgreSQL)]</span></code></pre>
+
+Resum del diagrama:
+
+- la base tècnica de Fase III ja permet obrir autenticació i permisos sense rehacer backend ni persistència
+- el control d'accessos s'haurà de recolzar en `Api` i `Application`, no només en la web
+- la Fase IV ja no és pendent conceptual, sinó línia activa de treball
 
 ### 3.1 Principis
 
