@@ -3,7 +3,7 @@
 ## 1. Introduccio
 
 Aquest document descriu com esta construida **YepPet** a nivell tecnic.
-En l'estat actual, el projecte es una web Angular 21 amb enfocament `mock-first`, arquitectura per `features`
+En l'estat actual, el projecte es una web Angular 21 connectada a un backend `.NET`, arquitectura per `features`
 i una primera base funcional de mapa amb `Leaflet` i `OpenStreetMap`.
 
 Objectius:
@@ -20,7 +20,7 @@ Objectius:
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
   <span style="color:#93c5fd;">U[Usuari]</span> --&gt;|<span style="color:#fcd34d;">Navegador</span>| <span style="color:#c4b5fd;">W[YepPet Web Angular]</span>
-  <span style="color:#c4b5fd;">W</span> --&gt;|<span style="color:#fca5a5;">Mock Services</span>| <span style="color:#86efac;">M[(Dades simulades)]</span>
+  <span style="color:#c4b5fd;">W</span> --&gt;|<span style="color:#fca5a5;">HTTP real</span>| <span style="color:#86efac;">API[(YepPet Api)]</span>
   <span style="color:#c4b5fd;">W</span> --&gt;|<span style="color:#fcd34d;">Mapa</span>| <span style="color:#67e8f9;">MAP[Leaflet + OpenStreetMap]</span>
 
   <span style="color:#5eead4; font-weight:700;">subgraph</span> <span style="color:#f9a8d4;">FE[Frontend Angular]</span>
@@ -32,7 +32,7 @@ Objectius:
   <span style="color:#c4b5fd;">W</span> --&gt; <span style="color:#93c5fd;">F</span>
   <span style="color:#93c5fd;">F</span> --&gt; <span style="color:#93c5fd;">C</span>
   <span style="color:#93c5fd;">F</span> --&gt; <span style="color:#93c5fd;">S</span>
-  <span style="color:#93c5fd;">F</span> --&gt; <span style="color:#86efac;">M</span>
+  <span style="color:#93c5fd;">F</span> --&gt; <span style="color:#86efac;">API</span>
   <span style="color:#93c5fd;">F</span> --&gt; <span style="color:#67e8f9;">MAP</span></code></pre>
 
 Resum del diagrama:
@@ -40,20 +40,21 @@ Resum del diagrama:
 - la web Angular es el punt d'entrada de l'usuari
 - la logica es distribueix per `features`
 - `core` conté peces globals i `shared` peces reutilitzables
-- els serveis actuals treballen contra dades simulades
+- els fluxos principals del frontend ja treballen contra API real
 - el mapa es tracta com una capacitat transversal reutilitzable
 
 ## 2.1 Estat tecnic actual
 
 En aquest moment conviuen dues capes amb rols diferents:
 
-- un frontend Angular 21 encara `mock-first`, que continua sent la base executable del producte
-- una primera base de backend a `src/Backend/Domain`, creada per obrir la Fase III amb `DDD`
+- un frontend Angular 21 que continua sent la base executable del producte
+- un backend `.NET` complet a `Domain`, `Application`, `Infrastructure` i `Api`, ja integrat amb la web per als fluxos principals
 
 Aixo vol dir que:
 
-- la UI encara treballa amb mocks
-- la persistencia real encara no esta implementada
+- la UI ja consumeix backend real per `places`, `favorites` i manteniment de `perfil`
+- la persistencia real ja esta implementada
+- el login continua local per no obrir encara l'autenticacio real de Fase IV
 - pero el model de domini ja no depen del model fake del frontend
 - el backend comenca pel domini i no per la base de dades
 - el domini continua separat de la persistencia ORM encara que `Entity Framework` ja estigui muntat a `Infrastructure`
@@ -290,7 +291,35 @@ Rutes reals validades:
 - `POST /api/reviews`
 - `PUT /api/reviews/{id}`
 
-El seguent punt tecnic actiu passa a ser la substitucio progressiva dels serveis mock del frontend per aquests endpoints reals, mantenint la UI Angular existent.
+## 2.9 Estat tancat de la integracio frontend -> API
+
+La Fase III queda tancada perquè el frontend ja consumeix la nova API en els fluxos principals.
+
+Peces integrades:
+
+- `PlaceService` carregant `places` des d'HTTP real
+- `FavoritesService` persistint favorits contra backend
+- `AuthService` sincronitzant usuaris locals amb l'endpoint de `users`
+- `ProfilePage` guardant sobre backend real
+- `Api` amb `CORS` habilitat per `http://localhost:4200`
+
+<pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
+  <span style="color:#93c5fd;">WEB[Angular Web]</span> --&gt; <span style="color:#c4b5fd;">PS[PlaceService HTTP]</span>
+  <span style="color:#93c5fd;">WEB</span> --&gt; <span style="color:#86efac;">FS[FavoritesService HTTP]</span>
+  <span style="color:#93c5fd;">WEB</span> --&gt; <span style="color:#fcd34d;">AS[AuthService + sync users]</span>
+  <span style="color:#c4b5fd;">PS</span> --&gt; <span style="color:#f9a8d4;">API[Minimal API]</span>
+  <span style="color:#86efac;">FS</span> --&gt; <span style="color:#f9a8d4;">API</span>
+  <span style="color:#fcd34d;">AS</span> --&gt; <span style="color:#f9a8d4;">API</span>
+  <span style="color:#f9a8d4;">API</span> --&gt; <span style="color:#67e8f9;">APP[Application]</span>
+  <span style="color:#67e8f9;">APP</span> --&gt; <span style="color:#a7f3d0;">INF[Infrastructure]</span>
+  <span style="color:#a7f3d0;">INF</span> --&gt; <span style="color:#fde68a;">DB[(PostgreSQL)]</span></code></pre>
+
+Resum del diagrama:
+
+- la web ja no depen del `PlaceSource` mock per al cataleg principal
+- favorits i perfil ja escriuen sobre dades persistides
+- el login es manté local però crea o recupera usuari real al backend
+- la Fase III es pot donar per tancada sense obrir encara l'autenticacio completa de Fase IV
 
 ## 3. Arquitectura aplicada
 

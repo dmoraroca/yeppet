@@ -3,7 +3,7 @@
 ## 1. Resum executiu
 
 YepPet es una plataforma pet-friendly orientada a descobrir llocs, estades i serveis que accepten mascotes.
-En l'estat actual, el producte es valida amb una web Angular i dades simulades abans d'entrar en backend real.
+En l'estat actual, el producte ja combina una web Angular amb backend `.NET` i `PostgreSQL` per als fluxos principals de Fase III.
 
 El focus funcional actual es:
 
@@ -11,8 +11,8 @@ El focus funcional actual es:
 - navegacio clara entre portada, resultats, detall i favorits
 - filtratge per ciutat, tipus, mascota i text de cerca
 - suport de mapa dins la feature `places` en mode mixt amb llistat sincronitzat
-- dades simulades més riques per entendre millor context, preu i política pet
-- serveis preparats per canviar la font de dades sense reescriure pantalles
+- dades reals per `places`, `favorites` i manteniment de `perfil`
+- transicio controlada entre serveis locals i API sense reescriure pantalles
 - autenticacio fake amb redireccio i manteniment de sessio
 - perfil fake amb consentiment de manteniment de dades
 - ajuda i contacte com a capes informatives
@@ -55,7 +55,6 @@ Inclou:
 
 Fora d'abast a data d'aquest document:
 
-- persistencia de favorits
 - autenticacio real contra API
 - permisos reals persistits
 - integracions externes de tercers
@@ -72,7 +71,7 @@ En l'estat actual:
 
 - la Fase I ja queda tancada com a base funcional inicial
 - la Fase II queda recollida com a base funcional ja consolidada segons els punts marcats en negreta a `project-phases.md`
-- la Fase III ja esta oberta
+- la Fase III ja queda tancada
 - el disseny del model de domini real ja queda completat com a base del backend
 - els contractes de repositori i les necessitats de persistencia ja queden definits com a base del backend
 - el model relacional a `PostgreSQL` ja queda tancat
@@ -80,7 +79,7 @@ En l'estat actual:
 - la configuracio de mapatge, migracions i repositoris ja queda tancada com a capa de persistencia operativa
 - el backend `.NET` ja queda tancat com a base de serveis i casos d'us
 - l'API real per `places`, `favorites`, `users` i `reviews` ja queda exposada i validada
-- el punt actiu actual de la Fase III es la `substitucio progressiva de serveis mock per serveis reals`
+- la substitucio progressiva dels serveis mock per serveis reals ja queda tancada
 - la traduccio inicial cap a persistencia relacional es documenta a `database-model-ca.md`
 - la base de dades de desenvolupament ja queda validada amb `Docker`, exposant-se localment pel port `5433`
 - la base de dades local ja te schema governat per `Entity Framework` i historial de migracions real
@@ -88,7 +87,7 @@ En l'estat actual:
 - el mapatge cap al domini ja es fa manualment per agregat, prioritzant claredat i control de negoci abans que automatismes
 - la capa `Application` ja existeix amb serveis i contractes per les principals funcionalitats del producte
 - ja existeixen consultes i altes basiques reals sobre HTTP per `places`, `favorites`, `users` i `reviews`
-- el focus funcional visible avui se centra sobretot en `places`, `place detail`, `favorites`, `auth/profile`, la capa base d'errors i les pagines informatives ja refinades, mentre el seguent treball es connectar progressivament el frontend a serveis reals
+- el focus funcional visible avui se centra en `places`, `place detail`, `favorites` i `perfil` recolzats en dades reals, mentre el login continua sent una porta d'entrada controlada i local
 
 Per tant, aquest document no substitueix el de fases, sino que el complementa des del punt de vista d'us, navegacio i comportament funcional.
 
@@ -96,31 +95,27 @@ Per tant, aquest document no substitueix el de fases, sino que el complementa de
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
   <span style="color:#93c5fd;">U[Usuari]</span> --&gt; <span style="color:#c4b5fd;">W[Web Angular actual]</span>
-  <span style="color:#c4b5fd;">W</span> --&gt; <span style="color:#86efac;">M[Mocks actuals]</span>
-  <span style="color:#c4b5fd;">W</span> -.-> <span style="color:#fcd34d;">D[Domini backend Fase III]</span>
-  <span style="color:#fcd34d;">D</span> -.-> <span style="color:#f9a8d4;">P[Persistencia real futura]</span>
-  <span style="color:#f9a8d4;">P</span> -.-> <span style="color:#67e8f9;">DB[(PostgreSQL amb taules locals :5433)]</span>
-  <span style="color:#f9a8d4;">P</span> -.-> <span style="color:#86efac;">EF[Entity Framework tancat]</span>
+  <span style="color:#c4b5fd;">W</span> --&gt; <span style="color:#86efac;">API[API real Fase III]</span>
+  <span style="color:#c4b5fd;">W</span> -.-> <span style="color:#fcd34d;">AUTH[Login local controlat]</span>
+  <span style="color:#86efac;">API</span> -.-> <span style="color:#f9a8d4;">APP[Application Services]</span>
+  <span style="color:#f9a8d4;">APP</span> -.-> <span style="color:#67e8f9;">DB[(PostgreSQL amb taules locals :5433)]</span>
+  <span style="color:#f9a8d4;">APP</span> -.-> <span style="color:#86efac;">EF[Entity Framework tancat]</span>
   <span style="color:#86efac;">EF</span> -.-> <span style="color:#fcd34d;">SC[Schema governat per migracions]</span>
   <span style="color:#86efac;">EF</span> -.-> <span style="color:#a7f3d0;">INF[Infrastructure]</span>
   <span style="color:#86efac;">EF</span> -.-> <span style="color:#67e8f9;">HIST[__EFMigrationsHistory]</span>
   <span style="color:#a7f3d0;">INF</span> -.-> <span style="color:#fde68a;">MAP[Mapatge manual per agregat]</span>
-  <span style="color:#a7f3d0;">INF</span> -.-> <span style="color:#fca5a5;">REP[Repositoris EF]</span>
-  <span style="color:#fca5a5;">REP</span> -.-> <span style="color:#c4b5fd;">APP[Application Services]</span></code></pre>
+  <span style="color:#a7f3d0;">INF</span> -.-> <span style="color:#fca5a5;">REP[Repositoris EF]</span></code></pre>
 
 Resum del diagrama:
 
 - l'usuari continua consumint la mateixa web funcional actual
-- la UI encara treballa amb mocks
-- el domini backend ja s'esta preparant per substituir progressivament aquestes fonts fake
-- la persistencia real encara no es visible funcionalment, pero el model relacional ja queda fixat
+- `places`, `favorites` i `perfil` ja treballen sobre backend real
+- el login continua controlat localment però sincronitza usuaris amb backend per obtenir identitat persistent
 - la BBDD de desenvolupament ja es pot aixecar sense sortir del repo
-- l'equip ja pot inspeccionar taules reals des de DBeaver sense esperar al backend complet
+- l'equip ja pot inspeccionar taules reals des de DBeaver
 - `Entity Framework` ja governa l'esquema local amb migracio inicial aplicada
 - el mapatge manual i els repositoris reals ja estan muntats a `Infrastructure`
-- el backend `.NET` ja te capa `Application`
-- l'API real ja permet consultes i altes basiques per `places`, `favorites`, `users` i `reviews`
-- el seguent moviment funcional-tecnic es substituir progressivament els mocks del frontend per crides HTTP reals
+- el backend `.NET` i l'API ja estan integrats amb el frontend en els fluxos principals de Fase III
 
 ## 4. Actors
 

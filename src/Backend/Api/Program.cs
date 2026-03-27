@@ -7,10 +7,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddProblemDetails();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("web", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
 app.UseExceptionHandler();
+app.UseCors("web");
 
 app.MapGet("/", () => "Hello World!");
 app.MapGet("/health/db", () => Results.Ok(new { status = "configured" }));

@@ -18,8 +18,8 @@ export class PermissionsPageComponent {
       body: '`core`, `shared` i `features` des del primer dia per mantenir el frontend net i escalable.'
     },
     {
-      title: 'Dades mock-first',
-      body: 'La UI treballa sobre serveis mock substituibles més endavant per `HttpClient` i backend real.'
+      title: 'Transicio a serveis reals',
+      body: 'La UI ja combina persistencia real per `places`, `favorites` i perfil, mantenint una transicio progressiva i controlada cap a backend complet.'
     },
     {
       title: 'Accés per permisos',

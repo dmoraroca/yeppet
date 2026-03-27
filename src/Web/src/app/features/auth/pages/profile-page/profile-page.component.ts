@@ -39,7 +39,7 @@ export class ProfilePageComponent {
     return raw || null;
   });
 
-  protected save(): void {
+  protected async save(): Promise<void> {
     if (!this.isAdmin() && !this.form.controls.privacyAccepted.value) {
       this.notifications.notify(
         'Consentiment obligatori',
@@ -57,7 +57,7 @@ export class ProfilePageComponent {
     }
 
     const value = this.form.getRawValue();
-    this.authService.updateProfile({
+    await this.authService.updateProfile({
       name: value.name.trim(),
       city: value.city.trim(),
       country: value.country.trim(),
@@ -66,7 +66,7 @@ export class ProfilePageComponent {
       privacyAccepted: this.isAdmin() ? true : value.privacyAccepted
     });
 
-    this.notifications.notify('Perfil actualitzat', 'Els canvis s’han guardat correctament en mode fake.');
+    this.notifications.notify('Perfil actualitzat', 'Els canvis s’han guardat correctament sobre backend real.');
   }
 
   protected logout(): void {

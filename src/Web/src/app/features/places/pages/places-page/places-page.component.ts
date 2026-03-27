@@ -43,7 +43,7 @@ export class PlacesPageComponent {
     pet: (this.queryParams().get('pet') as PlaceFilters['pet']) ?? 'all'
   }));
 
-  protected readonly cities = this.placeService.getAvailableCities();
+  protected readonly cities = computed(() => this.placeService.getAvailableCities());
   protected readonly types = this.placeService.getAvailableTypes();
   protected readonly places = computed(() => this.placeService.getPlaces(this.filters()));
   protected readonly selectedPlaceId = this.selectedPlaceIdState.asReadonly();
@@ -134,7 +134,7 @@ export class PlacesPageComponent {
       return 'Mode mixt validat: filtres, mapa i llistat conviuen a la mateixa pantalla per descobrir i comparar llocs sense canviar de vista.';
     }
 
-    return `Mode mixt actiu amb dades simulades: ${details.join(' · ')}. El mapa dona context i la llista facilita comparar i obrir el detall.`;
+    return `Mode mixt actiu sobre dades reals: ${details.join(' · ')}. El mapa dona context i la llista facilita comparar i obrir el detall.`;
   });
 
   protected updateFilters(partial: Partial<PlaceFilters>): void {

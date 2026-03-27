@@ -84,6 +84,13 @@ El punt queda validat amb un flux real sobre la BBDD local:
 - alta i lectura de `favorites`
 - alta i lectura de `reviews`
 
-## Seguent pas
+## Integracio tancada
 
-El seguent moviment de Fase III ja no es ampliar la base HTTP, sino substituir progressivament els serveis mock del frontend Angular per crides reals a aquesta API.
+La Fase III queda completada perquè aquesta API ja no només existeix i respon, sino que també queda consumida pel frontend Angular en els fluxos visibles principals:
+
+- cataleg de `places`
+- `place detail`
+- `favorites`
+- manteniment de `perfil`
+
+L'autenticacio real amb backend continua fora d'aquest document i passa a la Fase IV.

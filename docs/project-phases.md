@@ -190,7 +190,7 @@ La Fase II queda donada per acabada segons aquest criteri d'etiquetes explícite
 
 Una aplicació frontend sòlida que simula millor el comportament real del producte i està llesta per començar a parlar amb backend.
 
-## Fase III · Backend real i persistència (**EN CURS**)
+## Fase III · Backend real i persistència (**FET**)
 
 ### Objectiu
 
@@ -205,11 +205,11 @@ Passar de frontend mock-first a un sistema real amb backend i base de dades.
 - configuració de mapatge, migracions i repositoris (**FET**)
 - backend `.NET` (**FET**)
 - API per `places`, `favorites`, `users`, `reviews` (**FET**)
-- substitució progressiva de serveis mock per serveis reals (**EN CURS**)
+- substitució progressiva de serveis mock per serveis reals (**FET**)
 
 ### Resultat esperat
 
-YepPet deixa de ser una simulació i passa a tenir dades persistides i fluxos reals (**PENDENT**).
+YepPet deixa de ser una simulació i passa a tenir dades persistides i fluxos reals (**FET**).
 
 ### Estat actual del punt tancat
 
@@ -272,29 +272,16 @@ El punt `API per places, favorites, users i reviews` queda tancat amb:
 - flux provat de punta a punta: alta de `user`, alta de `place`, consulta de `place`, alta de favorit i alta de review
 - lectura real dels recursos guardats via HTTP sobre dades persistides
 
-### Nou punt actiu
+### Estat actual del punt tancat
 
-Ara mateix, el punt actiu passa a ser:
+El punt `substitució progressiva de serveis mock per serveis reals` queda tancat amb:
 
-- substitució progressiva de serveis mock per serveis reals (**EN CURS**)
-
-### Criteri del punt actiu
-
-Aquest punt es resoldra connectant la web Angular actual contra la nova API sense perdre la UX ni l'estructura `mock-first` ja consolidada.
-
-L'objectiu és substituir progressivament:
-
-- consultes de `places`
-- detall de `place`
-- `favorites`
-- `users`
-- `reviews`
-
-La implementació es fara sobre:
-
-- `Web` consumint HTTP real
-- `Api` com a capa backend ja validada
-- adaptadors o serveis del frontend que permetin fer la transició per etapes
+- `Web` consumint HTTP real contra `Api` per `places`
+- `favorites` persistits i sincronitzats contra backend real
+- `perfil` guardant contra l'endpoint de `users`
+- login mantenint porta d'entrada fake però sincronitzant usuaris contra backend per obtenir identitat real
+- `ng build` correcte un cop connectat el frontend a la nova API
+- convivència controlada entre UX existent i dades reals sense reescriure la navegació
 
 ## Fase IV · Permisos, administració i operativa (**PENDENT**)
 

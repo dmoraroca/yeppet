@@ -37,7 +37,7 @@ export class LoginPageComponent {
   });
 
   protected readonly previewFilters = this.previewFiltersState.asReadonly();
-  protected readonly previewCities = this.placeService.getAvailableCities();
+  protected readonly previewCities = computed(() => this.placeService.getAvailableCities());
   protected readonly previewTypes = this.placeService.getAvailableTypes();
   protected readonly samplePlaces = computed(() =>
     this.placeService.getPlaces(this.previewFilters()).slice(0, 4)
@@ -63,7 +63,7 @@ export class LoginPageComponent {
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
-  protected submit(): void {
+  protected async submit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.notifications.notify('Revisa el formulari', 'Cal informar un email vàlid i la contrasenya.');
@@ -71,13 +71,10 @@ export class LoginPageComponent {
       return;
     }
 
-    const result = this.authService.login(this.form.getRawValue());
+    const result = await this.authService.login(this.form.getRawValue());
 
     if (!result.ok) {
-      this.notifications.notify(
-        'Credencials incorrectes',
-        'Prova amb admin@admin.adm / Admin123 o user@user.com / Admin123.'
-      );
+      this.notifications.notify('Credencials incorrectes', 'Prova amb admin@admin.adm / Admin123 o user@user.com / Admin123.');
 
       return;
     }

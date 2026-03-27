@@ -1,8 +1,11 @@
-import { Inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { catchError, of } from 'rxjs';
 
+import { API_BASE_URL } from '../../../core/config/api.config';
 import { FavoritesService } from '../../favorites/services/favorites.service';
 import { PetFilter, Place, PlaceFilters } from '../models/place.model';
-import { PLACE_SOURCE, PlaceSource } from './place-source.token';
+import { PLACE_TYPE_LABELS } from '../mock/places.fake';
 
 const DEFAULT_FILTERS: PlaceFilters = {
   search: '',
@@ -13,16 +16,22 @@ const DEFAULT_FILTERS: PlaceFilters = {
 
 @Injectable({ providedIn: 'root' })
 export class PlaceService {
-  constructor(
-    private readonly favoritesService: FavoritesService,
-    @Inject(PLACE_SOURCE) private readonly placeSource: PlaceSource
-  ) {}
+  private readonly http = inject(HttpClient);
+  private readonly favoritesService = inject(FavoritesService);
+  private readonly placesState = signal<Place[]>([]);
+  private readonly loadedState = signal(false);
+
+  constructor() {
+    this.reload();
+  }
+
+  readonly hasLoaded = computed(() => this.loadedState());
 
   getPlaces(filters: Partial<PlaceFilters> = {}): Place[] {
     const safeFilters = { ...DEFAULT_FILTERS, ...filters };
     const search = safeFilters.search.trim().toLowerCase();
 
-    return this.placeSource.getAllPlaces().filter((place) => {
+    return this.placesState().filter((place) => {
       const matchesSearch =
         search.length === 0 ||
         [place.name, place.city, place.neighborhood, place.shortDescription, ...place.tags]
@@ -39,7 +48,7 @@ export class PlaceService {
   }
 
   getPlaceById(placeId: string): Place | undefined {
-    return this.placeSource.getAllPlaces().find((place) => place.id === placeId);
+    return this.placesState().find((place) => place.id === placeId);
   }
 
   getFavoritePlaces(): Place[] {
@@ -51,17 +60,27 @@ export class PlaceService {
   }
 
   getAvailableCities(): string[] {
-    return [...new Set(this.placeSource.getAllPlaces().map((place) => place.city))].sort((a, b) =>
+    return [...new Set(this.placesState().map((place) => place.city))].sort((a, b) =>
       a.localeCompare(b)
     );
   }
 
   getAvailableTypes(): { value: string; label: string }[] {
-    return Object.entries(this.placeSource.getTypeLabels()).map(([value, label]) => ({ value, label }));
+    return Object.entries(PLACE_TYPE_LABELS).map(([value, label]) => ({ value, label }));
   }
 
   getTypeLabel(type: Place['type']): string {
-    return this.placeSource.getTypeLabels()[type];
+    return PLACE_TYPE_LABELS[type];
+  }
+
+  reload(): void {
+    this.http
+      .get<PlaceApiSummaryDto[]>(`${API_BASE_URL}/places`)
+      .pipe(catchError(() => of([])))
+      .subscribe((places) => {
+        this.placesState.set(places.map((place) => this.toPlace(place)));
+        this.loadedState.set(true);
+      });
   }
 
   private matchesPet(place: Place, pet: PetFilter): boolean {
@@ -75,4 +94,56 @@ export class PlaceService {
 
     return true;
   }
+
+  private toPlace(place: PlaceApiSummaryDto): Place {
+    return {
+      id: place.id,
+      name: place.name,
+      city: place.city,
+      country: place.country,
+      neighborhood: place.neighborhood,
+      type: place.type.toLowerCase() as Place['type'],
+      shortDescription: place.shortDescription,
+      description: place.description,
+      imageUrl: place.coverImageUrl,
+      acceptsDogs: place.acceptsDogs,
+      acceptsCats: place.acceptsCats,
+      rating: place.ratingAverage,
+      reviewCount: place.reviewCount,
+      priceLabel: place.pricingLabel,
+      petPolicyLabel: place.petPolicyLabel,
+      tags: [...place.tags],
+      address: `${place.addressLine1}, ${place.city}`,
+      petNotes: place.petPolicyNotes,
+      features: [...place.features],
+      coordinates: {
+        lat: place.latitude,
+        lng: place.longitude
+      }
+    };
+  }
+}
+
+interface PlaceApiSummaryDto {
+  id: string;
+  name: string;
+  type: string;
+  shortDescription: string;
+  description: string;
+  coverImageUrl: string;
+  addressLine1: string;
+  city: string;
+  country: string;
+  neighborhood: string;
+  latitude: number;
+  longitude: number;
+  acceptsDogs: boolean;
+  acceptsCats: boolean;
+  petPolicyLabel: string;
+  petPolicyNotes: string;
+  pricingLabel: string;
+  ratingAverage: number;
+  reviewCount: number;
+  tags: string[];
+  features: string[];
 }
