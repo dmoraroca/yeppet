@@ -55,7 +55,6 @@ Inclou:
 
 Fora d'abast a data d'aquest document:
 
-- backend real
 - persistencia de favorits
 - autenticacio real contra API
 - permisos reals persistits
@@ -80,14 +79,16 @@ En l'estat actual:
 - la persistencia amb `Entity Framework` ja queda tancada com a capa ORM base
 - la configuracio de mapatge, migracions i repositoris ja queda tancada com a capa de persistencia operativa
 - el backend `.NET` ja queda tancat com a base de serveis i casos d'us
-- el punt actiu actual de la Fase III es `API per places, favorites, users i reviews`
+- l'API real per `places`, `favorites`, `users` i `reviews` ja queda exposada i validada
+- el punt actiu actual de la Fase III es la `substitucio progressiva de serveis mock per serveis reals`
 - la traduccio inicial cap a persistencia relacional es documenta a `database-model-ca.md`
 - la base de dades de desenvolupament ja queda validada amb `Docker`, exposant-se localment pel port `5433`
 - la base de dades local ja te schema governat per `Entity Framework` i historial de migracions real
 - la capa de persistencia ORM ja existeix a `Infrastructure` i ja inclou mapatge manual i repositoris EF
 - el mapatge cap al domini ja es fa manualment per agregat, prioritzant claredat i control de negoci abans que automatismes
 - la capa `Application` ja existeix amb serveis i contractes per les principals funcionalitats del producte
-- el focus funcional visible avui se centra sobretot en `places`, `place detail`, `favorites`, `auth/profile`, la capa base d'errors i les pagines informatives ja refinades, mentre backend i persistencia real entren en construccio
+- ja existeixen consultes i altes basiques reals sobre HTTP per `places`, `favorites`, `users` i `reviews`
+- el focus funcional visible avui se centra sobretot en `places`, `place detail`, `favorites`, `auth/profile`, la capa base d'errors i les pagines informatives ja refinades, mentre el seguent treball es connectar progressivament el frontend a serveis reals
 
 Per tant, aquest document no substitueix el de fases, sino que el complementa des del punt de vista d'us, navegacio i comportament funcional.
 
@@ -118,7 +119,8 @@ Resum del diagrama:
 - `Entity Framework` ja governa l'esquema local amb migracio inicial aplicada
 - el mapatge manual i els repositoris reals ja estan muntats a `Infrastructure`
 - el backend `.NET` ja te capa `Application`
-- el seguent moviment funcional-tecnic es exposar API real per `places`, `favorites`, `users` i `reviews`
+- l'API real ja permet consultes i altes basiques per `places`, `favorites`, `users` i `reviews`
+- el seguent moviment funcional-tecnic es substituir progressivament els mocks del frontend per crides HTTP reals
 
 ## 4. Actors
 

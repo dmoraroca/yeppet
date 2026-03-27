@@ -204,8 +204,8 @@ Passar de frontend mock-first a un sistema real amb backend i base de dades.
 - persistència amb `Entity Framework` última versió (**FET**)
 - configuració de mapatge, migracions i repositoris (**FET**)
 - backend `.NET` (**FET**)
-- API per `places`, `favorites`, `users`, `reviews` (**EN CURS**)
-- substitució progressiva de serveis mock per serveis reals (**PENDENT**)
+- API per `places`, `favorites`, `users`, `reviews` (**FET**)
+- substitució progressiva de serveis mock per serveis reals (**EN CURS**)
 
 ### Resultat esperat
 
@@ -260,11 +260,41 @@ El punt `backend .NET` queda tancat amb:
 - integracio de `Application` + `Infrastructure` + `Api` validada en compilacio
 - `dotnet build YepPet.sln` correcte amb les quatre capes del backend
 
+### Estat actual del punt tancat
+
+El punt `API per places, favorites, users i reviews` queda tancat amb:
+
+- `Api` exposant rutes HTTP reals via `minimal APIs`
+- grups de rutes separats per `places`, `favorites`, `users` i `reviews`
+- ús exclusiu de serveis d'`Application` des de la capa `Api`
+- sense dependència directa de `DbContext` ni de `Infrastructure` dins dels endpoints
+- validació end-to-end real contra `PostgreSQL` local a `localhost:5433`
+- flux provat de punta a punta: alta de `user`, alta de `place`, consulta de `place`, alta de favorit i alta de review
+- lectura real dels recursos guardats via HTTP sobre dades persistides
+
 ### Nou punt actiu
 
 Ara mateix, el punt actiu passa a ser:
 
-- API per `places`, `favorites`, `users`, `reviews` (**EN CURS**)
+- substitució progressiva de serveis mock per serveis reals (**EN CURS**)
+
+### Criteri del punt actiu
+
+Aquest punt es resoldra connectant la web Angular actual contra la nova API sense perdre la UX ni l'estructura `mock-first` ja consolidada.
+
+L'objectiu és substituir progressivament:
+
+- consultes de `places`
+- detall de `place`
+- `favorites`
+- `users`
+- `reviews`
+
+La implementació es fara sobre:
+
+- `Web` consumint HTTP real
+- `Api` com a capa backend ja validada
+- adaptadors o serveis del frontend que permetin fer la transició per etapes
 
 ## Fase IV · Permisos, administració i operativa (**PENDENT**)
 

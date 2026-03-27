@@ -248,6 +248,50 @@ Resum del diagrama:
 - el backend deixa de ser només infraestructura i passa a tenir capa d'ús real
 - el següent pas natural és exposar aquests serveis com a API HTTP
 
+## 2.8 Estat tancat del punt d'API
+
+El punt d'API ja queda tancat amb:
+
+- `minimal APIs` a la capa `Api`
+- grups de rutes per `places`, `favorites`, `users` i `reviews`
+- endpoints HTTP recolzats només en serveis d'`Application`
+- sense accedir directament a `DbContext` des de `Api`
+- validacio real contra `PostgreSQL`
+
+<pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
+  <span style="color:#93c5fd;">HTTP[HTTP Request]</span> --&gt; <span style="color:#c4b5fd;">API[Minimal API Endpoint]</span>
+  <span style="color:#c4b5fd;">API</span> --&gt; <span style="color:#86efac;">APP[Application Service]</span>
+  <span style="color:#86efac;">APP</span> --&gt; <span style="color:#fcd34d;">REPO[Repository Contract]</span>
+  <span style="color:#fcd34d;">REPO</span> --&gt; <span style="color:#f9a8d4;">INF[EF Repository]</span>
+  <span style="color:#f9a8d4;">INF</span> --&gt; <span style="color:#67e8f9;">DB[(PostgreSQL)]</span></code></pre>
+
+Resum del diagrama:
+
+- la capa `Api` no coneix la persistència
+- cada endpoint delega en un servei d'aplicació
+- la persistència queda encapsulada sota contractes i repositoris
+- el flux HTTP ja s'ha validat de punta a punta amb dades persistides
+
+Rutes reals validades:
+
+- `GET /api/places`
+- `GET /api/places/{id}`
+- `GET /api/places/cities`
+- `POST /api/places`
+- `PUT /api/places/{id}`
+- `GET /api/users/{id}`
+- `GET /api/users/by-email/{email}`
+- `POST /api/users`
+- `PUT /api/users/{id}/profile`
+- `GET /api/favorites/{ownerUserId}`
+- `POST /api/favorites/{ownerUserId}/places/{placeId}`
+- `DELETE /api/favorites/{ownerUserId}/places/{placeId}`
+- `GET /api/reviews/places/{placeId}`
+- `POST /api/reviews`
+- `PUT /api/reviews/{id}`
+
+El seguent punt tecnic actiu passa a ser la substitucio progressiva dels serveis mock del frontend per aquests endpoints reals, mantenint la UI Angular existent.
+
 ## 3. Arquitectura aplicada
 
 ### 3.1 Principis
