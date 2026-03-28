@@ -10,8 +10,8 @@
     />
 
     <p class="login-page__copy">
-      Primera base d’autenticació de la fase II. Comença amb login estàndard i deixa el camí
-      preparat per Google, LinkedIn, Facebook, Apple o Microsoft més endavant.
+      Primera entrega real d’autenticació de la fase IV. El login estàndard ja valida contra backend
+      i deixa el camí preparat per {{ authProviders().join(', ') || 'Google, LinkedIn i Facebook' }} més endavant.
     </p>
 
     <form class="login-form" [formGroup]="form" (ngSubmit)="submit()">

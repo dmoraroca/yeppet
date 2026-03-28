@@ -4,7 +4,9 @@ using YepPet.Domain.Users.ValueObjects;
 
 namespace YepPet.Application.Users;
 
-internal sealed class UserApplicationService(IUserRepository userRepository) : IUserApplicationService
+internal sealed class UserApplicationService(
+    IUserRepository userRepository,
+    Auth.IPasswordHasher passwordHasher) : IUserApplicationService
 {
     public async Task<UserDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -23,7 +25,7 @@ internal sealed class UserApplicationService(IUserRepository userRepository) : I
         var user = new User(
             Guid.NewGuid(),
             request.Email,
-            request.PasswordHash,
+            passwordHasher.Hash(request.PasswordHash),
             Enum.Parse<UserRole>(request.Role, ignoreCase: true),
             new UserProfile(request.DisplayName, request.City, request.Country, request.Bio, request.AvatarUrl),
             new PrivacyConsent(request.PrivacyAccepted, request.PrivacyAcceptedAtUtc));

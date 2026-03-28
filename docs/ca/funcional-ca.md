@@ -74,6 +74,8 @@ En l'estat actual:
 - la Fase III ja queda tancada
 - la Fase IV ja queda oberta com a nou focus actiu del producte
 - l'autenticacio de Fase IV inclou tant login propi com login federat amb proveidors externs
+- el primer tram actiu d'autenticacio passa a ser el login propi real contra backend, deixant preparada la capa per federacio posterior
+- la sessio actual de Fase IV ja es basa en token retornat per l'API i no en estat fake local
 - el disseny del model de domini real ja queda completat com a base del backend
 - els contractes de repositori i les necessitats de persistencia ja queden definits com a base del backend
 - el model relacional a `PostgreSQL` ja queda tancat
@@ -93,8 +95,13 @@ En l'estat actual:
 - el producte ja es pot aixecar en local amb `Docker Compose` com a stack complet de desenvolupament
 - l'API també queda consultable des de navegador via `Swagger`
 - `VS Code` ja disposa de perfils de `Run and Debug` per aixecar `db`, `api`, `web` o tota la stack des del workspace
+- els perfils de `Run and Debug` ja permeten depurar `api` i `web`, no només aixecar-los
 - el següent focus funcional passa a ser l'obertura d'autenticació, permisos, àrees internes i accessos restringits propis de la Fase IV
 - el login futur de Fase IV no queda limitat a credencials pròpies: també ha de contemplar `Google`, `LinkedIn`, `Facebook` i altres proveïdors federats
+- el punt d'autenticacio ja es considera en curs des del moment que el login deixa de dependre del fake del frontend i passa a recolzar-se en API
+- ja existeixen dos usuaris bootstrap de desenvolupament per provar el nou flux:
+  - `admin@admin.adm / Admin123`
+  - `user@user.com / Admin123`
 
 Per tant, aquest document no substitueix el de fases, sino que el complementa des del punt de vista d'us, navegacio i comportament funcional.
 
@@ -102,7 +109,8 @@ Per tant, aquest document no substitueix el de fases, sino que el complementa de
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
   <span style="color:#93c5fd;">PUB[Usuari public]</span> --&gt; <span style="color:#c4b5fd;">WEB[Web actual]</span>
-  <span style="color:#fcd34d;">AUTH[Autenticacio real]</span> -.-> <span style="color:#c4b5fd;">WEB</span>
+  <span style="color:#fcd34d;">AUTH[Login propi real]</span> -.-> <span style="color:#c4b5fd;">WEB</span>
+  <span style="color:#f9a8d4;">FED[Google / LinkedIn / Facebook / OIDC]</span> -.-> <span style="color:#fcd34d;">AUTH</span>
   <span style="color:#86efac;">ROLS[Rols i permisos]</span> -.-> <span style="color:#c4b5fd;">WEB</span>
   <span style="color:#f9a8d4;">INT[Zones internes]</span> -.-> <span style="color:#c4b5fd;">WEB</span>
   <span style="color:#c4b5fd;">WEB</span> --&gt; <span style="color:#67e8f9;">API[API real]</span>
@@ -112,8 +120,10 @@ Resum del diagrama:
 
 - la Fase IV obre el tram de seguretat i govern d'accessos
 - la web continua sent la mateixa base funcional, pero ara passa a requerir autenticació i permisos reals
+- el primer pas executable de la fase és el login propi contra backend amb sessió real
 - les zones internes i restriccions deixen de ser una idea futura i passen a ser el focus actiu
 - l'entrada d'usuari haurà de poder venir tant de login propi com de proveïdors socials o federats
+- el frontend ja conserva la sessió a navegador i reutilitza el token per a futures crides HTTP
 
 ### 3.2 Transicio funcional cap a Fase III
 

@@ -294,7 +294,7 @@ Separar clarament les zones públiques de les zones internes o controlades per p
 
 ### Què entra dins la fase IV
 
-- autenticació pròpia i federada (`Google`, `LinkedIn`, `Facebook` i altres proveïdors OAuth/OIDC) (**PENDENT**)
+- autenticació pròpia i federada (`Google`, `LinkedIn`, `Facebook` i altres proveïdors OAuth/OIDC) (**EN CURS**)
 - rols i permisos (**PENDENT**)
 - pàgines internes (**PENDENT**)
 - gestió de contingut o dades (**PENDENT**)
@@ -303,6 +303,19 @@ Separar clarament les zones públiques de les zones internes o controlades per p
 ### Resultat esperat
 
 La plataforma ja diferencia entre usuaris públics, usuaris autenticats i àrees internes (**PENDENT**).
+
+### Estat actual del punt en curs
+
+El punt `autenticació pròpia i federada` queda ara mateix en curs amb aquesta base ja operativa:
+
+- `Api` exposa `POST /api/auth/login`, `GET /api/auth/providers` i `GET /api/auth/me`
+- el login propi ja valida credencials reals contra backend
+- la sessió es representa amb `JWT`
+- el frontend ja desa i reutilitza el token per a les crides HTTP
+- existeixen usuaris de desenvolupament bootstrap:
+  - `admin@admin.adm / Admin123`
+  - `user@user.com / Admin123`
+- el model deixa preparat l'encaix posterior amb `Google`, `LinkedIn`, `Facebook` i altres proveïdors `OAuth/OIDC`
 
 ## Fase V · Internacionalització (**PENDENT**)
 

@@ -1,3 +1,7 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using YepPet.Infrastructure.Auth;
 using YepPet.Application;
 using YepPet.Api.Endpoints;
 using YepPet.Infrastructure;
@@ -7,6 +11,25 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddProblemDetails();
+var authOptions = builder.Configuration.GetSection(AuthOptions.SectionName).Get<AuthOptions>() ?? new AuthOptions();
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = authOptions.Jwt.Issuer,
+            ValidAudience = authOptions.Jwt.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authOptions.Jwt.SigningKey)),
+            NameClaimType = "sub",
+            RoleClaimType = "role"
+        };
+    });
+builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -29,8 +52,16 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<DevelopmentIdentitySeeder>();
+    await seeder.SeedAsync();
+}
+
 app.UseExceptionHandler();
 app.UseCors("web");
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
@@ -40,6 +71,7 @@ app.UseSwaggerUI(options =>
 
 app.MapGet("/", () => "Hello World!");
 app.MapGet("/health/db", () => Results.Ok(new { status = "configured" }));
+app.MapAuthEndpoints();
 app.MapPlaceEndpoints();
 app.MapFavoriteEndpoints();
 app.MapUserEndpoints();

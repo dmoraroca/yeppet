@@ -50,10 +50,12 @@ El workspace incorpora també `.vscode/launch.json` i `.vscode/tasks.json` per a
 
 Perfils:
 
-- `Docker: Stack completa`
+- `Docker: Stack completa (Attach)`
 - `Docker: DB`
+- `Docker: API (Attach)`
 - `Docker: API + Swagger`
-- `Docker: Web`
+- `Docker: Web (Debug)`
+- `Docker: API + Web (Attach)`
 
 Tasques:
 
@@ -62,6 +64,17 @@ Tasques:
 - `docker up api`
 - `docker up web`
 - `docker down`
+- `wait api ready`
+- `wait web ready`
+- `install vsdbg (api)`
+- `api up + ready + vsdbg`
+- `web up + ready`
+
+Notes de llançament:
+
+- l'API es depura amb `vsdbg` dins del contenidor `yeppet-api`
+- la web es depura amb Brave via `pwa-chrome` i `runtimeExecutable`
+- els perfils esperen que `api` i `web` estiguin llestos abans de l'attach
 
 ## UML addicional
 
