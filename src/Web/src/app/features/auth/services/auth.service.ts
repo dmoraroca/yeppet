@@ -42,6 +42,24 @@ export class AuthService {
     }
   }
 
+  async loginWithGoogle(idToken: string): Promise<{ ok: boolean; user?: AuthUser }> {
+    try {
+      const session = await firstValueFrom(
+        this.http.post<AuthSessionApiDto>(`${API_BASE_URL}/auth/google`, {
+          idToken
+        })
+      );
+
+      const mappedSession = this.toSession(session);
+      this.sessionState.set(mappedSession);
+      this.authStore.saveSession(mappedSession);
+
+      return { ok: true, user: mappedSession.user };
+    } catch {
+      return { ok: false };
+    }
+  }
+
   logout(): void {
     this.sessionState.set(null);
     this.authStore.saveSession(null);
@@ -91,7 +109,8 @@ export class AuthService {
       key: provider.key,
       displayName: provider.displayName,
       protocol: provider.protocol,
-      configured: provider.configured
+      configured: provider.configured,
+      clientId: provider.clientId ?? null
     }));
   }
 
@@ -148,4 +167,5 @@ interface AuthProviderApiDto {
   displayName: string;
   protocol: string;
   configured: boolean;
+  clientId?: string | null;
 }

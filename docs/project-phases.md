@@ -221,7 +221,7 @@ El punt `model relacional a PostgreSQL` queda tancat amb:
 - decisio presa: `rating_average` i `review_count` es mantenen a `places` com a snapshot optimitzat, derivat de `place_reviews`
 - decisio presa: el consentiment es manté en estat actual a `users` i amb historial a `privacy_consent_events`
 - base de dades de desenvolupament operativa amb `Docker` i `PostgreSQL`
-- coexistencia resolta amb altres projectes locals fent servir el port extern `5433` per `yepppet`
+- coexistencia resolta amb altres projectes locals fent servir el port extern `5433` per `YepPet`
 - `docker-compose.yml` al repo per poder aixecar la BBDD local sense dependències manuals
 
 ### Estat actual del punt tancat
@@ -309,13 +309,20 @@ La plataforma ja diferencia entre usuaris públics, usuaris autenticats i àrees
 El punt `autenticació pròpia i federada` queda ara mateix en curs amb aquesta base ja operativa:
 
 - `Api` exposa `POST /api/auth/login`, `GET /api/auth/providers` i `GET /api/auth/me`
+- `Api` exposa també `POST /api/auth/google` per tancar el primer proveïdor federat real
 - el login propi ja valida credencials reals contra backend
 - la sessió es representa amb `JWT`
 - el frontend ja desa i reutilitza el token per a les crides HTTP
+- `Google` ja queda configurat en entorn de desenvolupament amb `ClientId` local i botó federat visible a `login`
+- si un usuari entra per Google i no existeix a BBDD, el backend el crea automàticament amb email, nom visible i avatar
+- si un usuari ja existeix i el perfil es pot sincronitzar, el backend actualitza nom i avatar des de Google
+- la credencial descarregada de Google queda guardada com a suport local a `config/google/yeppet-dev.json`, fora de versionat
+- `yeppetcontact@gmail.com` queda definit com a compte administrador quan entra per Google en desenvolupament
+- la stack Docker de l'`Api` ja arrenca des de `src/Backend/Api`, carregant correctament `appsettings.Development.json`
 - existeixen usuaris de desenvolupament bootstrap:
   - `admin@admin.adm / Admin123`
   - `user@user.com / Admin123`
-- el model deixa preparat l'encaix posterior amb `Google`, `LinkedIn`, `Facebook` i altres proveïdors `OAuth/OIDC`
+- `LinkedIn` i `Facebook` continuen pendents, però el patró federat ja queda validat amb `Google`
 
 ## Fase V · Internacionalització (**PENDENT**)
 

@@ -28,6 +28,16 @@ public static class DependencyInjection
                 SigningKey = configuration["Auth:Jwt:SigningKey"]
                     ?? "dev-only-yep-pet-signing-key-change-in-production-123456789",
                 ExpiresInMinutes = expiresInMinutes
+            },
+            Google = new AuthOptions.GoogleOptions
+            {
+                ClientId = configuration["Auth:Google:ClientId"] ?? string.Empty,
+                AdminEmails = configuration.GetSection("Auth:Google:AdminEmails")
+                    .GetChildren()
+                    .Select(section => section.Value)
+                    .Where(value => !string.IsNullOrWhiteSpace(value))
+                    .Select(value => value!)
+                    .ToArray()
             }
         };
 
@@ -35,6 +45,7 @@ public static class DependencyInjection
         services.AddDbContext<YepPetDbContext>(options => options.UseNpgsql(connectionString));
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IAccessTokenIssuer, JwtAccessTokenIssuer>();
+        services.AddScoped<IGoogleIdTokenVerifier, GoogleIdTokenVerifier>();
         services.AddScoped<DevelopmentIdentitySeeder>();
         services.AddScoped<IPlaceRepository, PlaceRepository>();
         services.AddScoped<IUserRepository, UserRepository>();

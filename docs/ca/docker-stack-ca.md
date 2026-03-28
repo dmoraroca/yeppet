@@ -41,6 +41,7 @@ docker compose up -d --build
 
 - l'API espera que `db` estigui saludable abans d'arrencar
 - l'API executa `dotnet ef database update` a l'inici
+- l'API arrenca des de `src/Backend/Api` perquè el `content root` carregui correctament `appsettings.Development.json`
 - la web conserva hot reload i watch amb polling dins del contenidor
 - el `design-time DbContextFactory` ja respecta `ConnectionStrings__YepPet`, de manera que `dotnet ef` funciona igual en host i en Docker
 

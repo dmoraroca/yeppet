@@ -30,7 +30,7 @@ services:
     entrypoint: ["/bin/bash", "-lc"]
     command:
       [
-        "dotnet restore YepPet.sln && dotnet tool restore && until pg_isready -h db -p 5432 -U ${POSTGRES_USER:-app} -d ${POSTGRES_DB:-yeppet}; do sleep 2; done && dotnet ef database update --project src/Backend/Infrastructure/Infrastructure.csproj --startup-project src/Backend/Api/Api.csproj && dotnet build src/Backend/Api/Api.csproj -c Debug && exec dotnet /app/src/Backend/Api/bin/Debug/net10.0/Api.dll --urls http://0.0.0.0:${API_PORT:-5211}"
+        "dotnet restore YepPet.sln && dotnet tool restore && until pg_isready -h db -p 5432 -U ${POSTGRES_USER:-app} -d ${POSTGRES_DB:-yeppet}; do sleep 2; done && dotnet ef database update --project src/Backend/Infrastructure/Infrastructure.csproj --startup-project src/Backend/Api/Api.csproj && dotnet build src/Backend/Api/Api.csproj -c Debug && cd src/Backend/Api && exec dotnet bin/Debug/net10.0/Api.dll --urls http://0.0.0.0:${API_PORT:-5211}"
       ]
     ports:
       - "${API_PORT:-5211}:${API_PORT:-5211}"

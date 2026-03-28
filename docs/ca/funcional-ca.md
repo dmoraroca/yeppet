@@ -13,8 +13,8 @@ El focus funcional actual es:
 - suport de mapa dins la feature `places` en mode mixt amb llistat sincronitzat
 - dades reals per `places`, `favorites` i manteniment de `perfil`
 - transicio controlada entre serveis locals i API sense reescriure pantalles
-- autenticacio fake amb redireccio i manteniment de sessio
-- perfil fake amb consentiment de manteniment de dades
+- autenticacio real contra API amb login propi i Google en desenvolupament
+- perfil real amb consentiment de manteniment de dades
 - ajuda i contacte com a capes informatives
 
 Aquest document funcional es llegeix conjuntament amb `project-phases.md`, que fixa el criteri oficial d'estat, i amb aquests principis de treball actius:
@@ -40,14 +40,14 @@ La base funcional actual i la fase que s'obre a partir d'ara es recolzen en aque
 Inclou:
 
 - portada funcional
-- login fake
+- login real contra API
 - redireccio automatica a login si no hi ha sessio
 - redireccio a la ruta demanada despres del login
 - navegacio per `places`
 - llistat de llocs amb filtres
 - detall d'un lloc
 - favorits fake amb revisio local
-- perfil fake
+- perfil real
 - `Ajuda`
 - `Contacta'ns`
 - `permissions` com a vista separada i fora del flux public principal
@@ -74,7 +74,7 @@ En l'estat actual:
 - la Fase III ja queda tancada
 - la Fase IV ja queda oberta com a nou focus actiu del producte
 - l'autenticacio de Fase IV inclou tant login propi com login federat amb proveidors externs
-- el primer tram actiu d'autenticacio passa a ser el login propi real contra backend, deixant preparada la capa per federacio posterior
+- el primer tram actiu d'autenticacio ja inclou login propi real i federacio Google en desenvolupament
 - la sessio actual de Fase IV ja es basa en token retornat per l'API i no en estat fake local
 - el disseny del model de domini real ja queda completat com a base del backend
 - els contractes de repositori i les necessitats de persistencia ja queden definits com a base del backend
@@ -92,6 +92,13 @@ En l'estat actual:
 - la capa `Application` ja existeix amb serveis i contractes per les principals funcionalitats del producte
 - ja existeixen consultes i altes basiques reals sobre HTTP per `places`, `favorites`, `users` i `reviews`
 - el focus funcional visible avui se centra en `places`, `place detail`, `favorites` i `perfil` recolzats en dades reals, mentre el login continua sent una porta d'entrada controlada i local
+- el login ja mostra botó Google si el `ClientId` de desenvolupament està configurat
+- `yeppetcontact@gmail.com` queda reservat com a administrador federat de desenvolupament
+- la stack Docker de l'`Api` ja llegeix la configuració real de `Development`, incloent el `ClientId` de Google
+- la `LoginPage` ja pinta el botó Google un cop el contenidor visual queda disponible
+- el botó Google queda alineat en amplada amb el CTA principal de login
+- el contenidor del botó federat s'estira al 100% perquè no quedi visualment més curt que `Iniciar sessió`
+- la referència visual definitiva de mida del botó federat passa a ser el mateix botó `Iniciar sessió`
 - el producte ja es pot aixecar en local amb `Docker Compose` com a stack complet de desenvolupament
 - l'API també queda consultable des de navegador via `Swagger`
 - `VS Code` ja disposa de perfils de `Run and Debug` per aixecar `db`, `api`, `web` o tota la stack des del workspace
@@ -110,7 +117,7 @@ Per tant, aquest document no substitueix el de fases, sino que el complementa de
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
   <span style="color:#93c5fd;">PUB[Usuari public]</span> --&gt; <span style="color:#c4b5fd;">WEB[Web actual]</span>
   <span style="color:#fcd34d;">AUTH[Login propi real]</span> -.-> <span style="color:#c4b5fd;">WEB</span>
-  <span style="color:#f9a8d4;">FED[Google / LinkedIn / Facebook / OIDC]</span> -.-> <span style="color:#fcd34d;">AUTH</span>
+  <span style="color:#f9a8d4;">FED[Google actiu / LinkedIn / Facebook pendents]</span> -.-> <span style="color:#fcd34d;">AUTH</span>
   <span style="color:#86efac;">ROLS[Rols i permisos]</span> -.-> <span style="color:#c4b5fd;">WEB</span>
   <span style="color:#f9a8d4;">INT[Zones internes]</span> -.-> <span style="color:#c4b5fd;">WEB</span>
   <span style="color:#c4b5fd;">WEB</span> --&gt; <span style="color:#67e8f9;">API[API real]</span>
@@ -120,7 +127,7 @@ Resum del diagrama:
 
 - la Fase IV obre el tram de seguretat i govern d'accessos
 - la web continua sent la mateixa base funcional, pero ara passa a requerir autenticació i permisos reals
-- el primer pas executable de la fase és el login propi contra backend amb sessió real
+- el primer pas executable de la fase ja cobreix login propi contra backend i login Google en desenvolupament
 - les zones internes i restriccions deixen de ser una idea futura i passen a ser el focus actiu
 - l'entrada d'usuari haurà de poder venir tant de login propi com de proveïdors socials o federats
 - el frontend ja conserva la sessió a navegador i reutilitza el token per a futures crides HTTP

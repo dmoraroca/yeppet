@@ -160,7 +160,7 @@ Resum del diagrama:
 - el model relacional ja te una base operativa de desenvolupament
 - `docker-compose` permet iterar el disseny sense instal·lacions manuals
 - els scripts d'inicialitzacio queden separats del domini i preparats per passos futurs
-- `5433` es reserva per `yepppet` per no col·lisionar amb altres BBDD locals del workspace
+- `5433` es reserva per `YepPet` per no col·lisionar amb altres BBDD locals del workspace
 - el model ja es pot materialitzar localment per inspeccio i validacio estructural
 - la materialitzacio actual ja la governa `Entity Framework` mitjancant migracions
 

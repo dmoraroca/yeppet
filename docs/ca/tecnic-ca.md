@@ -11,7 +11,7 @@ Objectius:
 - documentar l'arquitectura actual del frontend
 - deixar traçabilitat de components, serveis i decisions tecniques
 - explicar el model de dades actual
-- descriure la base d'autenticacio fake i control d'acces
+- descriure la base d'autenticacio real i control d'acces
 - descriure la implementacio del mapa
 - deixar traçabilitat del domini backend que obre la Fase III
 - deixar una base UML tecnica clara i mantenible
@@ -52,9 +52,9 @@ En aquest moment conviuen dues capes amb rols diferents:
 
 Aixo vol dir que:
 
-- la UI ja consumeix backend real per `places`, `favorites` i manteniment de `perfil`
+- la UI ja consumeix backend real per `places`, `favorites`, manteniment de `perfil` i autenticació
 - la persistencia real ja esta implementada
-- el login continua local per no obrir encara l'autenticacio real de Fase IV
+- el login propi ja passa per `Api` i la federacio Google ja queda disponible en `Development`
 - pero el model de domini ja no depen del model fake del frontend
 - el backend comenca pel domini i no per la base de dades
 - el domini continua separat de la persistencia ORM encara que `Entity Framework` ja estigui muntat a `Infrastructure`
@@ -108,7 +108,7 @@ Resum del diagrama:
 - `sql/init` queda reservada per bootstrap auxiliar i no per crear l'esquema principal
 - la BBDD es un suport operatiu del punt actual, no el centre de l'arquitectura
 - el port `5433` evita conflictes amb altres repos locals que ja fan servir `5432`
-- la validacio del contenidor confirma que la base de dades local de `yepppet` ja esta operativa
+- la validacio del contenidor confirma que la base de dades local de `YepPet` ja esta operativa
 - l'esquema real ja queda governat per migracions d'`Entity Framework`
 
 ## 2.4 Persistencia ORM en Infrastructure
@@ -307,6 +307,7 @@ Peces integrades:
 - `AuthService` sincronitzant usuaris locals amb l'endpoint de `users`
 - `ProfilePage` guardant sobre backend real
 - `Api` amb `CORS` habilitat per `http://localhost:4200`
+- arrencada Docker de l'`Api` corregida perquè el `content root` sigui `src/Backend/Api` i carregui la configuració real de `Development`
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
   <span style="color:#93c5fd;">WEB[Angular Web]</span> --&gt; <span style="color:#c4b5fd;">PS[PlaceService HTTP]</span>
@@ -350,6 +351,7 @@ Resum del diagrama:
 
 - la BBDD, l'API i la web ja es poden aixecar en una sola ordre
 - l'API aplica migracions d'`Entity Framework` a l'arrencada
+- l'API s'executa des de la carpeta `src/Backend/Api`, evitant perdre `appsettings.Development.json` dins Docker
 - la web Angular s'executa en mode desenvolupament dins de contenidor
 - el flux local queda alineat amb el criteri operatiu usat a `escoles-publiques`
 
@@ -406,12 +408,12 @@ Amb la Fase III tancada, el nou focus tècnic passa a ser la seguretat operativa
 - rols i permisos
 - diferenciació entre zones públiques i internes
 - control d'accessos per funcionalitat
-- primer increment tècnic: login propi backend amb emissió de token i preparació per federació posterior
+- primer increment tècnic: login propi backend amb emissió de token i federació Google ja cablejada en desenvolupament
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
   <span style="color:#93c5fd;">WEB[Frontend Angular]</span> --&gt; <span style="color:#c4b5fd;">API[Backend API]</span>
   <span style="color:#fcd34d;">AUTH[Login propi + JWT]</span> -.-> <span style="color:#c4b5fd;">API</span>
-  <span style="color:#f9a8d4;">SOC[Google / LinkedIn / Facebook / OIDC]</span> -.-> <span style="color:#fcd34d;">AUTH</span>
+  <span style="color:#f9a8d4;">SOC[Google actiu / LinkedIn / Facebook pendents]</span> -.-> <span style="color:#fcd34d;">AUTH</span>
   <span style="color:#86efac;">RBAC[Rols i permisos]</span> -.-> <span style="color:#c4b5fd;">API</span>
   <span style="color:#f9a8d4;">INTERNAL[Àrees internes]</span> -.-> <span style="color:#93c5fd;">WEB</span>
   <span style="color:#c4b5fd;">API</span> --&gt; <span style="color:#67e8f9;">APP[Application]</span>
@@ -424,7 +426,7 @@ Resum del diagrama:
 - el control d'accessos s'haurà de recolzar en `Api` i `Application`, no només en la web
 - la Fase IV ja no és pendent conceptual, sinó línia activa de treball
 - el punt d'autenticació ja inclou des del principi la possibilitat de login federat via proveïdors `OAuth/OIDC`
-- el primer pas implementable és emissió i consum de token per al login propi, sense bloquejar la futura integració amb proveïdors externs
+- el primer pas implementable ja cobreix emissió i consum de token per al login propi i deixa `Google` operatiu en desenvolupament
 
 ### 2.11.1 Base implementada del punt d'autenticació
 
@@ -433,9 +435,15 @@ La primera entrega tècnica real de Fase IV ja incorpora:
 - `AuthApplicationService`
 - `Pbkdf2PasswordHasher`
 - `JwtAccessTokenIssuer`
+- `GoogleIdTokenVerifier`
 - `DevelopmentIdentitySeeder`
-- endpoints `auth/login`, `auth/providers` i `auth/me`
+- endpoints `auth/login`, `auth/google`, `auth/providers` i `auth/me`
 - `authInterceptor` al frontend per propagar el `Bearer token`
+- `LoginPage` amb càrrega de `Google Identity Services` i renderitzat del botó federat
+- segon intent de render del botó federat a `ngAfterViewInit` per no dependre de l'ordre entre `ViewChild` i càrrega del catàleg de proveïdors
+- l'amplada del botó oficial es calcula a partir del contenidor per mantenir-lo alineat amb el CTA principal de login
+- el contenidor visible del control federat força `width: 100%` i `justify-items: stretch` per evitar un botó més curt que el CTA verd
+- la mida final del botó de Google es deriva del `ViewChild` del botó `Iniciar sessió`, no d'una estimació del host
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">sequenceDiagram</span>
   participant U as Usuari
@@ -444,6 +452,7 @@ La primera entrega tècnica real de Fase IV ja incorpora:
   participant S as AuthApplicationService
   participant P as PasswordHasher
   participant T as JwtIssuer
+  participant G as GoogleIdTokenVerifier
 
   U-&gt;&gt;W: email + password
   W-&gt;&gt;A: POST /api/auth/login
@@ -453,6 +462,15 @@ La primera entrega tècnica real de Fase IV ja incorpora:
   T--&gt;&gt;S: JWT + expiresAtUtc
   S--&gt;&gt;A: AuthSessionDto
   A--&gt;&gt;W: token + user + provider
+  U-&gt;&gt;W: botó Google
+  W-&gt;&gt;A: POST /api/auth/google (idToken)
+  A-&gt;&gt;S: LoginWithGoogleAsync
+  S-&gt;&gt;G: VerifyAsync(idToken)
+  G--&gt;&gt;S: email verificat + perfil
+  S-&gt;&gt;T: Issue(user)
+  T--&gt;&gt;S: JWT + expiresAtUtc
+  S--&gt;&gt;A: AuthSessionDto(provider=google)
+  A--&gt;&gt;W: token + user + provider
   W-&gt;&gt;W: desa sessió i envia Bearer en futures crides</code></pre>
 
 Resum del diagrama:
@@ -460,7 +478,8 @@ Resum del diagrama:
 - la validació de credencials ja ha sortit del frontend
 - el backend emet el token i defineix la sessió real
 - el frontend només consumeix i propaga aquesta sessió
-- els proveïdors socials queden desacoblats del login propi, però ja previstos dins del mateix model
+- el login federat comparteix el mateix model de sessió que el login propi
+- `yeppetcontact@gmail.com` queda elevat a `ADMIN` per configuració de desenvolupament quan entra per Google
 
 ### 3.1 Principis
 
@@ -866,7 +885,8 @@ Resum del diagrama:
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
   <span style="color:#93c5fd;">LOGIN[LoginPage]</span> --&gt; <span style="color:#c4b5fd;">AUTH[AuthService]</span>
-  <span style="color:#c4b5fd;">AUTH</span> --&gt; <span style="color:#86efac;">MOCK[(AUTH_USERS_FAKE)]</span>
+  <span style="color:#93c5fd;">GIS[Google Identity Services]</span> --&gt; <span style="color:#93c5fd;">LOGIN</span>
+  <span style="color:#c4b5fd;">AUTH</span> --&gt; <span style="color:#86efac;">API[/api/auth/login|google|me/]</span>
   <span style="color:#c4b5fd;">AUTH</span> --&gt; <span style="color:#67e8f9;">LS[localStorage]</span>
   <span style="color:#f9a8d4;">ROUTES[app.routes]</span> --&gt; <span style="color:#fcd34d;">AG[authGuard]</span>
   <span style="color:#f9a8d4;">ROUTES</span> --&gt; <span style="color:#fcd34d;">GG[guestGuard]</span>
@@ -879,9 +899,9 @@ Resum del diagrama:
 
 Resum del diagrama:
 
-- `AuthService` centralitza la sessio fake, el rol actual i l'actualitzacio de perfil
+- `AuthService` centralitza la sessió real, el rol actual i l'actualització de perfil
 - `authGuard`, `guestGuard` i `adminGuard` governen l'acces a les rutes
-- la sessio es manté a `localStorage` per simular persistencia bàsica
+- la sessio es manté a `localStorage` com a cache de navegador sobre token real
 - `LoginPage`, `ProfilePage` i `SiteHeader` consumeixen el mateix estat d'autenticacio
 
 ## 5. Features actuals

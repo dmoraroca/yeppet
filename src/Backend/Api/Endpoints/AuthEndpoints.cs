@@ -12,6 +12,7 @@ internal static class AuthEndpoints
         var group = app.MapGroup("/api/auth");
 
         group.MapPost("/login", LoginAsync);
+        group.MapPost("/google", GoogleLoginAsync);
         group.MapGet("/providers", GetProviders);
         group.MapGet("/me", GetCurrentSessionAsync).RequireAuthorization();
 
@@ -24,6 +25,15 @@ internal static class AuthEndpoints
         CancellationToken cancellationToken)
     {
         var session = await service.LoginAsync(request, cancellationToken);
+        return session is null ? TypedResults.Unauthorized() : TypedResults.Ok(session);
+    }
+
+    private static async Task<Results<Ok<AuthSessionDto>, UnauthorizedHttpResult>> GoogleLoginAsync(
+        GoogleLoginRequest request,
+        IAuthApplicationService service,
+        CancellationToken cancellationToken)
+    {
+        var session = await service.LoginWithGoogleAsync(request, cancellationToken);
         return session is null ? TypedResults.Unauthorized() : TypedResults.Ok(session);
     }
 

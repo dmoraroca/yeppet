@@ -38,4 +38,5 @@ export interface AuthProvider {
   displayName: string;
   protocol: string;
   configured: boolean;
+  clientId?: string | null;
 }
