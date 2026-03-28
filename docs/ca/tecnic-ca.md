@@ -361,8 +361,11 @@ Perfils disponibles:
 
 - `Docker: Stack completa`
 - `Docker: DB`
+- `Docker: API (Attach)`
 - `Docker: API + Swagger`
-- `Docker: Web`
+- `Docker: Web (Debug)`
+- `Docker: API + Web (Attach)`
+- `Docker: Stack completa (Attach)`
 
 Tasques disponibles:
 
@@ -371,6 +374,11 @@ Tasques disponibles:
 - `docker up api`
 - `docker up web`
 - `docker down`
+- `wait api ready`
+- `wait web ready`
+- `install vsdbg (api)`
+- `api up + ready + vsdbg`
+- `web up + ready`
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
   <span style="color:#93c5fd;">VS[VS Code Run and Debug]</span> --&gt; <span style="color:#c4b5fd;">LA[launch.json]</span>
@@ -382,9 +390,10 @@ Tasques disponibles:
 
 Resum del diagrama:
 
-- `launch.json` orquestra l'obertura de web o Swagger segons el perfil triat
+- `launch.json` combina `attach` real de `.NET` a `yeppet-api` i debug web amb Brave
+- l'API es depura per `coreclr` + `vsdbg` dins del contenidor
 - `tasks.json` encapsula les ordres `docker compose` per evitar passos manuals
-- el workspace pot aixecar la stack completa o només el servei que toqui
+- el workspace pot aixecar la stack completa o només el servei que toqui, esperant que els serveis quedin llestos abans de depurar
 
 ## 3. Arquitectura aplicada
 
@@ -397,10 +406,11 @@ Amb la Fase III tancada, el nou focus tècnic passa a ser la seguretat operativa
 - rols i permisos
 - diferenciació entre zones públiques i internes
 - control d'accessos per funcionalitat
+- primer increment tècnic: login propi backend amb emissió de token i preparació per federació posterior
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
   <span style="color:#93c5fd;">WEB[Frontend Angular]</span> --&gt; <span style="color:#c4b5fd;">API[Backend API]</span>
-  <span style="color:#fcd34d;">AUTH[Autenticacio]</span> -.-> <span style="color:#c4b5fd;">API</span>
+  <span style="color:#fcd34d;">AUTH[Login propi + JWT]</span> -.-> <span style="color:#c4b5fd;">API</span>
   <span style="color:#f9a8d4;">SOC[Google / LinkedIn / Facebook / OIDC]</span> -.-> <span style="color:#fcd34d;">AUTH</span>
   <span style="color:#86efac;">RBAC[Rols i permisos]</span> -.-> <span style="color:#c4b5fd;">API</span>
   <span style="color:#f9a8d4;">INTERNAL[Àrees internes]</span> -.-> <span style="color:#93c5fd;">WEB</span>
@@ -414,6 +424,43 @@ Resum del diagrama:
 - el control d'accessos s'haurà de recolzar en `Api` i `Application`, no només en la web
 - la Fase IV ja no és pendent conceptual, sinó línia activa de treball
 - el punt d'autenticació ja inclou des del principi la possibilitat de login federat via proveïdors `OAuth/OIDC`
+- el primer pas implementable és emissió i consum de token per al login propi, sense bloquejar la futura integració amb proveïdors externs
+
+### 2.11.1 Base implementada del punt d'autenticació
+
+La primera entrega tècnica real de Fase IV ja incorpora:
+
+- `AuthApplicationService`
+- `Pbkdf2PasswordHasher`
+- `JwtAccessTokenIssuer`
+- `DevelopmentIdentitySeeder`
+- endpoints `auth/login`, `auth/providers` i `auth/me`
+- `authInterceptor` al frontend per propagar el `Bearer token`
+
+<pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">sequenceDiagram</span>
+  participant U as Usuari
+  participant W as Web Angular
+  participant A as API Auth
+  participant S as AuthApplicationService
+  participant P as PasswordHasher
+  participant T as JwtIssuer
+
+  U-&gt;&gt;W: email + password
+  W-&gt;&gt;A: POST /api/auth/login
+  A-&gt;&gt;S: LoginAsync
+  S-&gt;&gt;P: Verify(hash, password)
+  S-&gt;&gt;T: Issue(user)
+  T--&gt;&gt;S: JWT + expiresAtUtc
+  S--&gt;&gt;A: AuthSessionDto
+  A--&gt;&gt;W: token + user + provider
+  W-&gt;&gt;W: desa sessió i envia Bearer en futures crides</code></pre>
+
+Resum del diagrama:
+
+- la validació de credencials ja ha sortit del frontend
+- el backend emet el token i defineix la sessió real
+- el frontend només consumeix i propaga aquesta sessió
+- els proveïdors socials queden desacoblats del login propi, però ja previstos dins del mateix model
 
 ### 3.1 Principis
 

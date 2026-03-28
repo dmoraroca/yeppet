@@ -37,6 +37,7 @@ export class LoginPageComponent {
   });
 
   protected readonly previewFilters = this.previewFiltersState.asReadonly();
+  protected readonly authProviders = signal<string[]>([]);
   protected readonly previewCities = computed(() => this.placeService.getAvailableCities());
   protected readonly previewTypes = this.placeService.getAvailableTypes();
   protected readonly samplePlaces = computed(() =>
@@ -63,6 +64,10 @@ export class LoginPageComponent {
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
+  constructor() {
+    void this.loadProvidersAsync();
+  }
+
   protected async submit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -83,6 +88,17 @@ export class LoginPageComponent {
 
     const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
     void this.router.navigateByUrl(redirectTo || this.authService.getPostLoginRoute());
+  }
+
+  private async loadProvidersAsync(): Promise<void> {
+    try {
+      const providers = await this.authService.getProviders();
+      this.authProviders.set(
+        providers.filter((provider) => provider.key !== 'password').map((provider) => provider.displayName)
+      );
+    } catch {
+      this.authProviders.set(['Google', 'LinkedIn', 'Facebook']);
+    }
   }
 
   protected goToPreviewSearch(): void {

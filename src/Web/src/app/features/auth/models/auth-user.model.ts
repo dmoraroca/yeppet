@@ -3,7 +3,6 @@ export type AuthRole = 'USER' | 'ADMIN';
 export interface AuthUser {
   id: string;
   email: string;
-  password: string;
   name: string;
   role: AuthRole;
   city: string;
@@ -11,6 +10,13 @@ export interface AuthUser {
   bio: string;
   avatarUrl: string | null;
   privacyAccepted: boolean;
+}
+
+export interface AuthSession {
+  accessToken: string;
+  expiresAtUtc: string;
+  provider: string;
+  user: AuthUser;
 }
 
 export interface AuthCredentials {
@@ -25,4 +31,11 @@ export interface AuthProfileUpdate {
   bio: string;
   avatarUrl: string | null;
   privacyAccepted: boolean;
+}
+
+export interface AuthProvider {
+  key: string;
+  displayName: string;
+  protocol: string;
+  configured: boolean;
 }

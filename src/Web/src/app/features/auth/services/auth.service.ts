@@ -3,7 +3,7 @@ import { Inject, Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { API_BASE_URL } from '../../../core/config/api.config';
-import { AuthCredentials, AuthProfileUpdate, AuthRole, AuthUser } from '../models/auth-user.model';
+import { AuthCredentials, AuthProfileUpdate, AuthProvider, AuthRole, AuthSession, AuthUser } from '../models/auth-user.model';
 import { AUTH_STORE, AuthStore } from './auth-store.token';
 
 @Injectable({
@@ -11,50 +11,44 @@ import { AUTH_STORE, AuthStore } from './auth-store.token';
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
-  private readonly usersState: ReturnType<typeof signal<AuthUser[]>>;
-  private readonly currentUserState: ReturnType<typeof signal<AuthUser | null>>;
+  private readonly sessionState: ReturnType<typeof signal<AuthSession | null>>;
 
   constructor(@Inject(AUTH_STORE) private readonly authStore: AuthStore) {
-    this.usersState = signal<AuthUser[]>(this.authStore.loadUsers());
-    this.currentUserState = signal<AuthUser | null>(this.authStore.loadCurrentUser());
-    void this.ensureCurrentUserIsBackedAsync();
+    this.sessionState = signal<AuthSession | null>(this.authStore.loadSession());
   }
 
-  readonly currentUser = computed(() => this.currentUserState());
-  readonly isAuthenticated = computed(() => this.currentUserState() !== null);
-  readonly isAdmin = computed(() => this.currentUserState()?.role === 'ADMIN');
-  readonly role = computed<AuthRole | null>(() => this.currentUserState()?.role ?? null);
+  readonly currentUser = computed(() => this.sessionState()?.user ?? null);
+  readonly isAuthenticated = computed(() => this.sessionState() !== null);
+  readonly isAdmin = computed(() => this.sessionState()?.user.role === 'ADMIN');
+  readonly role = computed<AuthRole | null>(() => this.sessionState()?.user.role ?? null);
+  readonly provider = computed(() => this.sessionState()?.provider ?? null);
 
   async login(credentials: AuthCredentials): Promise<{ ok: boolean; user?: AuthUser }> {
-    const email = credentials.email.trim().toLowerCase();
-    const password = credentials.password.trim();
-    const user = this.usersState().find(
-      (candidate) => candidate.email.toLowerCase() === email && candidate.password === password
-    );
+    try {
+      const session = await firstValueFrom(
+        this.http.post<AuthSessionApiDto>(`${API_BASE_URL}/auth/login`, {
+          email: credentials.email.trim(),
+          password: credentials.password.trim()
+        })
+      );
 
-    if (!user) {
+      const mappedSession = this.toSession(session);
+      this.sessionState.set(mappedSession);
+      this.authStore.saveSession(mappedSession);
+
+      return { ok: true, user: mappedSession.user };
+    } catch {
       return { ok: false };
     }
-
-    const backendUser = await this.syncUserWithBackend(user);
-
-    this.usersState.update((users) =>
-      users.map((candidate) => (candidate.email.toLowerCase() === email ? backendUser : candidate))
-    );
-    this.authStore.saveUsers(this.usersState());
-    this.currentUserState.set(backendUser);
-    this.authStore.saveCurrentUser(backendUser);
-
-    return { ok: true, user: backendUser };
   }
 
   logout(): void {
-    this.currentUserState.set(null);
-    this.authStore.saveCurrentUser(null);
+    this.sessionState.set(null);
+    this.authStore.saveSession(null);
   }
 
   async updateProfile(update: AuthProfileUpdate): Promise<AuthUser | null> {
-    const current = this.currentUserState();
+    const current = this.currentUser();
 
     if (!current) {
       return null;
@@ -78,67 +72,46 @@ export class AuthService {
       })
     );
 
-    this.usersState.update((users) => users.map((user) => (user.id === current.id ? nextUser : user)));
-    this.authStore.saveUsers(this.usersState());
-    this.currentUserState.set(nextUser);
-    this.authStore.saveCurrentUser(nextUser);
+    this.sessionState.update((session) =>
+      session
+        ? {
+            ...session,
+            user: nextUser
+          }
+        : session
+    );
+    this.authStore.saveSession(this.sessionState());
 
     return nextUser;
+  }
+
+  async getProviders(): Promise<AuthProvider[]> {
+    const providers = await firstValueFrom(this.http.get<AuthProviderApiDto[]>(`${API_BASE_URL}/auth/providers`));
+    return providers.map((provider) => ({
+      key: provider.key,
+      displayName: provider.displayName,
+      protocol: provider.protocol,
+      configured: provider.configured
+    }));
   }
 
   getPostLoginRoute(): string {
     return this.isAdmin() ? '/permissions' : '/perfil';
   }
 
-  private async ensureCurrentUserIsBackedAsync(): Promise<void> {
-    const currentUser = this.currentUserState();
-
-    if (!currentUser) {
-      return;
-    }
-
-    const backendUser = await this.syncUserWithBackend(currentUser);
-    this.usersState.update((users) =>
-      users.map((user) => (user.email.toLowerCase() === backendUser.email.toLowerCase() ? backendUser : user))
-    );
-    this.authStore.saveUsers(this.usersState());
-    this.currentUserState.set(backendUser);
-    this.authStore.saveCurrentUser(backendUser);
+  private toSession(session: AuthSessionApiDto): AuthSession {
+    return {
+      accessToken: session.accessToken,
+      expiresAtUtc: session.expiresAtUtc,
+      provider: session.provider,
+      user: this.toAuthUser(session.user)
+    };
   }
 
-  private async syncUserWithBackend(user: AuthUser): Promise<AuthUser> {
-    try {
-      const backendUser = await firstValueFrom(
-        this.http.get<UserApiDto>(`${API_BASE_URL}/users/by-email/${encodeURIComponent(user.email)}`)
-      );
-
-      return this.toAuthUser(backendUser, user.password);
-    } catch {
-      const createdUserId = await firstValueFrom(
-        this.http.post<string>(`${API_BASE_URL}/users/`, {
-          email: user.email,
-          passwordHash: user.password,
-          role: user.role === 'ADMIN' ? 'Admin' : 'User',
-          displayName: user.name,
-          city: user.city,
-          country: user.country,
-          bio: user.bio,
-          avatarUrl: user.avatarUrl,
-          privacyAccepted: user.privacyAccepted,
-          privacyAcceptedAtUtc: user.privacyAccepted ? new Date().toISOString() : null
-        })
-      );
-
-      const createdUser = await firstValueFrom(this.http.get<UserApiDto>(`${API_BASE_URL}/users/${createdUserId}`));
-      return this.toAuthUser(createdUser, user.password);
-    }
-  }
-
-  private toAuthUser(user: UserApiDto, password: string): AuthUser {
+  private toAuthUser(user: UserApiDto): AuthUser {
     return {
       id: user.id,
       email: user.email,
-      password,
       name: user.displayName,
       role: user.role.toUpperCase() as AuthRole,
       city: user.city,
@@ -161,4 +134,18 @@ interface UserApiDto {
   avatarUrl: string | null;
   privacyAccepted: boolean;
   privacyAcceptedAtUtc: string | null;
+}
+
+interface AuthSessionApiDto {
+  accessToken: string;
+  expiresAtUtc: string;
+  provider: string;
+  user: UserApiDto;
+}
+
+interface AuthProviderApiDto {
+  key: string;
+  displayName: string;
+  protocol: string;
+  configured: boolean;
 }

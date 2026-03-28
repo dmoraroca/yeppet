@@ -3,8 +3,9 @@ import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
-import { MockAuthStoreService } from './features/auth/mock/mock-auth-store.service';
+import { BrowserAuthStoreService } from './features/auth/services/browser-auth-store.service';
 import { AUTH_STORE } from './features/auth/services/auth-store.token';
 import { MockFavoritesStoreService } from './features/favorites/mock/mock-favorites-store.service';
 import { FAVORITES_STORE } from './features/favorites/services/favorites-store.token';
@@ -12,14 +13,14 @@ import { FAVORITES_STORE } from './features/favorites/services/favorites-store.t
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideHttpClient(withInterceptors([errorInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
     {
       provide: FAVORITES_STORE,
       useExisting: MockFavoritesStoreService
     },
     {
       provide: AUTH_STORE,
-      useExisting: MockAuthStoreService
+      useExisting: BrowserAuthStoreService
     },
     provideRouter(
       routes,

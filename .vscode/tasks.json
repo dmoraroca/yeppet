@@ -50,6 +50,73 @@
       }
     },
     {
+      "label": "wait api ready",
+      "type": "shell",
+      "command": "bash -lc 'for i in $(seq 1 120); do if curl -fsS http://localhost:5211/health/db >/dev/null 2>&1; then exit 0; fi; sleep 2; done; echo \"API no ha quedat llesta a :5211\"; exit 1'",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "wait web ready",
+      "type": "shell",
+      "command": "bash -lc 'for i in $(seq 1 120); do if curl -fsS http://localhost:4200 >/dev/null 2>&1; then exit 0; fi; sleep 2; done; echo \"Web no ha quedat llesta a :4200\"; exit 1'",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "install vsdbg (api)",
+      "type": "shell",
+      "command": "docker exec -i yeppet-api bash -lc 'if [ ! -x /vsdbg/vsdbg ]; then mkdir -p /vsdbg && curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l /vsdbg; fi'",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "api up + ready + vsdbg",
+      "dependsOn": [
+        "docker up api",
+        "wait api ready",
+        "install vsdbg (api)"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "web up + ready",
+      "dependsOn": [
+        "docker up web",
+        "wait web ready"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "showReuseMessage": false
+      }
+    },
+    {
       "label": "docker down",
       "type": "shell",
       "command": "docker compose down",
