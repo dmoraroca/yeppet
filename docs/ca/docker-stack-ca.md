@@ -54,7 +54,8 @@ Perfils:
 - `Docker: Stack completa (Attach)`
 - `Docker: DB`
 - `Docker: API (Attach)`
-- `Docker: API + Swagger`
+- `Docker: Swagger`
+- `Docker: API + Swagger (Attach)`
 - `Docker: Web (Debug)`
 - `Docker: API + Web (Attach)`
 
@@ -73,7 +74,9 @@ Tasques:
 
 Notes de llançament:
 
+- `Docker: Stack completa (Attach)` no depura `db`; arrenca `db` per dependència i fa `attach` només a `api` i `web`
 - l'API es depura amb `vsdbg` dins del contenidor `yeppet-api`
+- el perfil `Docker: API + Swagger (Attach)` combina `attach` real a l'API i obertura de `Swagger`
 - la web es depura amb Brave via `pwa-chrome` i `runtimeExecutable`
 - els perfils esperen que `api` i `web` estiguin llestos abans de l'attach
 

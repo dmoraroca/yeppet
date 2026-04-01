@@ -103,6 +103,8 @@ En l'estat actual:
 - l'API també queda consultable des de navegador via `Swagger`
 - `VS Code` ja disposa de perfils de `Run and Debug` per aixecar `db`, `api`, `web` o tota la stack des del workspace
 - els perfils de `Run and Debug` ja permeten depurar `api` i `web`, no només aixecar-los
+- el perfil `Docker: Stack completa (Attach)` tracta la base de dades com a dependència del stack i centra la depuració real en `api` i `web`
+- `Docker: API + Swagger (Attach)` ja manté el debugger de l'API mentre obre `Swagger`
 - el següent focus funcional passa a ser l'obertura d'autenticació, permisos, àrees internes i accessos restringits propis de la Fase IV
 - el login futur de Fase IV no queda limitat a credencials pròpies: també ha de contemplar `Google`, `LinkedIn`, `Facebook` i altres proveïdors federats
 - el punt d'autenticacio ja es considera en curs des del moment que el login deixa de dependre del fake del frontend i passa a recolzar-se en API

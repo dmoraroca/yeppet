@@ -31,18 +31,38 @@
       "preLaunchTask": "api up + ready + vsdbg"
     },
     {
-      "name": "Docker: API + Swagger",
-      "type": "pwa-chrome",
+      "name": "Docker: API (Attach, from stack)",
+      "type": "coreclr",
+      "request": "attach",
+      "requireExactSource": false,
+      "processId": "1",
+      "pipeTransport": {
+        "pipeProgram": "docker",
+        "pipeArgs": [
+          "exec",
+          "-i",
+          "yeppet-api"
+        ],
+        "debuggerPath": "/vsdbg/vsdbg",
+        "pipeCwd": "${workspaceFolder}",
+        "quoteArgs": false
+      },
+      "sourceFileMap": {
+        "/app": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "Docker: Swagger",
+      "type": "node-terminal",
       "request": "launch",
-      "url": "http://localhost:5211/swagger/index.html",
-      "webRoot": "${workspaceFolder}",
-      "runtimeExecutable": "/usr/bin/brave-browser",
-      "runtimeArgs": [
-        "--new-window",
-        "--user-data-dir=/tmp/brave-codex",
-        "--no-first-run"
-      ],
+      "command": "xdg-open http://localhost:5211/swagger/index.html",
       "preLaunchTask": "api up + ready + vsdbg"
+    },
+    {
+      "name": "Docker: Swagger (from stack)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "xdg-open http://localhost:5211/swagger/index.html"
     },
     {
       "name": "Docker: Web (Debug)",
@@ -57,9 +77,30 @@
         "--no-first-run"
       ],
       "preLaunchTask": "web up + ready"
+    },
+    {
+      "name": "Docker: Web (Debug, from stack)",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}/src/Web",
+      "runtimeExecutable": "/usr/bin/brave-browser",
+      "runtimeArgs": [
+        "--new-window",
+        "--user-data-dir=/tmp/brave-codex",
+        "--no-first-run"
+      ]
     }
   ],
   "compounds": [
+    {
+      "name": "Docker: API + Swagger (Attach)",
+      "configurations": [
+        "Docker: API (Attach)",
+        "Docker: Swagger"
+      ],
+      "stopAll": false
+    },
     {
       "name": "Docker: API + Web (Attach)",
       "configurations": [
@@ -70,10 +111,11 @@
     },
     {
       "name": "Docker: Stack completa (Attach)",
+      "preLaunchTask": "stack up + ready + vsdbg",
       "configurations": [
-        "Docker: DB",
-        "Docker: API (Attach)",
-        "Docker: Web (Debug)"
+        "Docker: API (Attach, from stack)",
+        "Docker: Web (Debug, from stack)",
+        "Docker: Swagger (from stack)"
       ],
       "stopAll": false
     }

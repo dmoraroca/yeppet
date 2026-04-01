@@ -9,7 +9,8 @@ internal sealed class AuthApplicationService(
     IUserRepository userRepository,
     IPasswordHasher passwordHasher,
     IAccessTokenIssuer accessTokenIssuer,
-    IGoogleIdTokenVerifier googleIdTokenVerifier) : IAuthApplicationService
+    IGoogleIdTokenVerifier googleIdTokenVerifier,
+    IFacebookOAuthClient facebookOAuthClient) : IAuthApplicationService
 {
     public async Task<AuthSessionDto?> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
     {
@@ -34,8 +35,87 @@ internal sealed class AuthApplicationService(
             return null;
         }
 
+        return await LoginWithFederatedIdentityAsync(
+            identity,
+            "google",
+            "Google",
+            googleIdTokenVerifier.AdminEmails,
+            cancellationToken);
+    }
+
+    public string? GetFacebookAuthorizationUrl(string? redirectTo = null)
+    {
+        return facebookOAuthClient.BuildAuthorizationUrl(redirectTo);
+    }
+
+    public async Task<AuthCallbackResult?> LoginWithFacebookAsync(
+        FacebookOAuthCallbackRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var exchange = await facebookOAuthClient.ExchangeCodeAsync(request.Code, request.State, cancellationToken);
+
+        if (exchange is null || !exchange.Value.Identity.EmailVerified)
+        {
+            return null;
+        }
+
+        var session = await LoginWithFederatedIdentityAsync(
+            exchange.Value.Identity,
+            "facebook",
+            "Facebook",
+            facebookOAuthClient.AdminEmails,
+            cancellationToken);
+
+        return session is null ? null : new AuthCallbackResult(session, exchange.Value.RedirectTo);
+    }
+
+    public async Task<AuthSessionDto?> GetSessionByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var user = await userRepository.GetByIdAsync(userId, cancellationToken);
+        return user is null ? null : CreateSession(user);
+    }
+
+    public IReadOnlyCollection<AuthProviderDto> GetProviders()
+    {
+        return
+        [
+            new("password", "Credencials pròpies", "password", true),
+            new("google", "Google", "oidc", googleIdTokenVerifier.IsConfigured, googleIdTokenVerifier.ClientId),
+            new("linkedin", "LinkedIn", "oauth2", false),
+            new("facebook", "Facebook", "oauth2", facebookOAuthClient.IsConfigured, facebookOAuthClient.AppId)
+        ];
+    }
+
+    private AuthSessionDto CreateSession(User user, string provider = "password")
+    {
+        var token = accessTokenIssuer.Issue(user);
+
+        return new AuthSessionDto(
+            token.Token,
+            token.ExpiresAtUtc,
+            provider,
+            new UserDto(
+                user.Id,
+                user.Email,
+                user.Role.ToString(),
+                user.Profile.DisplayName,
+                user.Profile.City,
+                user.Profile.Country,
+                user.Profile.Bio,
+                user.Profile.AvatarUrl,
+                user.PrivacyConsent.Accepted,
+                user.PrivacyConsent.AcceptedAtUtc));
+    }
+
+    private async Task<AuthSessionDto?> LoginWithFederatedIdentityAsync(
+        FederatedIdentityPayload identity,
+        string providerKey,
+        string providerDisplayName,
+        IReadOnlyCollection<string> adminEmails,
+        CancellationToken cancellationToken)
+    {
         var user = await userRepository.GetByEmailAsync(identity.Email, cancellationToken);
-        var shouldBeAdmin = IsAdminEmail(identity.Email);
+        var shouldBeAdmin = IsAdminEmail(identity.Email, adminEmails);
 
         if (user is null)
         {
@@ -45,10 +125,10 @@ internal sealed class AuthApplicationService(
                 passwordHasher.Hash(Guid.NewGuid().ToString("N")),
                 shouldBeAdmin ? UserRole.Admin : UserRole.User,
                 new UserProfile(
-                    string.IsNullOrWhiteSpace(identity.DisplayName) ? identity.Email : identity.DisplayName,
+                    ResolveDisplayName(identity),
                     string.Empty,
                     string.Empty,
-                    "Perfil creat a través de Google.",
+                    $"Perfil creat a través de {providerDisplayName}.",
                     identity.AvatarUrl),
                 shouldBeAdmin
                     ? new PrivacyConsent(true, DateTimeOffset.UtcNow)
@@ -80,7 +160,7 @@ internal sealed class AuthApplicationService(
                         user.Profile.City,
                         user.Profile.Country,
                         string.IsNullOrWhiteSpace(user.Profile.Bio)
-                            ? "Perfil sincronitzat a través de Google."
+                            ? $"Perfil sincronitzat a través de {providerDisplayName}."
                             : user.Profile.Bio,
                         string.IsNullOrWhiteSpace(identity.AvatarUrl) ? user.Profile.AvatarUrl : identity.AvatarUrl));
                 shouldPersist = true;
@@ -92,52 +172,13 @@ internal sealed class AuthApplicationService(
             }
         }
 
-        return CreateSession(user, "google");
+        return CreateSession(user, providerKey);
     }
 
-    public async Task<AuthSessionDto?> GetSessionByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
-    {
-        var user = await userRepository.GetByIdAsync(userId, cancellationToken);
-        return user is null ? null : CreateSession(user);
-    }
-
-    public IReadOnlyCollection<AuthProviderDto> GetProviders()
-    {
-        return
-        [
-            new("password", "Credencials pròpies", "password", true),
-            new("google", "Google", "oidc", googleIdTokenVerifier.IsConfigured, googleIdTokenVerifier.ClientId),
-            new("linkedin", "LinkedIn", "oauth2", false),
-            new("facebook", "Facebook", "oauth2", false)
-        ];
-    }
-
-    private AuthSessionDto CreateSession(User user, string provider = "password")
-    {
-        var token = accessTokenIssuer.Issue(user);
-
-        return new AuthSessionDto(
-            token.Token,
-            token.ExpiresAtUtc,
-            provider,
-            new UserDto(
-                user.Id,
-                user.Email,
-                user.Role.ToString(),
-                user.Profile.DisplayName,
-                user.Profile.City,
-                user.Profile.Country,
-                user.Profile.Bio,
-                user.Profile.AvatarUrl,
-                user.PrivacyConsent.Accepted,
-                user.PrivacyConsent.AcceptedAtUtc));
-    }
-
-    private bool IsAdminEmail(string email)
+    private static bool IsAdminEmail(string email, IReadOnlyCollection<string> adminEmails)
     {
         var normalizedEmail = email.Trim().ToLowerInvariant();
-
-        return googleIdTokenVerifier.AdminEmails.Any(candidate => candidate == normalizedEmail);
+        return adminEmails.Any(candidate => candidate == normalizedEmail);
     }
 
     private static string ResolveDisplayName(FederatedIdentityPayload identity)

@@ -5,12 +5,17 @@ namespace YepPet.Application.Auth;
 public sealed record LoginRequest(string Email, string Password);
 
 public sealed record GoogleLoginRequest(string IdToken);
+public sealed record FacebookOAuthCallbackRequest(string Code, string State);
 
 public sealed record AuthSessionDto(
     string AccessToken,
     DateTimeOffset ExpiresAtUtc,
     string Provider,
     UserDto User);
+
+public sealed record AuthCallbackResult(
+    AuthSessionDto Session,
+    string? RedirectTo);
 
 public sealed record AuthProviderDto(
     string Key,

@@ -4,7 +4,19 @@
     {
       "label": "docker up all",
       "type": "shell",
-      "command": "docker compose up -d --build db api web",
+      "command": "docker compose up -d db api web",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "docker build all",
+      "type": "shell",
+      "command": "docker compose build api web",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -106,6 +118,23 @@
       "dependsOn": [
         "docker up web",
         "wait web ready"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "stack up + ready + vsdbg",
+      "dependsOn": [
+        "docker up all",
+        "wait api ready",
+        "wait web ready",
+        "install vsdbg (api)"
       ],
       "dependsOrder": "sequence",
       "problemMatcher": [],

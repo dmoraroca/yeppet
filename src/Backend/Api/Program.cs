@@ -7,6 +7,10 @@ using YepPet.Api.Endpoints;
 using YepPet.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+var facebookLocalConfig = Path.GetFullPath(
+    Path.Combine(builder.Environment.ContentRootPath, "..", "..", "..", "config", "facebook", "yeppet-dev.json"));
+
+builder.Configuration.AddJsonFile(facebookLocalConfig, optional: true, reloadOnChange: true);
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);

@@ -39,6 +39,7 @@ export class LoginPageComponent implements AfterViewInit {
   protected readonly previewFilters = this.previewFiltersState.asReadonly();
   protected readonly authProviders = signal<string[]>([]);
   protected readonly googleProvider = signal<{ clientId: string } | null>(null);
+  protected readonly facebookProvider = signal<boolean>(false);
   protected readonly googleButtonVisible = signal(false);
   protected readonly previewCities = computed(() => this.placeService.getAvailableCities());
   protected readonly previewTypes = this.placeService.getAvailableTypes();
@@ -117,11 +118,14 @@ export class LoginPageComponent implements AfterViewInit {
         providers.filter((provider) => provider.key !== 'password').map((provider) => provider.displayName)
       );
       const google = providers.find((provider) => provider.key === 'google' && provider.configured && provider.clientId);
+      const facebook = providers.find((provider) => provider.key === 'facebook' && provider.configured);
       this.googleProvider.set(google?.clientId ? { clientId: google.clientId } : null);
+      this.facebookProvider.set(Boolean(facebook));
       void this.tryRenderGoogleButtonAsync();
     } catch {
       this.authProviders.set(['Google', 'LinkedIn', 'Facebook']);
       this.googleProvider.set(null);
+      this.facebookProvider.set(false);
     }
   }
 
@@ -138,6 +142,11 @@ export class LoginPageComponent implements AfterViewInit {
       ...current,
       ...partial
     }));
+  }
+
+  protected startFacebookLogin(): void {
+    const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
+    window.location.href = this.authService.getFacebookStartUrl(redirectTo);
   }
 
   private async tryRenderGoogleButtonAsync(): Promise<void> {

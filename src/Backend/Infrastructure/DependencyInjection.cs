@@ -21,6 +21,7 @@ public static class DependencyInjection
             : 480;
         var authOptions = new AuthOptions
         {
+            FrontendBaseUrl = configuration["Auth:FrontendBaseUrl"] ?? "http://localhost:4200",
             Jwt = new AuthOptions.JwtOptions
             {
                 Issuer = configuration["Auth:Jwt:Issuer"] ?? "YepPet",
@@ -38,11 +39,25 @@ public static class DependencyInjection
                     .Where(value => !string.IsNullOrWhiteSpace(value))
                     .Select(value => value!)
                     .ToArray()
+            },
+            Facebook = new AuthOptions.FacebookOptions
+            {
+                AppId = configuration["Auth:Facebook:AppId"] ?? string.Empty,
+                AppSecret = configuration["Auth:Facebook:AppSecret"] ?? string.Empty,
+                RedirectUri = configuration["Auth:Facebook:RedirectUri"] ?? string.Empty,
+                AdminEmails = configuration.GetSection("Auth:Facebook:AdminEmails")
+                    .GetChildren()
+                    .Select(section => section.Value)
+                    .Where(value => !string.IsNullOrWhiteSpace(value))
+                    .Select(value => value!)
+                    .ToArray()
             }
         };
 
         services.AddSingleton(Options.Create(authOptions));
+        services.AddDataProtection();
         services.AddDbContext<YepPetDbContext>(options => options.UseNpgsql(connectionString));
+        services.AddHttpClient<IFacebookOAuthClient, FacebookOAuthClient>();
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IAccessTokenIssuer, JwtAccessTokenIssuer>();
         services.AddScoped<IGoogleIdTokenVerifier, GoogleIdTokenVerifier>();

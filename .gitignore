@@ -13,3 +13,4 @@ obj/
 .NETCoreApp,Version=*.AssemblyAttributes.cs
 .DS_Store
 config/google/*.json
+config/facebook/*.json

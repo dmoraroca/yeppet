@@ -6,6 +6,12 @@ public interface IAuthApplicationService
 
     Task<AuthSessionDto?> LoginWithGoogleAsync(GoogleLoginRequest request, CancellationToken cancellationToken = default);
 
+    string? GetFacebookAuthorizationUrl(string? redirectTo = null);
+
+    Task<AuthCallbackResult?> LoginWithFacebookAsync(
+        FacebookOAuthCallbackRequest request,
+        CancellationToken cancellationToken = default);
+
     Task<AuthSessionDto?> GetSessionByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
 
     IReadOnlyCollection<AuthProviderDto> GetProviders();

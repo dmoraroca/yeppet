@@ -60,6 +60,13 @@ export class AuthService {
     }
   }
 
+  hydrateFederatedSession(session: AuthSessionApiDto): AuthUser {
+    const mappedSession = this.toSession(session);
+    this.sessionState.set(mappedSession);
+    this.authStore.saveSession(mappedSession);
+    return mappedSession.user;
+  }
+
   logout(): void {
     this.sessionState.set(null);
     this.authStore.saveSession(null);
@@ -116,6 +123,13 @@ export class AuthService {
 
   getPostLoginRoute(): string {
     return this.isAdmin() ? '/permissions' : '/perfil';
+  }
+
+  getFacebookStartUrl(redirectTo?: string | null): string {
+    const target = redirectTo?.trim();
+    return target
+      ? `${API_BASE_URL}/auth/facebook/start?redirectTo=${encodeURIComponent(target)}`
+      : `${API_BASE_URL}/auth/facebook/start`;
   }
 
   private toSession(session: AuthSessionApiDto): AuthSession {

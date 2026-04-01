@@ -364,7 +364,8 @@ Perfils disponibles:
 - `Docker: Stack completa`
 - `Docker: DB`
 - `Docker: API (Attach)`
-- `Docker: API + Swagger`
+- `Docker: Swagger`
+- `Docker: API + Swagger (Attach)`
 - `Docker: Web (Debug)`
 - `Docker: API + Web (Attach)`
 - `Docker: Stack completa (Attach)`
@@ -381,6 +382,12 @@ Tasques disponibles:
 - `install vsdbg (api)`
 - `api up + ready + vsdbg`
 - `web up + ready`
+
+Notes tècniques:
+
+- `Docker: Stack completa (Attach)` tracta `db` com a servei dependent del stack, però els únics targets de depuració reals són `api` i `web`
+- `Docker: API + Swagger (Attach)` és un `compound` que combina l'`attach` real de `.NET` amb l'obertura de `Swagger`
+- el navegador continua sent `Brave` via `pwa-chrome`
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
   <span style="color:#93c5fd;">VS[VS Code Run and Debug]</span> --&gt; <span style="color:#c4b5fd;">LA[launch.json]</span>
