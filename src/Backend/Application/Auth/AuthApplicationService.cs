@@ -10,6 +10,7 @@ internal sealed class AuthApplicationService(
     IPasswordHasher passwordHasher,
     IAccessTokenIssuer accessTokenIssuer,
     IGoogleIdTokenVerifier googleIdTokenVerifier,
+    ILinkedInOAuthClient linkedInOAuthClient,
     IFacebookOAuthClient facebookOAuthClient) : IAuthApplicationService
 {
     public async Task<AuthSessionDto?> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
@@ -41,6 +42,32 @@ internal sealed class AuthApplicationService(
             "Google",
             googleIdTokenVerifier.AdminEmails,
             cancellationToken);
+    }
+
+    public string? GetLinkedInAuthorizationUrl(string? redirectTo = null)
+    {
+        return linkedInOAuthClient.BuildAuthorizationUrl(redirectTo);
+    }
+
+    public async Task<AuthCallbackResult?> LoginWithLinkedInAsync(
+        LinkedInOAuthCallbackRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var exchange = await linkedInOAuthClient.ExchangeCodeAsync(request.Code, request.State, cancellationToken);
+
+        if (exchange is null || !exchange.Value.Identity.EmailVerified)
+        {
+            return null;
+        }
+
+        var session = await LoginWithFederatedIdentityAsync(
+            exchange.Value.Identity,
+            "linkedin",
+            "LinkedIn",
+            linkedInOAuthClient.AdminEmails,
+            cancellationToken);
+
+        return session is null ? null : new AuthCallbackResult(session, exchange.Value.RedirectTo);
     }
 
     public string? GetFacebookAuthorizationUrl(string? redirectTo = null)
@@ -81,7 +108,7 @@ internal sealed class AuthApplicationService(
         [
             new("password", "Credencials pròpies", "password", true),
             new("google", "Google", "oidc", googleIdTokenVerifier.IsConfigured, googleIdTokenVerifier.ClientId),
-            new("linkedin", "LinkedIn", "oauth2", false),
+            new("linkedin", "LinkedIn", "oidc", linkedInOAuthClient.IsConfigured, linkedInOAuthClient.ClientId),
             new("facebook", "Facebook", "oauth2", facebookOAuthClient.IsConfigured, facebookOAuthClient.AppId)
         ];
     }

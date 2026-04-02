@@ -10,12 +10,16 @@ namespace YepPet.Api.Endpoints;
 
 internal static class AuthEndpoints
 {
+    private static readonly JsonSerializerOptions CallbackJsonOptions = new(JsonSerializerDefaults.Web);
+
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/auth");
 
         group.MapPost("/login", LoginAsync);
         group.MapPost("/google", GoogleLoginAsync);
+        group.MapGet("/linkedin/start", LinkedInStartAsync);
+        group.MapGet("/linkedin/callback", LinkedInCallbackAsync);
         group.MapGet("/facebook/start", FacebookStartAsync);
         group.MapGet("/facebook/callback", FacebookCallbackAsync);
         group.MapGet("/providers", GetProviders);
@@ -45,6 +49,56 @@ internal static class AuthEndpoints
     private static Ok<IReadOnlyCollection<AuthProviderDto>> GetProviders(IAuthApplicationService service)
     {
         return TypedResults.Ok(service.GetProviders());
+    }
+
+    private static Results<RedirectHttpResult, NotFound> LinkedInStartAsync(
+        IAuthApplicationService service,
+        string? redirectTo = null)
+    {
+        var authorizationUrl = service.GetLinkedInAuthorizationUrl(redirectTo);
+        return string.IsNullOrWhiteSpace(authorizationUrl)
+            ? TypedResults.NotFound()
+            : TypedResults.Redirect(authorizationUrl);
+    }
+
+    private static async Task<RedirectHttpResult> LinkedInCallbackAsync(
+        IAuthApplicationService service,
+        IConfiguration configuration,
+        string? code = null,
+        string? state = null,
+        string? error = null,
+        string? error_description = null,
+        CancellationToken cancellationToken = default)
+    {
+        var frontendBaseUrl = configuration["Auth:FrontendBaseUrl"] ?? "http://localhost:4200";
+        var loginUrl = $"{frontendBaseUrl.TrimEnd('/')}/login";
+
+        if (!string.IsNullOrWhiteSpace(error) || string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(state))
+        {
+            return TypedResults.Redirect(
+                QueryHelpers.AddQueryString(
+                    loginUrl,
+                    "federatedError",
+                    string.IsNullOrWhiteSpace(error_description) ? "linkedin-login-failed" : error_description));
+        }
+
+        var result = await service.LoginWithLinkedInAsync(new LinkedInOAuthCallbackRequest(code, state), cancellationToken);
+        if (result is null)
+        {
+            return TypedResults.Redirect(QueryHelpers.AddQueryString(loginUrl, "federatedError", "linkedin-login-failed"));
+        }
+
+        var serializedSession = JsonSerializer.Serialize(result.Session, CallbackJsonOptions);
+        var sessionPayload = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(serializedSession));
+        var callbackUrl = QueryHelpers.AddQueryString(
+            $"{frontendBaseUrl.TrimEnd('/')}/auth/callback",
+            new Dictionary<string, string?>()
+            {
+                ["session"] = sessionPayload,
+                ["redirectTo"] = result.RedirectTo
+            });
+
+        return TypedResults.Redirect(callbackUrl);
     }
 
     private static Results<RedirectHttpResult, NotFound> FacebookStartAsync(
@@ -84,7 +138,7 @@ internal static class AuthEndpoints
             return TypedResults.Redirect(QueryHelpers.AddQueryString(loginUrl, "federatedError", "facebook-login-failed"));
         }
 
-        var serializedSession = JsonSerializer.Serialize(result.Session);
+        var serializedSession = JsonSerializer.Serialize(result.Session, CallbackJsonOptions);
         var sessionPayload = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(serializedSession));
         var callbackUrl = QueryHelpers.AddQueryString(
             $"{frontendBaseUrl.TrimEnd('/')}/auth/callback",

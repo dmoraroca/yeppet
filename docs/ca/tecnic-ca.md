@@ -433,6 +433,8 @@ Resum del diagrama:
 - el control d'accessos s'haurà de recolzar en `Api` i `Application`, no només en la web
 - la Fase IV ja no és pendent conceptual, sinó línia activa de treball
 - el punt d'autenticació ja inclou des del principi la possibilitat de login federat via proveïdors `OAuth/OIDC`
+- el següent tram d'implementació dins del punt actiu d'autenticació queda fixat a `LinkedIn`
+- `Facebook` queda aparcat a nivell de roadmap fins després de publicar la web, tot i que la base tècnica federada es manté oberta
 - el primer pas implementable ja cobreix emissió i consum de token per al login propi i deixa `Google` operatiu en desenvolupament
 
 ### 2.11.1 Base implementada del punt d'autenticació

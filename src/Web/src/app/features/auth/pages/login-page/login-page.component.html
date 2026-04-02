@@ -11,8 +11,8 @@
 
     <p class="login-page__copy">
       Primera entrega real d’autenticació de la fase IV. El login estàndard ja valida contra backend
-      i Google queda disponible en desenvolupament, mentre {{ authProviders().join(', ') || 'LinkedIn i Facebook' }}
-      continuen pendents.
+      i Google queda disponible en desenvolupament. La següent federació activa és LinkedIn, mentre
+      {{ authProviders().join(', ') || 'LinkedIn i Facebook' }} acaba de completar-se de manera incremental.
     </p>
 
     <form class="login-form" [formGroup]="form" (ngSubmit)="submit()">
@@ -54,6 +54,15 @@
         </section>
       }
 
+      @if (linkedInProvider()) {
+        <section class="login-page__federated login-page__federated--visible">
+          <button type="button" class="login-page__provider-button login-page__provider-button--linkedin" (click)="startLinkedInLogin()">
+            <span class="login-page__provider-button-icon login-page__provider-button-icon--linkedin" aria-hidden="true">in</span>
+            <span class="login-page__provider-button-label">Iniciar amb LinkedIn</span>
+          </button>
+        </section>
+      }
+
       @if (false && facebookProvider()) {
         <section class="login-page__federated login-page__federated--visible">
           <button type="button" class="login-page__provider-button login-page__provider-button--facebook" (click)="startFacebookLogin()">
@@ -75,6 +84,10 @@
       </div>
       <div>
         <strong>Administrador Google</strong>
+        <p>yeppetcontact@gmail.com</p>
+      </div>
+      <div>
+        <strong>Administrador LinkedIn</strong>
         <p>yeppetcontact@gmail.com</p>
       </div>
       <div>

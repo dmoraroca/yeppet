@@ -51,11 +51,12 @@ internal sealed class FacebookOAuthClient(
             return null;
         }
 
-        var redirectTo = UnprotectState(state);
-        if (redirectTo is null && !string.IsNullOrWhiteSpace(state))
+        var statePayload = UnprotectState(state);
+        if (statePayload is null)
         {
             return null;
         }
+        var redirectTo = statePayload.RedirectTo;
 
         var tokenResponse = await httpClient.GetFromJsonAsync<FacebookTokenResponse>(
             $"https://graph.facebook.com/v23.0/oauth/access_token?client_id={Uri.EscapeDataString(AppId)}&redirect_uri={Uri.EscapeDataString(options.Value.Facebook.RedirectUri)}&client_secret={Uri.EscapeDataString(options.Value.Facebook.AppSecret)}&code={Uri.EscapeDataString(code)}",
@@ -96,7 +97,7 @@ internal sealed class FacebookOAuthClient(
         return dataProtector.Protect(payload);
     }
 
-    private string? UnprotectState(string protectedState)
+    private FacebookStatePayload? UnprotectState(string protectedState)
     {
         try
         {
@@ -108,7 +109,7 @@ internal sealed class FacebookOAuthClient(
                 return null;
             }
 
-            return payload.RedirectTo;
+            return payload;
         }
         catch
         {

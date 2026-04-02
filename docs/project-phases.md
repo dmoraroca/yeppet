@@ -322,7 +322,10 @@ El punt `autenticació pròpia i federada` queda ara mateix en curs amb aquesta 
 - existeixen usuaris de desenvolupament bootstrap:
   - `admin@admin.adm / Admin123`
   - `user@user.com / Admin123`
-- `LinkedIn` i `Facebook` continuen pendents, però el patró federat ja queda validat amb `Google`
+- el focus immediat del punt en curs passa a ser `LinkedIn`
+- `LinkedIn` continua pendent dins del mateix punt d'autenticació federada
+- `Facebook` queda aparcat expressament fins després de publicar la web
+- el patró federat ja queda validat amb `Google`
 
 ## Fase V · Internacionalització (**PENDENT**)
 

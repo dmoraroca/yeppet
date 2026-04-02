@@ -6,6 +6,12 @@ public interface IAuthApplicationService
 
     Task<AuthSessionDto?> LoginWithGoogleAsync(GoogleLoginRequest request, CancellationToken cancellationToken = default);
 
+    string? GetLinkedInAuthorizationUrl(string? redirectTo = null);
+
+    Task<AuthCallbackResult?> LoginWithLinkedInAsync(
+        LinkedInOAuthCallbackRequest request,
+        CancellationToken cancellationToken = default);
+
     string? GetFacebookAuthorizationUrl(string? redirectTo = null);
 
     Task<AuthCallbackResult?> LoginWithFacebookAsync(

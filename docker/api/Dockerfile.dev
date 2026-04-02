@@ -13,3 +13,17 @@ RUN apt-get update && apt-get install -y \
 
 ENV ASPNETCORE_ENVIRONMENT=Development
 ENV DOTNET_USE_POLLING_FILE_WATCHER=1
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+WORKDIR /tmp/bootstrap
+
+COPY YepPet.sln dotnet-tools.json ./
+COPY src/Backend/Api/Api.csproj src/Backend/Api/
+COPY src/Backend/Application/Application.csproj src/Backend/Application/
+COPY src/Backend/Domain/Domain.csproj src/Backend/Domain/
+COPY src/Backend/Infrastructure/Infrastructure.csproj src/Backend/Infrastructure/
+
+RUN dotnet restore YepPet.sln \
+  && dotnet tool install --global dotnet-ef --version 10.0.0
+
+WORKDIR /app

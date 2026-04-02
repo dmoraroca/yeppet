@@ -61,7 +61,7 @@ export class AuthService {
   }
 
   hydrateFederatedSession(session: AuthSessionApiDto): AuthUser {
-    const mappedSession = this.toSession(session);
+    const mappedSession = this.toSession(this.normalizeSession(session));
     this.sessionState.set(mappedSession);
     this.authStore.saveSession(mappedSession);
     return mappedSession.user;
@@ -122,7 +122,24 @@ export class AuthService {
   }
 
   getPostLoginRoute(): string {
-    return this.isAdmin() ? '/permissions' : '/perfil';
+    const user = this.currentUser();
+
+    if (!user) {
+      return '/login';
+    }
+
+    if (user.role === 'ADMIN') {
+      return '/permissions';
+    }
+
+    return this.requiresProfileCompletion(user) ? '/perfil' : '/';
+  }
+
+  getLinkedInStartUrl(redirectTo?: string | null): string {
+    const target = redirectTo?.trim();
+    return target
+      ? `${API_BASE_URL}/auth/linkedin/start?redirectTo=${encodeURIComponent(target)}`
+      : `${API_BASE_URL}/auth/linkedin/start`;
   }
 
   getFacebookStartUrl(redirectTo?: string | null): string {
@@ -141,6 +158,42 @@ export class AuthService {
     };
   }
 
+  private normalizeSession(session: AuthSessionApiDto | PascalCaseAuthSessionApiDto): AuthSessionApiDto {
+    const candidate = session as Partial<AuthSessionApiDto> & Partial<PascalCaseAuthSessionApiDto>;
+    const user = candidate.user ?? candidate.User;
+
+    if (!user) {
+      throw new Error('Federated session does not include user payload.');
+    }
+
+    return {
+      accessToken: candidate.accessToken ?? candidate.AccessToken ?? '',
+      expiresAtUtc: candidate.expiresAtUtc ?? candidate.ExpiresAtUtc ?? '',
+      provider: candidate.provider ?? candidate.Provider ?? '',
+      user: {
+        id: this.readUserField(user, 'id', 'Id') ?? '',
+        email: this.readUserField(user, 'email', 'Email') ?? '',
+        role: this.readUserField(user, 'role', 'Role') ?? '',
+        displayName: this.readUserField(user, 'displayName', 'DisplayName') ?? '',
+        city: this.readUserField(user, 'city', 'City') ?? '',
+        country: this.readUserField(user, 'country', 'Country') ?? '',
+        bio: this.readUserField(user, 'bio', 'Bio') ?? '',
+        avatarUrl: this.readUserField(user, 'avatarUrl', 'AvatarUrl') ?? null,
+        privacyAccepted: this.readUserField(user, 'privacyAccepted', 'PrivacyAccepted') ?? false,
+        privacyAcceptedAtUtc: this.readUserField(user, 'privacyAcceptedAtUtc', 'PrivacyAcceptedAtUtc') ?? null
+      }
+    };
+  }
+
+  private readUserField<T>(
+    user: UserApiDto | PascalCaseUserApiDto,
+    camelKey: keyof UserApiDto,
+    pascalKey: keyof PascalCaseUserApiDto
+  ): T | undefined {
+    const record = user as Record<string, unknown>;
+    return (record[camelKey as string] ?? record[pascalKey as string]) as T | undefined;
+  }
+
   private toAuthUser(user: UserApiDto): AuthUser {
     return {
       id: user.id,
@@ -153,6 +206,16 @@ export class AuthService {
       avatarUrl: user.avatarUrl,
       privacyAccepted: user.privacyAccepted
     };
+  }
+
+  private requiresProfileCompletion(user: AuthUser): boolean {
+    return (
+      !user.name.trim() ||
+      !user.city.trim() ||
+      !user.country.trim() ||
+      !user.bio.trim() ||
+      !user.privacyAccepted
+    );
   }
 }
 
@@ -174,6 +237,26 @@ interface AuthSessionApiDto {
   expiresAtUtc: string;
   provider: string;
   user: UserApiDto;
+}
+
+interface PascalCaseUserApiDto {
+  Id?: string;
+  Email?: string;
+  Role?: string;
+  DisplayName?: string;
+  City?: string;
+  Country?: string;
+  Bio?: string;
+  AvatarUrl?: string | null;
+  PrivacyAccepted?: boolean;
+  PrivacyAcceptedAtUtc?: string | null;
+}
+
+interface PascalCaseAuthSessionApiDto {
+  AccessToken?: string;
+  ExpiresAtUtc?: string;
+  Provider?: string;
+  User?: PascalCaseUserApiDto;
 }
 
 interface AuthProviderApiDto {

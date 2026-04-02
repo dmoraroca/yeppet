@@ -107,6 +107,7 @@ En l'estat actual:
 - `Docker: API + Swagger (Attach)` ja manté el debugger de l'API mentre obre `Swagger`
 - el següent focus funcional passa a ser l'obertura d'autenticació, permisos, àrees internes i accessos restringits propis de la Fase IV
 - el login futur de Fase IV no queda limitat a credencials pròpies: també ha de contemplar `Google`, `LinkedIn`, `Facebook` i altres proveïdors federats
+- `Facebook` queda aparcat funcionalment fins després de publicar la web
 - el punt d'autenticacio ja es considera en curs des del moment que el login deixa de dependre del fake del frontend i passa a recolzar-se en API
 - ja existeixen dos usuaris bootstrap de desenvolupament per provar el nou flux:
   - `admin@admin.adm / Admin123`
@@ -130,6 +131,7 @@ Resum del diagrama:
 - la Fase IV obre el tram de seguretat i govern d'accessos
 - la web continua sent la mateixa base funcional, pero ara passa a requerir autenticació i permisos reals
 - el primer pas executable de la fase ja cobreix login propi contra backend i login Google en desenvolupament
+- el següent proveïdor federat que entra a focus de treball és `LinkedIn`
 - les zones internes i restriccions deixen de ser una idea futura i passen a ser el focus actiu
 - l'entrada d'usuari haurà de poder venir tant de login propi com de proveïdors socials o federats
 - el frontend ja conserva la sessió a navegador i reutilitza el token per a futures crides HTTP

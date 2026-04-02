@@ -40,6 +40,18 @@ public static class DependencyInjection
                     .Select(value => value!)
                     .ToArray()
             },
+            LinkedIn = new AuthOptions.LinkedInOptions
+            {
+                ClientId = configuration["Auth:LinkedIn:ClientId"] ?? string.Empty,
+                ClientSecret = configuration["Auth:LinkedIn:ClientSecret"] ?? string.Empty,
+                RedirectUri = configuration["Auth:LinkedIn:RedirectUri"] ?? string.Empty,
+                AdminEmails = configuration.GetSection("Auth:LinkedIn:AdminEmails")
+                    .GetChildren()
+                    .Select(section => section.Value)
+                    .Where(value => !string.IsNullOrWhiteSpace(value))
+                    .Select(value => value!)
+                    .ToArray()
+            },
             Facebook = new AuthOptions.FacebookOptions
             {
                 AppId = configuration["Auth:Facebook:AppId"] ?? string.Empty,
@@ -57,6 +69,7 @@ public static class DependencyInjection
         services.AddSingleton(Options.Create(authOptions));
         services.AddDataProtection();
         services.AddDbContext<YepPetDbContext>(options => options.UseNpgsql(connectionString));
+        services.AddHttpClient<ILinkedInOAuthClient, LinkedInOAuthClient>();
         services.AddHttpClient<IFacebookOAuthClient, FacebookOAuthClient>();
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IAccessTokenIssuer, JwtAccessTokenIssuer>();

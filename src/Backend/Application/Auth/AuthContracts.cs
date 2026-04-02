@@ -6,6 +6,7 @@ public sealed record LoginRequest(string Email, string Password);
 
 public sealed record GoogleLoginRequest(string IdToken);
 public sealed record FacebookOAuthCallbackRequest(string Code, string State);
+public sealed record LinkedInOAuthCallbackRequest(string Code, string State);
 
 public sealed record AuthSessionDto(
     string AccessToken,

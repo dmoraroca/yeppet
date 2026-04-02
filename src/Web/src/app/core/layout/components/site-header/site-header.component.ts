@@ -29,7 +29,9 @@ export class SiteHeaderComponent {
   protected logout(): void {
     this.authService.logout();
     this.notifications.notify('Sessió tancada', 'Has sortit de YepPet.');
-    void this.router.navigateByUrl('/login');
+    void this.router.navigate(['/login'], {
+      replaceUrl: true
+    });
   }
 
   @HostListener('document:click', ['$event'])
