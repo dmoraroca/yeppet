@@ -24,11 +24,21 @@ internal sealed class NavigationApplicationService(IMenuRepository menuRepositor
             }
 
             return children
-                .Select(item => new NavigationMenuItemDto(
-                    item.Key,
-                    item.Label,
-                    item.Route,
-                    Build(item.Key)))
+                .Select(item =>
+                {
+                    var label = item.Label;
+
+                    if (item.Key.Equals("admin", StringComparison.Ordinal))
+                    {
+                        label = role == UserRole.Developer ? "Del desenvolupador" : "Del administrador";
+                    }
+
+                    return new NavigationMenuItemDto(
+                        item.Key,
+                        label,
+                        item.Route,
+                        Build(item.Key));
+                })
                 .ToArray();
         }
 

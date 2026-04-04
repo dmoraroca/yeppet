@@ -93,7 +93,7 @@ public sealed class DevelopmentIdentitySeeder(
         new("help", "Ajuda", null, null, 50, true),
         new("help.general", "Com funciona", "/ajuda", "help", 10, true),
         new("help.contact", "Contacta'ns", "/contacte", "help", 20, true),
-        new("admin", "ADMIN", null, null, 60, true),
+        new("admin", "Del administrador", null, null, 60, true),
         new("admin.documentation", "Documentació", "/admin/documentacio", "admin", 10, true),
         new("admin.users", "Usuaris", "/admin/usuaris", "admin", 20, true),
         new("admin.permissions", "Permisos", "/admin/permisos", "admin", 30, true),
