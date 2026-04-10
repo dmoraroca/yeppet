@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -6,6 +6,7 @@ import { SiteFooterComponent } from '../../../../core/layout/components/site-foo
 import { SiteHeaderComponent } from '../../../../core/layout/components/site-header/site-header.component';
 import { ErrorNotificationsService } from '../../../../core/services/error-notifications.service';
 import { SectionHeadingComponent } from '../../../../shared/components/section-heading/section-heading.component';
+import { fileToAvatarDataUrl } from '../../../../shared/utils/avatar-image.util';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -23,6 +24,7 @@ export class ProfilePageComponent {
 
   protected readonly user = computed(() => this.authService.currentUser());
   protected readonly isAdmin = computed(() => this.authService.isAdmin());
+  protected readonly avatarPreview = signal<string | null>(this.currentUser?.avatarUrl ?? null);
 
   protected readonly form = this.formBuilder.nonNullable.group({
     name: [this.currentUser?.name ?? '', [Validators.required, Validators.minLength(3)]],
@@ -33,11 +35,39 @@ export class ProfilePageComponent {
     privacyAccepted: [this.currentUser?.privacyAccepted ?? false]
   });
 
-  protected readonly previewAvatarUrl = computed(() => {
-    const raw = this.form.controls.avatarUrl.value.trim();
+  protected readonly previewAvatarUrl = computed(() => this.avatarPreview());
 
-    return raw || null;
-  });
+  protected async onAvatarSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    await this.setAvatarFromFile(file);
+    input.value = '';
+  }
+
+  protected async onAvatarDropped(event: DragEvent): Promise<void> {
+    event.preventDefault();
+    const file = event.dataTransfer?.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    await this.setAvatarFromFile(file);
+  }
+
+  protected allowAvatarDrop(event: DragEvent): void {
+    event.preventDefault();
+  }
+
+  protected removeAvatar(): void {
+    this.avatarPreview.set(null);
+    this.form.controls.avatarUrl.setValue('');
+  }
 
   protected async save(): Promise<void> {
     if (!this.isAdmin() && !this.form.controls.privacyAccepted.value) {
@@ -62,7 +92,7 @@ export class ProfilePageComponent {
       city: value.city.trim(),
       country: value.country.trim(),
       bio: value.bio.trim(),
-      avatarUrl: value.avatarUrl.trim() || null,
+      avatarUrl: this.avatarPreview(),
       privacyAccepted: this.isAdmin() ? true : value.privacyAccepted
     });
 
@@ -75,5 +105,16 @@ export class ProfilePageComponent {
     void this.router.navigate(['/login'], {
       replaceUrl: true
     });
+  }
+
+  private async setAvatarFromFile(file: File): Promise<void> {
+    try {
+      const dataUrl = await fileToAvatarDataUrl(file);
+      this.avatarPreview.set(dataUrl);
+      this.form.controls.avatarUrl.setValue(dataUrl);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'No s’ha pogut preparar la imatge.';
+      this.notifications.notify('Imatge no vàlida', message);
+    }
   }
 }

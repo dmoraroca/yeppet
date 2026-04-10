@@ -1,6 +1,22 @@
 <app-site-header />
 
 <main class="admin-console-page">
+  @if (avatarSuccessPopup(); as popup) {
+    <div class="admin-console-success-popup" (click)="closeAvatarSuccessPopup()">
+      <article class="admin-console-success-popup__card" (click)="$event.stopPropagation()">
+        <div class="admin-console-success-popup__halo"></div>
+        <div class="admin-console-success-popup__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M5 12.5 9.2 17 19 7.5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <p class="admin-console-success-popup__eyebrow">{{ popup.eyebrow }}</p>
+        <h3>{{ popup.title }}</h3>
+        <p>{{ popup.message }}</p>
+      </article>
+    </div>
+  }
+
   <section class="admin-console-hero">
     <app-section-heading [eyebrow]="eyebrow()" [title]="title()" />
     <p class="admin-console-copy">{{ copy() }}</p>
@@ -34,70 +50,363 @@
     </section>
   } @else if (mode() === 'users') {
     <section class="admin-console-panel">
-      <h2>Usuaris</h2>
-      <div class="admin-console-form admin-console-form--inline">
-        <label>
-          <span>Email</span>
-          <input
-            placeholder="usuari@domini.com"
-            [ngModel]="newUser().email"
-            (ngModelChange)="newUser.set({ ...newUser(), email: $event })"
-          />
-        </label>
-        <label>
-          <span>Contrasenya</span>
-          <input
-            type="password"
-            placeholder="Contrasenya inicial"
-            [ngModel]="newUser().password"
-            (ngModelChange)="newUser.set({ ...newUser(), password: $event })"
-          />
-        </label>
-        <label>
-          <span>Nom visible</span>
-          <input
-            placeholder="Nom que veurà l'usuari"
-            [ngModel]="newUser().displayName"
-            (ngModelChange)="newUser.set({ ...newUser(), displayName: $event })"
-          />
-        </label>
-        <label>
-          <span>Rol</span>
-          <select [ngModel]="newUser().role" (ngModelChange)="newUser.set({ ...newUser(), role: $event })">
-            @for (role of roleOptions; track role) {
-              <option [value]="role">{{ role }}</option>
-            }
-          </select>
-        </label>
-        <button type="button" class="admin-console-primary" [disabled]="!canCreateUser()" (click)="createUser()">Crear usuari</button>
+      <div class="admin-console-titlebar">
+        <div>
+          <p class="admin-console-kicker">Manteniment intern</p>
+          <h2 class="admin-console-highlight-title">Gestió d'usuaris</h2>
+        </div>
+        <button type="button" class="admin-console-primary admin-console-primary--inline" (click)="openCreateUserModal()">
+          Crear usuari
+        </button>
       </div>
-      <table class="admin-console-table">
-        <thead>
-          <tr>
-            <th>Email</th>
-            <th>Nom</th>
-            <th>Rol</th>
-            <th>Consentiment</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (user of users(); track user.id) {
+      <div class="admin-console-table-wrap">
+        <table class="admin-console-table admin-console-table--responsive admin-console-table--users">
+          <thead>
             <tr>
-              <td>{{ user.email }}</td>
-              <td>{{ user.displayName }}</td>
-              <td>
-                <select [ngModel]="user.role" (ngModelChange)="saveUserRole(user, $event)">
-                  @for (role of roleOptions; track role) {
-                    <option [value]="role">{{ role }}</option>
-                  }
-                </select>
-              </td>
-              <td>{{ user.privacyAccepted ? 'Sí' : 'No' }}</td>
+              <th>Email</th>
+              <th>Nom</th>
+              <th>Ciutat</th>
+              <th>País</th>
+              <th>Rol</th>
+              <th>Consentiment</th>
+              <th>Data d'alta</th>
+              <th>Últim accés</th>
+              <th>Accions</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (user of users(); track user.id) {
+              <tr
+                (click)="selectUser(user)"
+                class="admin-console-row-action"
+                [class.admin-console-row-selected]="selectedUser()?.id === user.id"
+              >
+                <td data-label="Email">{{ user.email }}</td>
+                <td data-label="Nom">{{ user.displayName }}</td>
+                <td data-label="Ciutat">{{ user.city || '-' }}</td>
+                <td data-label="País">{{ user.country || '-' }}</td>
+                <td data-label="Rol">{{ user.role }}</td>
+                <td data-label="Consentiment">{{ user.privacyAccepted ? 'Sí' : 'No' }}</td>
+                <td data-label="Data d'alta">{{ formatDateTime(user.createdAtUtc) }}</td>
+                <td data-label="Últim accés">{{ formatDateTime(user.lastAccessedAtUtc) }}</td>
+                <td data-label="Accions">
+                  <div class="admin-console-table-actions">
+                    <button type="button" class="admin-console-icon-button" title="Veure detall" aria-label="Veure detall" (click)="selectUser(user); $event.stopPropagation()">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M1.5 12s3.8-7 10.5-7 10.5 7 10.5 7-3.8 7-10.5 7S1.5 12 1.5 12Z"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.8"
+                        />
+                        <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8" />
+                      </svg>
+                    </button>
+                    <button type="button" class="admin-console-icon-button admin-console-icon-button--danger" title="Esborrar usuari" aria-label="Esborrar usuari" (click)="askDeleteUser(user, $event)">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M4 7h16M9.5 3h5M8 7l.7 11.2c.1 1 1 1.8 2 1.8h2.6c1 0 1.9-.8 2-1.8L16 7M10 10.5v6M14 10.5v6"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.8"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </section>
+
+    @if (createUserModalOpen()) {
+      <div class="admin-console-modal-backdrop" (click)="closeCreateUserModal()">
+        <section class="admin-console-modal admin-console-modal--detail admin-console-modal--create" (click)="$event.stopPropagation()">
+          <div class="admin-console-modal__header">
+            <div>
+              <h3>Crear usuari</h3>
+            </div>
+          </div>
+
+          <form id="admin-create-user-form" class="admin-console-form admin-console-form--inline admin-console-form--create" [formGroup]="userForm" (ngSubmit)="createUser()">
+            <label>
+              <span>Email <strong class="admin-console-required">*</strong></span>
+              <input type="email" placeholder="usuari@domini.com" formControlName="email" required />
+            </label>
+            <label>
+              <span>Contrasenya <strong class="admin-console-required">*</strong></span>
+              <input type="password" placeholder="Contrasenya inicial" formControlName="password" required />
+            </label>
+            <label>
+              <span>Nom visible <strong class="admin-console-required">*</strong></span>
+              <input placeholder="Nom que veurà l'usuari" formControlName="displayName" required />
+            </label>
+            <label>
+              <span>Ciutat <strong class="admin-console-required">*</strong></span>
+              <input placeholder="Ciutat" formControlName="city" required />
+            </label>
+            <label>
+              <span>País <strong class="admin-console-required">*</strong></span>
+              <input placeholder="País" formControlName="country" required />
+            </label>
+            <label>
+              <span>Rol <strong class="admin-console-required">*</strong></span>
+              <select formControlName="role">
+                @for (role of roleOptions; track role) {
+                  <option [value]="role">{{ role }}</option>
+                }
+              </select>
+            </label>
+
+            <section class="admin-console-avatar-field">
+              <span>Imatge de perfil</span>
+              <div
+                class="admin-console-avatar-dropzone"
+                (dragover)="allowAvatarDrop($event)"
+                (drop)="onCreateAvatarDropped($event)"
+              >
+                @if (createAvatarPreview()) {
+                  <img [src]="createAvatarPreview()" alt="Avatar nou" />
+                } @else {
+                  <div class="admin-console-avatar-placeholder" aria-label="Sense foto">
+                    <span class="admin-console-avatar-none">NONE</span>
+                  </div>
+                }
+              </div>
+              <div class="admin-console-avatar-actions">
+                <input #createAvatarInput type="file" accept="image/*" hidden (change)="onCreateAvatarSelected($event)" />
+                <button type="button" class="admin-console-icon-button-text" (click)="createAvatarInput.click()">Afegir imatge</button>
+                <button type="button" class="admin-console-icon-button-text admin-console-icon-button-text--secondary" (click)="removeCreateAvatar()">
+                  Treure
+                </button>
+                <p>També pots arrossegar una imatge des del teu PC.</p>
+              </div>
+            </section>
+
+          </form>
+
+          <div class="admin-console-modal__footer">
+            <div class="admin-console-modal__footer-band">
+              <label class="admin-console-privacy-check">
+                <input
+                  type="checkbox"
+                  [checked]="createPrivacyAccepted()"
+                  (change)="createPrivacyAccepted.set($any($event.target).checked)"
+                />
+                <span>Accepto les condicions de privacitat d'aquest entorn intern.</span>
+              </label>
+              <div class="admin-console-modal__footer-actions">
+                <button type="submit" form="admin-create-user-form" class="admin-console-primary" [disabled]="!canCreateUser() || !createPrivacyAccepted()">
+                  Crear
+                </button>
+                <button type="button" class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button" (click)="closeCreateUserModal()">
+                  Tancar
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    }
+
+    @if (detailModalOpen() && selectedUser(); as user) {
+      <div class="admin-console-modal-backdrop" (click)="closeDetailModal()">
+        <section class="admin-console-modal admin-console-modal--detail" (click)="$event.stopPropagation()">
+          <div class="admin-console-modal__header">
+            <div>
+              <p class="admin-console-kicker">Consulta</p>
+              <h3>Detall d'usuari</h3>
+            </div>
+          </div>
+
+          <form id="admin-detail-user-form" [formGroup]="detailForm">
+            <div class="admin-console-form admin-console-form--inline admin-console-form--readonly admin-console-user-detail__meta">
+              <label>
+                <span>ID</span>
+                <input [value]="user.id" readonly />
+              </label>
+              <label>
+                <span>Email</span>
+                <input [value]="user.email" readonly />
+              </label>
+              <label>
+                <span>Nom visible</span>
+                @if (detailEditMode()) {
+                  <input formControlName="displayName" />
+                } @else {
+                  <input class="admin-console-static-field" [value]="user.displayName" readonly />
+                }
+              </label>
+              <label>
+                <span>Ciutat</span>
+                @if (detailEditMode()) {
+                  <input formControlName="city" />
+                } @else {
+                  <input class="admin-console-static-field" [value]="user.city || '-'" readonly />
+                }
+              </label>
+              <label>
+                <span>País</span>
+                @if (detailEditMode()) {
+                  <input formControlName="country" />
+                } @else {
+                  <input class="admin-console-static-field" [value]="user.country || '-'" readonly />
+                }
+              </label>
+              <label>
+                <span>Consentiment</span>
+                <input [value]="user.privacyAccepted ? 'Sí' : 'No'" readonly />
+              </label>
+              <label>
+                <span>Data de consentiment</span>
+                <input [value]="formatDateTime(user.privacyAcceptedAtUtc)" readonly />
+              </label>
+              <label>
+                <span>Data d'alta</span>
+                <input [value]="formatDateTime(user.createdAtUtc)" readonly />
+              </label>
+              <label>
+                <span>Últim accés</span>
+                <input [value]="formatDateTime(user.lastAccessedAtUtc)" readonly />
+              </label>
+            </div>
+
+            <section class="admin-console-avatar-field" [class.admin-console-avatar-field--readonly]="!detailEditMode()">
+              <span>Imatge de perfil</span>
+              <div
+                class="admin-console-avatar-dropzone"
+                [class.admin-console-avatar-dropzone--readonly]="!detailEditMode()"
+                (dragover)="allowAvatarDrop($event)"
+                (drop)="onDetailAvatarDropped($event)"
+              >
+                @if (detailAvatarPreview()) {
+                  <img [src]="detailAvatarPreview()" [alt]="detailForm.controls.displayName.value || user.displayName" />
+                } @else {
+                  <div class="admin-console-avatar-placeholder" aria-label="Sense foto">
+                    <span class="admin-console-avatar-none">NONE</span>
+                  </div>
+                }
+              </div>
+
+              @if (detailEditMode()) {
+                <div class="admin-console-avatar-actions">
+                  <input #detailAvatarInput type="file" accept="image/*" hidden (change)="onDetailAvatarSelected($event)" />
+                  <button type="button" class="admin-console-icon-button-text" (click)="detailAvatarInput.click()">Afegir imatge</button>
+                  <button type="button" class="admin-console-icon-button-text admin-console-icon-button-text--secondary" (click)="removeDetailAvatar()">
+                    Treure
+                  </button>
+                  <p>També pots arrossegar una imatge des del teu PC.</p>
+                </div>
+              }
+            </section>
+
+            <label class="admin-console-form admin-console-form--readonly">
+              <span>Bio</span>
+              @if (detailEditMode()) {
+                <textarea rows="4" formControlName="bio"></textarea>
+              } @else {
+                <textarea class="admin-console-static-field" rows="4" [value]="user.bio || '-'" readonly></textarea>
+              }
+            </label>
+
+            <div class="admin-console-role-strip">
+              <label>
+                <span>Rol</span>
+                @if (detailEditMode()) {
+                  <select formControlName="role">
+                    @for (role of roleOptions; track role) {
+                      <option [value]="role">{{ role }}</option>
+                    }
+                  </select>
+                } @else {
+                  <input class="admin-console-static-field" [value]="user.role" readonly />
+                }
+              </label>
+            </div>
+          </form>
+
+          <div class="admin-console-modal__footer">
+            <div class="admin-console-modal__footer-band">
+              @if (detailEditMode()) {
+                <label class="admin-console-privacy-check admin-console-privacy-check--inverse">
+                  <input
+                    type="checkbox"
+                    [checked]="detailPrivacyAccepted()"
+                    (change)="detailPrivacyAccepted.set($any($event.target).checked)"
+                  />
+                  <span>Accepto les condicions de privacitat.</span>
+                </label>
+              }
+
+              <div class="admin-console-modal__footer-actions">
+                @if (detailEditMode()) {
+                  <button
+                    type="button"
+                    class="admin-console-primary admin-console-role-strip__button"
+                    [disabled]="!detailPrivacyAccepted()"
+                    (click)="saveSelectedUserRole()"
+                  >
+                    Desar
+                  </button>
+                  <button
+                    type="button"
+                    class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button"
+                    (click)="cancelDetailEdit()"
+                  >
+                    Cancelar
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    class="admin-console-primary admin-console-role-strip__button"
+                    (click)="beginDetailEdit()"
+                  >
+                    Modificar
+                  </button>
+                  <button
+                    type="button"
+                    class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button"
+                    (click)="closeDetailModal()"
+                  >
+                    Tancar
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    }
+
+    @if (deleteCandidate(); as user) {
+      <div class="admin-console-modal-backdrop" (click)="cancelDeleteUser()">
+        <section class="admin-console-modal admin-console-modal--confirm" (click)="$event.stopPropagation()">
+          <div class="admin-console-modal__header">
+            <div>
+              <p class="admin-console-kicker">Acció destructiva</p>
+              <h3>Esborrar usuari</h3>
+            </div>
+          </div>
+
+          <p>Vols esborrar l'usuari <strong>{{ user.email }}</strong>?</p>
+
+          <div class="admin-console-modal__actions">
+            <button type="button" class="admin-console-primary admin-console-primary--secondary" (click)="cancelDeleteUser()">
+              Cancel·lar
+            </button>
+            <button type="button" class="admin-console-primary admin-console-icon-button--danger" (click)="confirmDeleteUser()">
+              Esborrar
+            </button>
+          </div>
+        </section>
+      </div>
+    }
   } @else if (mode() === 'permissions') {
     <section class="admin-console-panel">
       <h2>Permisos per rol</h2>

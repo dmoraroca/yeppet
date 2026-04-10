@@ -32,7 +32,14 @@ internal sealed class AdminApplicationService(
                 user.Email,
                 user.Role.ToString().ToUpperInvariant(),
                 user.Profile.DisplayName,
-                user.PrivacyConsent.Accepted))
+                user.Profile.City,
+                user.Profile.Country,
+                user.Profile.Bio,
+                user.Profile.AvatarUrl,
+                user.PrivacyConsent.Accepted,
+                user.PrivacyConsent.AcceptedAtUtc,
+                user.CreatedAtUtc,
+                user.LastAccessedAtUtc))
             .ToArray();
     }
 
@@ -49,6 +56,11 @@ internal sealed class AdminApplicationService(
         CancellationToken cancellationToken = default)
     {
         return await updateRoleHandler.HandleAsync(new UpdateUserRoleCommand(userId, request), cancellationToken);
+    }
+
+    public async Task DeleteUserAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        await userRepository.DeleteAsync(userId, cancellationToken);
     }
 
     public async Task<RolePermissionCatalogDto> GetRolePermissionsAsync(CancellationToken cancellationToken = default)

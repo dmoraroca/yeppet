@@ -77,6 +77,20 @@ internal sealed class UserRepository(YepPetDbContext dbContext) : IUserRepositor
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var record = await dbContext.Users
+            .FirstOrDefaultAsync(current => current.Id == id, cancellationToken);
+
+        if (record is null)
+        {
+            return;
+        }
+
+        dbContext.Users.Remove(record);
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
     private void AppendConsentEventIfNeeded(
         UserRecord record,
         (bool accepted, DateTimeOffset? acceptedAtUtc)? previousState)

@@ -60,6 +60,14 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'notificacions',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/notifications/pages/notifications-page/notifications-page.component').then(
+        (m) => m.NotificationsPageComponent
+      )
+  },
+  {
     path: 'contacte',
     canActivate: [authGuard],
     loadComponent: () =>

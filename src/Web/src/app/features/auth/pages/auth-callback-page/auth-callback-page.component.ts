@@ -30,8 +30,7 @@ export class AuthCallbackPageComponent {
 
     try {
       const json = this.decodeBase64Url(sessionPayload);
-      const user = this.authService.hydrateFederatedSession(JSON.parse(json) as AuthSessionApiDto);
-      this.notifications.notify('Sessió iniciada', `Benvingut/da, ${user.name}.`);
+      this.authService.hydrateFederatedSession(JSON.parse(json) as AuthSessionApiDto);
       void this.router.navigateByUrl(redirectTo || this.authService.getPostLoginRoute());
     } catch {
       this.notifications.notify('Login social incomplet', 'No s’ha pogut recuperar la sessió federada.');

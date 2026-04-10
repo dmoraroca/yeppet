@@ -1,0 +1,85 @@
+<app-site-header />
+
+<main class="notifications-page">
+  <section class="notifications-page__hero">
+    <div class="notifications-page__copy">
+      <app-section-heading
+        eyebrow="Notificacions"
+        title="Centre de notificacions intern de la sessio."
+      />
+      <p>
+        Aqui queden registrades les notificacions funcionals i d’error que decidiu conservar. Les
+        no llegides es mostren destacades en negreta i es poden marcar manualment.
+      </p>
+    </div>
+
+    <aside class="notifications-page__summary">
+      <p class="notifications-page__summary-label">Pendents</p>
+      <strong>{{ unreadCount() }}</strong>
+      <span>notificacions sense llegir</span>
+      <button
+        type="button"
+        class="notifications-page__mark-all"
+        (click)="markAllAsRead()"
+        [disabled]="!unreadCount()"
+      >
+        Marcar totes com a llegides
+      </button>
+    </aside>
+  </section>
+
+  <section class="notifications-page__table-card">
+    @if (notifications().length) {
+      <div class="notifications-page__table-wrap">
+        <table class="notifications-page__table">
+          <thead>
+            <tr>
+              <th>Estat</th>
+              <th>Titol</th>
+              <th>Missatge</th>
+              <th>Data</th>
+              <th>Accions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (notification of notifications(); track notification.id) {
+              <tr [class.notifications-page__row--unread]="notification.readAt === null">
+                <td>
+                  <span
+                    class="notifications-page__status"
+                    [class.notifications-page__status--unread]="notification.readAt === null"
+                  >
+                    {{ notification.readAt === null ? 'No llegida' : 'Llegida' }}
+                  </span>
+                </td>
+                <td>{{ notification.title }}</td>
+                <td>{{ notification.message }}</td>
+                <td>{{ notification.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                <td>
+                  @if (notification.readAt === null) {
+                    <button type="button" class="notifications-page__action" (click)="markAsRead(notification.id)">
+                      Marcar llegida
+                    </button>
+                  } @else {
+                    <button type="button" class="notifications-page__action" (click)="markAsUnread(notification.id)">
+                      Marcar no llegida
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="notifications-page__empty">
+        <p class="notifications-page__empty-title">No hi ha notificacions.</p>
+        <p class="notifications-page__empty-copy">
+          La campana del header s’activara quan es registri la primera notificacio.
+        </p>
+      </div>
+    }
+  </section>
+</main>
+
+<app-site-footer />

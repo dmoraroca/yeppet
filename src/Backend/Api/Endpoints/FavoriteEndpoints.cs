@@ -16,13 +16,14 @@ internal static class FavoriteEndpoints
         return app;
     }
 
-    private static async Task<Results<Ok<FavoriteListDto>, NotFound>> GetByOwnerAsync(
+    private static async Task<Ok<FavoriteListDto>> GetByOwnerAsync(
         Guid ownerUserId,
         IFavoriteListApplicationService service,
         CancellationToken cancellationToken)
     {
         var favoriteList = await service.GetByOwnerAsync(ownerUserId, cancellationToken);
-        return favoriteList is null ? TypedResults.NotFound() : TypedResults.Ok(favoriteList);
+        return TypedResults.Ok(
+            favoriteList ?? new FavoriteListDto(Guid.Empty, ownerUserId, Array.Empty<FavoriteEntryDto>()));
     }
 
     private static async Task<Ok<Guid>> SavePlaceAsync(

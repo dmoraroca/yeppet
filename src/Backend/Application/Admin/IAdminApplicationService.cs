@@ -13,6 +13,8 @@ public interface IAdminApplicationService
         UpdateUserRoleRequest request,
         CancellationToken cancellationToken = default);
 
+    Task DeleteUserAsync(Guid userId, CancellationToken cancellationToken = default);
+
     Task<RolePermissionCatalogDto> GetRolePermissionsAsync(CancellationToken cancellationToken = default);
 
     Task<RolePermissionCatalogDto> UpdateRolePermissionsAsync(

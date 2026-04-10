@@ -9,7 +9,14 @@ export interface AdminUserListItem {
   email: string;
   role: 'VIEWER' | 'USER' | 'DEVELOPER' | 'ADMIN';
   displayName: string;
+  city: string;
+  country: string;
+  bio: string;
+  avatarUrl: string | null;
   privacyAccepted: boolean;
+  privacyAcceptedAtUtc: string | null;
+  createdAtUtc: string;
+  lastAccessedAtUtc: string | null;
 }
 
 export interface CreateAdminUserRequest {
@@ -17,6 +24,19 @@ export interface CreateAdminUserRequest {
   password: string;
   role: 'VIEWER' | 'USER' | 'DEVELOPER' | 'ADMIN';
   displayName: string;
+  city: string;
+  country: string;
+  avatarUrl: string | null;
+}
+
+export interface AdminUserUpdateRequest {
+  displayName: string;
+  city: string;
+  country: string;
+  bio: string;
+  avatarUrl: string | null;
+  privacyAccepted: boolean;
+  privacyAcceptedAtUtc: string | null;
 }
 
 export interface PermissionDefinition {
@@ -84,6 +104,19 @@ export class AdminService {
     await firstValueFrom(
       this.http.put(`${API_BASE_URL}/admin/users/${userId}/role`, { role })
     );
+  }
+
+  async updateUserDetails(userId: string, request: AdminUserUpdateRequest): Promise<void> {
+    await firstValueFrom(
+      this.http.put(`${API_BASE_URL}/users/${userId}/profile`, {
+        id: userId,
+        ...request
+      })
+    );
+  }
+
+  async deleteUser(userId: string): Promise<void> {
+    await firstValueFrom(this.http.delete(`${API_BASE_URL}/admin/users/${userId}`));
   }
 
   async getPermissions(): Promise<RolePermissionCatalog> {

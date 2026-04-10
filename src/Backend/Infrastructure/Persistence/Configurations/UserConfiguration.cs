@@ -47,8 +47,7 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<UserRecord>
             .HasColumnName("bio");
 
         builder.Property(user => user.AvatarUrl)
-            .HasColumnName("avatar_url")
-            .HasMaxLength(2048);
+            .HasColumnName("avatar_url");
 
         builder.Property(user => user.PrivacyAccepted)
             .HasColumnName("privacy_accepted")
@@ -57,6 +56,14 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<UserRecord>
 
         builder.Property(user => user.PrivacyAcceptedAtUtc)
             .HasColumnName("privacy_accepted_at_utc");
+
+        builder.Property(user => user.CreatedAtUtc)
+            .HasColumnName("created_at_utc")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .IsRequired();
+
+        builder.Property(user => user.LastAccessedAtUtc)
+            .HasColumnName("last_accessed_at_utc");
 
         builder.HasIndex(user => user.Email)
             .IsUnique()

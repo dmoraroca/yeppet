@@ -11,13 +11,17 @@ public sealed class User : AggregateRoot<Guid>
         string passwordHash,
         UserRole role,
         UserProfile profile,
-        PrivacyConsent privacyConsent) : base(id)
+        PrivacyConsent privacyConsent,
+        DateTimeOffset? createdAtUtc = null,
+        DateTimeOffset? lastAccessedAtUtc = null) : base(id)
     {
         SetEmail(email);
         SetPasswordHash(passwordHash);
         Role = role;
         Profile = profile;
         PrivacyConsent = privacyConsent;
+        CreatedAtUtc = createdAtUtc ?? DateTimeOffset.UtcNow;
+        LastAccessedAtUtc = lastAccessedAtUtc;
     }
 
     public string Email { get; private set; } = string.Empty;
@@ -29,6 +33,10 @@ public sealed class User : AggregateRoot<Guid>
     public UserProfile Profile { get; private set; }
 
     public PrivacyConsent PrivacyConsent { get; private set; }
+
+    public DateTimeOffset CreatedAtUtc { get; private set; }
+
+    public DateTimeOffset? LastAccessedAtUtc { get; private set; }
 
     public void UpdateProfile(UserProfile profile)
     {
@@ -58,6 +66,11 @@ public sealed class User : AggregateRoot<Guid>
     public void ChangeRole(UserRole role)
     {
         Role = role;
+    }
+
+    public void RecordAccess(DateTimeOffset accessedAtUtc)
+    {
+        LastAccessedAtUtc = accessedAtUtc;
     }
 
     private void SetEmail(string email)

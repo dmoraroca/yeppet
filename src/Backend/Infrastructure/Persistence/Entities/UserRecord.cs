@@ -24,6 +24,10 @@ public sealed class UserRecord
 
     public DateTimeOffset? PrivacyAcceptedAtUtc { get; set; }
 
+    public DateTimeOffset CreatedAtUtc { get; set; }
+
+    public DateTimeOffset? LastAccessedAtUtc { get; set; }
+
     public FavoriteListRecord? FavoriteList { get; set; }
 
     public ICollection<PlaceReviewRecord> Reviews { get; set; } = [];

@@ -12,18 +12,23 @@ namespace YepPet.Application.Admin.Commands;
 public sealed class CreateAdminUserCommandHandler(
     IUserRepository userRepository,
     Auth.IPasswordHasher passwordHasher,
-    IUserProfileFactory userProfileFactory,
+    IUserProfileFactory ruserProfileFactory,
     IEventPublisher eventPublisher)
     : ICommandHandler<CreateAdminUserCommand, Result<UserDto>>
-{
+    {
     public async Task<Result<UserDto>> HandleAsync(
         CreateAdminUserCommand command,
         CancellationToken cancellationToken = default)
     {
         var request = command.Request;
-        var role = Enum.Parse<UserRole>(request.Role, ignoreCase: true);
+        var role = string.IsNullOrWhiteSpace(request.Role)
+            ? UserRole.User
+            : Enum.Parse<UserRole>(request.Role, ignoreCase: true);
         var email = request.Email.Trim().ToLowerInvariant();
         var displayName = request.DisplayName.Trim();
+        var city = request.City.Trim();
+        var country = request.Country.Trim();
+        var avatarUrl = string.IsNullOrWhiteSpace(request.AvatarUrl) ? null : request.AvatarUrl.Trim();
 
         if (await userRepository.ExistsByEmailAsync(email, cancellationToken))
         {
@@ -35,7 +40,7 @@ public sealed class CreateAdminUserCommandHandler(
             email,
             passwordHasher.Hash(request.Password.Trim()),
             role,
-            userProfileFactory.Create(displayName, string.Empty, string.Empty, string.Empty, null),
+            userProfileFactory.Create(displayName, city, country, string.Empty, avatarUrl),
             new Domain.Users.ValueObjects.PrivacyConsent(false, null));
 
             await userRepository.AddAsync(user, cancellationToken);

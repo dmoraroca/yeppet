@@ -13,8 +13,8 @@ import { ErrorNotificationsService } from '../../../services/error-notifications
 })
 export class SiteHeaderComponent {
   private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
   private readonly notifications = inject(ErrorNotificationsService);
+  private readonly router = inject(Router);
   @ViewChild('menuHost') private readonly menuHost?: ElementRef<HTMLElement>;
 
   protected readonly currentUser = computed(() => this.authService.currentUser());
@@ -27,13 +27,20 @@ export class SiteHeaderComponent {
   protected readonly helpMenu = computed(
     () => this.navigationMenu().find((item) => item.key === 'help') ?? null
   );
+  protected readonly unreadNotifications = computed(() => this.notifications.unreadCount());
+  protected readonly hasUnreadNotifications = computed(() => this.notifications.hasUnread());
+  protected readonly hasNotifications = computed(() => this.notifications.notifications().length > 0);
 
   protected logout(): void {
     this.authService.logout();
-    this.notifications.notify('Sessió tancada', 'Has sortit de YepPet.');
     void this.router.navigate(['/login'], {
       replaceUrl: true
     });
+  }
+
+  protected openNotifications(): void {
+    this.closeAllDropdowns();
+    void this.router.navigate(['/notificacions']);
   }
 
   protected isDropdown(item: NavigationMenuItem): boolean {

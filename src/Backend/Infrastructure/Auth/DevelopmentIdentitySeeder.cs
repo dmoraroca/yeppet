@@ -232,6 +232,17 @@ public sealed class DevelopmentIdentitySeeder(
                 existing.PasswordHash = passwordHasher.Hash(password);
             }
 
+            if (!string.Equals(existing.Role, role, StringComparison.OrdinalIgnoreCase))
+            {
+                existing.Role = role;
+            }
+
+            if (privacyAccepted && !existing.PrivacyAccepted)
+            {
+                existing.PrivacyAccepted = true;
+                existing.PrivacyAcceptedAtUtc ??= DateTimeOffset.UtcNow;
+            }
+
             return;
         }
 

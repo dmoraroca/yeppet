@@ -64,7 +64,7 @@
     {
       "label": "wait api ready",
       "type": "shell",
-      "command": "bash -lc 'for i in $(seq 1 120); do if curl -fsS http://localhost:5211/health/db >/dev/null 2>&1; then exit 0; fi; sleep 2; done; echo \"API no ha quedat llesta a :5211\"; exit 1'",
+      "command": "bash -lc 'for i in $(seq 1 120); do if docker exec -i yeppet-api bash -lc \"curl -fsS http://localhost:5211/health/db >/dev/null 2>&1\"; then exit 0; fi; sleep 2; done; echo \"API no ha quedat llesta a :5211\"; exit 1'",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -88,7 +88,7 @@
     {
       "label": "install vsdbg (api)",
       "type": "shell",
-      "command": "docker exec -i yeppet-api bash -lc 'if [ ! -x /vsdbg/vsdbg ]; then mkdir -p /vsdbg && curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l /vsdbg; fi'",
+      "command": "docker exec -i yeppet-api bash -lc 'rm -rf /vsdbg && mkdir -p /vsdbg && curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l /vsdbg'",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",

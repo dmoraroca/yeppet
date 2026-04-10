@@ -1,5 +1,5 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, effect, inject, signal } from '@angular/core';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { SiteFooterComponent } from '../../../../core/layout/components/site-footer/site-footer.component';
@@ -7,6 +7,7 @@ import { SiteHeaderComponent } from '../../../../core/layout/components/site-hea
 import { ErrorNotificationsService } from '../../../../core/services/error-notifications.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { SectionHeadingComponent } from '../../../../shared/components/section-heading/section-heading.component';
+import { fileToAvatarDataUrl } from '../../../../shared/utils/avatar-image.util';
 import {
   AdminMenuCatalog,
   AdminMenuDefinition,
@@ -18,18 +19,22 @@ import {
 } from '../../services/admin.service';
 
 type AdminMode = 'documentation' | 'users' | 'permissions' | 'menus';
+type AdminRole = 'VIEWER' | 'USER' | 'DEVELOPER' | 'ADMIN';
+type AvatarSuccessOperation = 'crear' | 'modificar' | 'esborrar';
 
 @Component({
   selector: 'app-admin-console-page',
-  imports: [FormsModule, SiteHeaderComponent, SiteFooterComponent, SectionHeadingComponent],
+  imports: [FormsModule, ReactiveFormsModule, SiteHeaderComponent, SiteFooterComponent, SectionHeadingComponent],
   templateUrl: './admin-console-page.component.html',
   styleUrl: './admin-console-page.component.scss'
 })
 export class AdminConsolePageComponent {
+  private readonly formBuilder = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly adminService = inject(AdminService);
   private readonly authService = inject(AuthService);
   private readonly notifications = inject(ErrorNotificationsService);
+  private avatarSuccessTimer: ReturnType<typeof setTimeout> | null = null;
 
   protected readonly mode = signal<AdminMode>((this.route.snapshot.data['mode'] as AdminMode | undefined) ?? 'documentation');
   protected readonly title = signal((this.route.snapshot.data['title'] as string | undefined) ?? 'Administració');
@@ -37,23 +42,45 @@ export class AdminConsolePageComponent {
   protected readonly copy = signal((this.route.snapshot.data['copy'] as string | undefined) ?? '');
 
   protected readonly users = signal<AdminUserListItem[]>([]);
+  protected readonly selectedUser = signal<AdminUserListItem | null>(null);
+  protected readonly selectedUserRole = signal<string>('');
+  protected readonly createUserModalOpen = signal(false);
+  protected readonly detailModalOpen = signal(false);
+  protected readonly detailEditMode = signal(false);
+  protected readonly deleteCandidate = signal<AdminUserListItem | null>(null);
+  protected readonly createPrivacyAccepted = signal(false);
+  protected readonly detailPrivacyAccepted = signal(false);
+  protected readonly createAvatarPreview = signal<string | null>(null);
+  protected readonly detailAvatarPreview = signal<string | null>(null);
+  protected readonly avatarSuccessPopup = signal<{
+    operation: AvatarSuccessOperation;
+    eyebrow: string;
+    title: string;
+    message: string;
+  } | null>(null);
   protected readonly permissions = signal<RolePermissionCatalog | null>(null);
   protected readonly menus = signal<AdminMenuCatalog | null>(null);
   protected readonly documents = signal<InternalDocumentSummary[]>([]);
   protected readonly selectedDocument = signal<InternalDocument | null>(null);
   protected readonly loading = signal(false);
 
-  protected readonly roleOptions = ['VIEWER', 'USER', 'DEVELOPER', 'ADMIN'];
-  protected readonly menuRoleOptions = ['VIEWER', 'USER', 'DEVELOPER', 'ADMIN'];
-  protected readonly newUser = signal({
-    email: '',
-    password: '',
-    role: 'VIEWER',
-    displayName: ''
+  protected readonly roleOptions: readonly AdminRole[] = ['VIEWER', 'USER', 'DEVELOPER', 'ADMIN'];
+  protected readonly menuRoleOptions: readonly AdminRole[] = ['VIEWER', 'USER', 'DEVELOPER', 'ADMIN'];
+  protected readonly userForm = this.formBuilder.nonNullable.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    displayName: ['', [Validators.required, Validators.minLength(3)]],
+    city: ['', [Validators.required, Validators.minLength(2)]],
+    country: ['', [Validators.required, Validators.minLength(2)]],
+    role: this.formBuilder.nonNullable.control<AdminRole>('USER'),
+    avatarUrl: ['']
   });
-  protected readonly canCreateUser = computed(() => {
-    const payload = this.newUser();
-    return !!payload.email.trim() && !!payload.password.trim() && !!payload.displayName.trim();
+  protected readonly detailForm = this.formBuilder.nonNullable.group({
+    displayName: ['', [Validators.required, Validators.minLength(3)]],
+    city: ['', [Validators.required, Validators.minLength(2)]],
+    country: ['', [Validators.required, Validators.minLength(2)]],
+    bio: ['', [Validators.required, Validators.minLength(12)]],
+    role: this.formBuilder.nonNullable.control<AdminRole>('USER')
   });
   protected readonly editableMenu = signal<AdminMenuDefinition>({
     key: '',
@@ -140,29 +167,293 @@ export class AdminConsolePageComponent {
     await this.loadUsers();
   }
 
-  protected async createUser(): Promise<void> {
-    const payload = this.newUser();
+  protected selectUser(user: AdminUserListItem): void {
+    this.selectedUser.set(user);
+    this.selectedUserRole.set(user.role);
+    this.detailForm.reset({
+      displayName: user.displayName,
+      city: user.city || '',
+      country: user.country || '',
+      bio: user.bio || '',
+      role: user.role
+    });
+    this.detailAvatarPreview.set(user.avatarUrl);
+    this.detailEditMode.set(false);
+    this.detailPrivacyAccepted.set(false);
+    this.detailModalOpen.set(true);
+  }
 
-    if (!payload.email.trim() || !payload.password.trim() || !payload.displayName.trim()) {
-      this.notifications.notify('Dades incompletes', 'Cal informar email, contrasenya i nom visible.');
+  protected openCreateUserModal(): void {
+    this.userForm.reset({
+      email: '',
+      password: '',
+      displayName: '',
+      city: '',
+      country: '',
+      role: 'USER',
+      avatarUrl: ''
+    });
+    this.createPrivacyAccepted.set(false);
+    this.createAvatarPreview.set(null);
+    this.createUserModalOpen.set(true);
+  }
+
+  protected closeCreateUserModal(): void {
+    this.createUserModalOpen.set(false);
+    this.createPrivacyAccepted.set(false);
+    this.createAvatarPreview.set(null);
+  }
+
+  protected closeDetailModal(): void {
+    this.detailModalOpen.set(false);
+    this.detailEditMode.set(false);
+    this.detailPrivacyAccepted.set(false);
+  }
+
+  protected closeAvatarSuccessPopup(): void {
+    this.avatarSuccessPopup.set(null);
+
+    if (this.avatarSuccessTimer) {
+      clearTimeout(this.avatarSuccessTimer);
+      this.avatarSuccessTimer = null;
+    }
+  }
+
+  protected beginDetailEdit(): void {
+    const user = this.selectedUser();
+
+    if (!user) {
       return;
     }
+
+    this.detailForm.reset({
+      displayName: user.displayName,
+      city: user.city || '',
+      country: user.country || '',
+      bio: user.bio || '',
+      role: user.role
+    });
+    this.detailAvatarPreview.set(user.avatarUrl);
+    this.detailPrivacyAccepted.set(false);
+    this.detailEditMode.set(true);
+  }
+
+  protected cancelDetailEdit(): void {
+    const user = this.selectedUser();
+
+    if (!user) {
+      this.detailEditMode.set(false);
+      return;
+    }
+
+    this.detailForm.reset({
+      displayName: user.displayName,
+      city: user.city || '',
+      country: user.country || '',
+      bio: user.bio || '',
+      role: user.role
+    });
+    this.detailAvatarPreview.set(user.avatarUrl);
+    this.selectedUserRole.set(user.role);
+    this.detailPrivacyAccepted.set(false);
+    this.detailEditMode.set(false);
+  }
+
+  protected askDeleteUser(user: AdminUserListItem, event?: Event): void {
+    event?.stopPropagation();
+    this.deleteCandidate.set(user);
+  }
+
+  protected cancelDeleteUser(): void {
+    this.deleteCandidate.set(null);
+  }
+
+  protected async saveSelectedUserRole(): Promise<void> {
+    const user = this.selectedUser();
+
+    if (!user) {
+      return;
+    }
+
+    if (this.detailForm.invalid) {
+      this.detailForm.markAllAsTouched();
+      this.notifications.notify('Dades incompletes', 'Revisa nom visible, ciutat, país i bio abans de desar.');
+      return;
+    }
+
+    if (!this.detailPrivacyAccepted()) {
+      this.notifications.notify('Privacitat obligatòria', 'Cal acceptar les condicions de privacitat abans de desar.');
+      return;
+    }
+
+    const payload = this.detailForm.getRawValue();
+    const nextRole = payload.role as 'VIEWER' | 'USER' | 'DEVELOPER' | 'ADMIN';
+    const avatarOperation = this.getAvatarOperation(user.avatarUrl, this.detailAvatarPreview());
+
+    await this.adminService.updateUserDetails(user.id, {
+      displayName: payload.displayName.trim(),
+      city: payload.city.trim(),
+      country: payload.country.trim(),
+      bio: payload.bio.trim(),
+      avatarUrl: this.detailAvatarPreview(),
+      privacyAccepted: user.privacyAccepted,
+      privacyAcceptedAtUtc: user.privacyAcceptedAtUtc
+    });
+
+    if (nextRole !== user.role) {
+      await this.adminService.updateUserRole(user.id, nextRole);
+    }
+
+    this.notifications.notify('Usuari actualitzat', 'Els canvis s’han desat correctament.');
+    this.detailPrivacyAccepted.set(false);
+    this.detailEditMode.set(false);
+    if (avatarOperation) {
+      this.showAvatarSuccessPopup(avatarOperation);
+    }
+    await this.loadUsers();
+  }
+
+  protected formatDateTime(value: string | null | undefined): string {
+    if (!value) {
+      return '-';
+    }
+
+    const parsed = new Date(value);
+
+    if (Number.isNaN(parsed.getTime())) {
+      return value;
+    }
+
+    return new Intl.DateTimeFormat('ca-ES', {
+      dateStyle: 'short',
+      timeStyle: 'short'
+    }).format(parsed);
+  }
+
+  protected async onCreateAvatarSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    await this.setCreateAvatarFromFile(file);
+    input.value = '';
+  }
+
+  protected async onCreateAvatarDropped(event: DragEvent): Promise<void> {
+    event.preventDefault();
+    const file = event.dataTransfer?.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    await this.setCreateAvatarFromFile(file);
+  }
+
+  protected allowAvatarDrop(event: DragEvent): void {
+    event.preventDefault();
+  }
+
+  protected removeCreateAvatar(): void {
+    this.createAvatarPreview.set(null);
+    this.userForm.controls.avatarUrl.setValue('');
+  }
+
+  protected async onDetailAvatarSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    await this.setDetailAvatarFromFile(file);
+    input.value = '';
+  }
+
+  protected async onDetailAvatarDropped(event: DragEvent): Promise<void> {
+    event.preventDefault();
+    const file = event.dataTransfer?.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    await this.setDetailAvatarFromFile(file);
+  }
+
+  protected removeDetailAvatar(): void {
+    this.detailAvatarPreview.set(null);
+  }
+
+  protected async createUser(): Promise<void> {
+    if (this.userForm.invalid) {
+      this.userForm.markAllAsTouched();
+      this.notifications.notify('Dades incompletes', 'Cal informar email, contrasenya, nom visible, ciutat i país.');
+      return;
+    }
+
+    if (!this.createPrivacyAccepted()) {
+      this.notifications.notify('Privacitat obligatòria', 'Cal acceptar les condicions de privacitat abans de crear.');
+      return;
+    }
+
+    const payload = this.userForm.getRawValue();
+    const createdWithAvatar = !!this.createAvatarPreview();
 
     await this.adminService.createUser({
       email: payload.email.trim(),
       password: payload.password.trim(),
       role: payload.role as 'VIEWER' | 'USER' | 'DEVELOPER' | 'ADMIN',
-      displayName: payload.displayName.trim()
+      displayName: payload.displayName.trim(),
+      city: payload.city.trim(),
+      country: payload.country.trim(),
+      avatarUrl: this.createAvatarPreview()
     });
 
-    this.newUser.set({
+    this.userForm.reset({
       email: '',
       password: '',
-      role: 'VIEWER',
-      displayName: ''
+      displayName: '',
+      city: '',
+      country: '',
+      role: 'USER',
+      avatarUrl: ''
     });
+    this.createUserModalOpen.set(false);
+    this.createPrivacyAccepted.set(false);
+    this.createAvatarPreview.set(null);
     this.notifications.notify('Usuari creat', 'El nou usuari s’ha creat correctament.');
+    if (createdWithAvatar) {
+      this.showAvatarSuccessPopup('crear');
+    }
     await this.loadUsers();
+  }
+
+  protected async confirmDeleteUser(): Promise<void> {
+    const user = this.deleteCandidate();
+
+    if (!user) {
+      return;
+    }
+
+    await this.adminService.deleteUser(user.id);
+
+    if (this.selectedUser()?.id === user.id) {
+      this.selectedUser.set(null);
+      this.detailModalOpen.set(false);
+    }
+
+    this.deleteCandidate.set(null);
+    this.notifications.notify('Usuari eliminat', 'L’usuari s’ha eliminat correctament.');
+    await this.loadUsers();
+  }
+
+  protected canCreateUser(): boolean {
+    return this.userForm.valid;
   }
 
   protected async savePermissions(role: string): Promise<void> {
@@ -240,6 +531,110 @@ export class AdminConsolePageComponent {
   }
 
   private async loadUsers(): Promise<void> {
-    this.users.set(await this.adminService.getUsers());
+    const users = await this.adminService.getUsers();
+    this.users.set(users);
+
+    const currentSelected = this.selectedUser();
+
+    if (!currentSelected) {
+      const nextUser = users[0] ?? null;
+      this.selectedUser.set(nextUser);
+      this.selectedUserRole.set(nextUser?.role ?? '');
+      return;
+    }
+
+    const nextUser = users.find((user) => user.id === currentSelected.id) ?? users[0] ?? null;
+    this.selectedUser.set(nextUser);
+    this.selectedUserRole.set(nextUser?.role ?? '');
+  }
+
+  private async setCreateAvatarFromFile(file: File): Promise<void> {
+    try {
+      const dataUrl = await fileToAvatarDataUrl(file);
+      this.createAvatarPreview.set(dataUrl);
+      this.userForm.controls.avatarUrl.setValue(dataUrl);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'No s’ha pogut preparar la imatge.';
+      this.notifications.notify('Imatge no vàlida', message);
+    }
+  }
+
+  private async setDetailAvatarFromFile(file: File): Promise<void> {
+    try {
+      const dataUrl = await fileToAvatarDataUrl(file);
+      this.detailAvatarPreview.set(dataUrl);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'No s’ha pogut preparar la imatge.';
+      this.notifications.notify('Imatge no vàlida', message);
+    }
+  }
+
+  private getAvatarOperation(previousAvatar: string | null, nextAvatar: string | null): AvatarSuccessOperation | null {
+    const before = previousAvatar?.trim() || null;
+    const after = nextAvatar?.trim() || null;
+
+    if (before === after) {
+      return null;
+    }
+
+    if (!before && after) {
+      return 'crear';
+    }
+
+    if (before && !after) {
+      return 'esborrar';
+    }
+
+    if (before && after) {
+      return 'modificar';
+    }
+
+    return null;
+  }
+
+  private showAvatarSuccessPopup(operation: AvatarSuccessOperation): void {
+    const content = this.getAvatarSuccessContent(operation);
+    this.avatarSuccessPopup.set(content);
+
+    if (this.avatarSuccessTimer) {
+      clearTimeout(this.avatarSuccessTimer);
+    }
+
+    this.avatarSuccessTimer = setTimeout(() => {
+      this.avatarSuccessPopup.set(null);
+      this.avatarSuccessTimer = null;
+    }, 2400);
+  }
+
+  private getAvatarSuccessContent(operation: AvatarSuccessOperation): {
+    operation: AvatarSuccessOperation;
+    eyebrow: string;
+    title: string;
+    message: string;
+  } {
+    switch (operation) {
+      case 'crear':
+        return {
+          operation,
+          eyebrow: 'Nova imatge',
+          title: 'Imatge creada correctament',
+          message: 'La nova imatge de perfil ja ha quedat assignada.'
+        };
+      case 'esborrar':
+        return {
+          operation,
+          eyebrow: 'Imatge retirada',
+          title: 'Imatge esborrada correctament',
+          message: 'L’avatar s’ha retirat i el perfil ha quedat sense imatge.'
+        };
+      case 'modificar':
+      default:
+        return {
+          operation,
+          eyebrow: 'Imatge actualitzada',
+          title: 'Imatge modificada correctament',
+          message: 'La imatge de perfil s’ha actualitzat correctament.'
+        };
+    }
   }
 }

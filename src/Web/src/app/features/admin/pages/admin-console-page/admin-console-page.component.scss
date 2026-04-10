@@ -1,9 +1,122 @@
 .admin-console-page {
-  max-width: var(--yp-max-width);
+  max-width: min(1480px, calc(100vw - 2rem));
   margin: 0 auto;
   padding: 2rem 1.5rem 3rem;
   display: grid;
   gap: 1.5rem;
+}
+
+.admin-console-success-popup {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(3px);
+}
+
+.admin-console-success-popup__card {
+  position: relative;
+  width: min(32rem, 100%);
+  overflow: hidden;
+  padding: 1.5rem 1.6rem 1.55rem;
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  border-radius: 1.6rem;
+  background:
+    radial-gradient(circle at top center, rgba(110, 231, 183, 0.3), transparent 38%),
+    linear-gradient(180deg, rgba(251, 255, 254, 0.98), rgba(236, 253, 245, 0.98));
+  box-shadow: 0 28px 70px -28px rgba(15, 23, 42, 0.45);
+  animation: admin-console-popup-increscendo 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-console-success-popup__halo {
+  position: absolute;
+  inset: -30% 16% auto;
+  height: 8rem;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.32), transparent 68%);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.admin-console-success-popup__icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 4.25rem;
+  height: 4.25rem;
+  margin: 0 auto 0.95rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #10b981, #0f766e);
+  color: #f8fffe;
+  box-shadow: 0 18px 38px -18px rgba(15, 118, 110, 0.78);
+  animation: admin-console-icon-increscendo 560ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-console-success-popup__icon svg {
+  width: 1.9rem;
+  height: 1.9rem;
+}
+
+.admin-console-success-popup__eyebrow {
+  position: relative;
+  margin: 0 0 0.35rem;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #0f766e;
+}
+
+.admin-console-success-popup__card h3 {
+  position: relative;
+  margin: 0;
+  text-align: center;
+  font-size: 1.45rem;
+}
+
+.admin-console-success-popup__card > p:last-child {
+  position: relative;
+  margin: 0.55rem 0 0;
+  text-align: center;
+  color: var(--yp-color-text-muted);
+  line-height: 1.55;
+}
+
+@keyframes admin-console-popup-increscendo {
+  0% {
+    opacity: 0;
+    transform: scale(0.82) translateY(24px);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scale(1.03) translateY(-2px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes admin-console-icon-increscendo {
+  0% {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+
+  65% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .admin-console-hero,
@@ -23,6 +136,28 @@
 .admin-console-copy {
   margin: 0.75rem 0 0;
   color: var(--yp-color-text-muted);
+}
+
+.admin-console-titlebar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-console-kicker {
+  margin: 0 0 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--yp-color-primary-dark);
+}
+
+.admin-console-highlight-title {
+  margin: 0;
+  font-size: clamp(1.6rem, 2vw, 2.2rem);
+  line-height: 1.1;
 }
 
 .admin-console-grid {
@@ -69,6 +204,38 @@
   border-collapse: collapse;
 }
 
+.admin-console-table-wrap {
+  margin-top: 1rem;
+  overflow-x: auto;
+}
+
+.admin-console-table--users {
+  min-width: 980px;
+  table-layout: fixed;
+}
+
+.admin-console-table--users th:nth-child(1),
+.admin-console-table--users td:nth-child(1) {
+  width: 21%;
+}
+
+.admin-console-table--users th:nth-child(2),
+.admin-console-table--users td:nth-child(2) {
+  width: 16%;
+}
+
+.admin-console-table--users th:nth-child(7),
+.admin-console-table--users td:nth-child(7),
+.admin-console-table--users th:nth-child(8),
+.admin-console-table--users td:nth-child(8) {
+  width: 11%;
+}
+
+.admin-console-table--users th:nth-child(9),
+.admin-console-table--users td:nth-child(9) {
+  width: 12%;
+}
+
 .admin-console-table th,
 .admin-console-table td {
   padding: 0.75rem 0.6rem;
@@ -90,6 +257,25 @@
 
 .admin-console-row-action:hover {
   background: rgba(45, 212, 191, 0.07);
+}
+
+.admin-console-row-selected {
+  background: rgba(45, 212, 191, 0.12);
+}
+
+.admin-console-table--responsive td[data-label] {
+  position: relative;
+}
+
+.admin-console-table td {
+  overflow-wrap: anywhere;
+  font-size: 0.95rem;
+}
+
+.admin-console-table-actions {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
 }
 
 .admin-console-checkbox-grid {
@@ -130,6 +316,98 @@
   align-items: end;
 }
 
+.admin-console-form--create {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.admin-console-form--create .admin-console-primary {
+  align-self: end;
+}
+
+.admin-console-avatar-field {
+  display: grid;
+  gap: 0.7rem;
+  grid-column: 1 / -1;
+}
+
+.admin-console-avatar-field > span {
+  font-weight: 700;
+  color: var(--yp-color-primary-dark);
+}
+
+.admin-console-avatar-dropzone {
+  width: min(13rem, 100%);
+  aspect-ratio: 1;
+}
+
+.admin-console-avatar-dropzone img,
+.admin-console-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 1.1rem;
+}
+
+.admin-console-avatar-dropzone img {
+  object-fit: cover;
+  border: 1px solid rgba(209, 213, 219, 0.84);
+}
+
+.admin-console-avatar-placeholder {
+  display: grid;
+  place-items: center;
+  border: 1px dashed rgba(148, 163, 184, 0.75);
+  background: linear-gradient(135deg, rgba(236, 253, 245, 0.9), rgba(239, 246, 255, 0.9));
+}
+
+.admin-console-avatar-none {
+  transform: rotate(-24deg);
+  color: rgba(15, 23, 42, 0.34);
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+
+.admin-console-avatar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.admin-console-avatar-actions p {
+  margin: 0;
+  color: var(--yp-color-text-muted);
+}
+
+.admin-console-icon-button-text {
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 999px;
+  padding: 0.72rem 1rem;
+  background: rgba(45, 212, 191, 0.1);
+  color: var(--yp-color-primary-dark);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-console-icon-button-text--secondary {
+  background: rgba(15, 23, 42, 0.05);
+}
+
+.admin-console-avatar-field--readonly {
+  margin-bottom: 0.6rem;
+}
+
+.admin-console-avatar-dropzone--readonly {
+  pointer-events: none;
+}
+
+.admin-console-avatar-dropzone--readonly img,
+.admin-console-avatar-dropzone--readonly .admin-console-avatar-placeholder {
+  background: linear-gradient(180deg, rgba(247, 251, 250, 0.98), rgba(235, 245, 242, 0.98));
+  border-color: rgba(14, 116, 144, 0.2);
+}
+
 .admin-console-form label {
   display: grid;
   gap: 0.35rem;
@@ -139,9 +417,19 @@
   font-weight: 700;
 }
 
+.admin-console-required {
+  color: #b91c1c;
+  font-weight: 800;
+}
+
+.admin-console-form--readonly input {
+  color: var(--yp-color-text-muted);
+}
+
 .admin-console-form input,
 .admin-console-form select,
-.admin-console-table select {
+.admin-console-table select,
+.admin-console-form textarea {
   width: 100%;
   min-height: 2.7rem;
   border: 1px solid rgba(209, 213, 219, 0.9);
@@ -149,6 +437,17 @@
   padding: 0.7rem 0.85rem;
   background: #fff;
   font: inherit;
+}
+
+.admin-console-form textarea {
+  resize: vertical;
+}
+
+.admin-console-form input[readonly],
+.admin-console-form textarea[readonly],
+.admin-console-static-field {
+  background: linear-gradient(180deg, rgba(247, 251, 250, 0.98), rgba(235, 245, 242, 0.98));
+  border-color: rgba(14, 116, 144, 0.2);
 }
 
 .admin-console-inline {
@@ -179,14 +478,299 @@
   width: 100%;
 }
 
+.admin-console-primary--inline {
+  width: auto;
+  min-width: 11rem;
+}
+
+.admin-console-user-detail {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-console-user-detail__meta {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 0;
+}
+
+.admin-console-role-strip {
+  display: grid;
+  grid-template-columns: minmax(14rem, 20rem) minmax(10rem, 14rem);
+  gap: 0.9rem;
+  align-items: end;
+}
+
+.admin-console-role-strip label {
+  display: grid;
+  gap: 0.35rem;
+}
+
 .admin-console-primary:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
 
+.admin-console-primary--secondary {
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.admin-console-role-strip__button {
+  width: auto;
+  min-width: 11.5rem;
+  padding-inline: 1.35rem;
+  border-color: rgba(15, 23, 42, 0.18);
+  background: linear-gradient(135deg, #0f766e, #115e59);
+  color: #f8fffe;
+  box-shadow: 0 18px 30px -18px rgba(15, 118, 110, 0.85);
+}
+
+.admin-console-role-strip__button:hover {
+  filter: brightness(1.03);
+}
+
+.admin-console-icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 0.8rem;
+  padding: 0;
+  background: #fff;
+  color: var(--yp-color-primary-dark);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-console-icon-button svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.admin-console-icon-button--danger {
+  background: rgba(220, 38, 38, 0.1);
+  color: #991b1b;
+}
+
+.admin-console-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(6px);
+}
+
+.admin-console-modal {
+  width: min(920px, 100%);
+  max-height: calc(100vh - 2.5rem);
+  overflow: auto;
+  border: 1px solid rgba(209, 213, 219, 0.85);
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(circle at top left, rgba(45, 212, 191, 0.12), transparent 34%),
+    rgba(255, 255, 255, 0.98);
+  box-shadow: 0 30px 80px -32px rgba(15, 23, 42, 0.55);
+  padding: 1.25rem;
+}
+
+.admin-console-modal--detail {
+  width: min(1080px, 100%);
+}
+
+.admin-console-modal--create .admin-console-modal__header {
+  margin: -1.25rem -1.25rem 1.25rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(180deg, rgba(247, 251, 250, 0.98), rgba(235, 245, 242, 0.98));
+  border-top: 2px solid rgba(14, 116, 144, 0.38);
+  border-bottom: 2px solid rgba(14, 116, 144, 0.38);
+  border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.admin-console-modal--create .admin-console-form--create {
+  gap: 1rem 1.1rem;
+}
+
+.admin-console-modal--confirm {
+  width: min(520px, 100%);
+}
+
+.admin-console-modal__header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-console-modal__header h3 {
+  margin: 0;
+  font-size: 1.45rem;
+}
+
+.admin-console-modal__close {
+  border: 0;
+  background: transparent;
+  color: var(--yp-color-text-muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-console-modal__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.admin-console-modal__actions .admin-console-primary {
+  width: auto;
+  min-width: 10rem;
+}
+
+.admin-console-modal__actions-group,
+.admin-console-modal__footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.admin-console-modal__footer-actions {
+  margin-left: auto;
+}
+
+.admin-console-modal__footer {
+  margin: 1.4rem -1.25rem -1.25rem;
+}
+
+.admin-console-modal__footer-band {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem 1.1rem;
+  border-radius: 0 0 1.5rem 1.5rem;
+  background: linear-gradient(180deg, rgba(247, 251, 250, 0.98), rgba(235, 245, 242, 0.98));
+  border-top: 2px solid rgba(14, 116, 144, 0.38);
+}
+
+.admin-console-privacy-check {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.92rem;
+  color: var(--yp-color-text);
+}
+
+.admin-console-privacy-check input {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+}
+
+.admin-console-privacy-check span {
+  line-height: 1.4;
+}
+
+.admin-console-privacy-check--inverse {
+  color: rgba(15, 23, 42, 0.82);
+}
+
 @media (max-width: 900px) {
+  .admin-console-page {
+    max-width: 100%;
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .admin-console-titlebar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .admin-console-grid,
   .admin-console-grid--docs {
     grid-template-columns: 1fr;
   }
+
+  .admin-console-form--create,
+  .admin-console-user-detail__meta,
+  .admin-console-role-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-console-avatar-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-console-table--responsive thead {
+    display: none;
+  }
+
+  .admin-console-table--responsive,
+  .admin-console-table--responsive tbody,
+  .admin-console-table--responsive tr,
+  .admin-console-table--responsive td {
+    display: block;
+    width: 100%;
+  }
+
+  .admin-console-table--responsive tr {
+    border: 1px solid rgba(209, 213, 219, 0.7);
+    border-radius: 1rem;
+    padding: 0.8rem 0.9rem;
+    margin-bottom: 0.9rem;
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  .admin-console-table--responsive td {
+    border-bottom: 0;
+    padding: 0.35rem 0;
+    font-size: 0.92rem;
+  }
+
+  .admin-console-table--responsive td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--yp-color-text-muted);
+    margin-bottom: 0.15rem;
+  }
+
+  .admin-console-table--responsive td select {
+    width: 100%;
+  }
+
+  .admin-console-modal {
+    padding: 1rem;
+    border-radius: 1.15rem;
+  }
+
+  .admin-console-modal__footer {
+    margin: 1.2rem -1rem -1rem;
+  }
+
+  .admin-console-modal__header,
+  .admin-console-modal__actions,
+  .admin-console-table-actions,
+  .admin-console-modal__actions-group,
+  .admin-console-modal__footer-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-console-modal__footer-band {
+    justify-content: stretch;
+    padding: 0.85rem;
+    border-radius: 0 0 1.15rem 1.15rem;
+  }
+
 }

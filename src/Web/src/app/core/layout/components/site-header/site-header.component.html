@@ -5,39 +5,66 @@
     </a>
 
     <nav class="site-header__nav" aria-label="Primary navigation" #menuHost>
-      @for (item of primaryNavigationMenu(); track item.key) {
-        @if (isDropdown(item)) {
-          <details class="site-header__dropdown" (toggle)="onDropdownToggle($event)">
-            <summary class="site-header__nav-link">
-              {{ item.label }}
-              <span class="site-header__caret" aria-hidden="true"></span>
-            </summary>
-            <div class="site-header__dropdown-menu">
-              @for (child of item.children; track child.key) {
-                @if (child.route) {
-                  <a
-                    class="site-header__dropdown-item"
-                    [routerLink]="child.route"
-                    (click)="closeAllDropdowns()"
-                  >
-                    <span class="site-header__dropdown-title">{{ child.label }}</span>
-                  </a>
-                }
-              }
-            </div>
-          </details>
-        } @else if (item.route) {
-          <a
-            class="site-header__nav-link"
-            [routerLink]="item.route"
-            routerLinkActive="site-header__nav-link--active"
-            [routerLinkActiveOptions]="{ exact: item.route === '/' }"
-          >
-            {{ item.label }}
-          </a>
-        }
-      }
       @if (isAuthenticated()) {
+        @for (item of primaryNavigationMenu(); track item.key) {
+          @if (isDropdown(item)) {
+            <details class="site-header__dropdown" (toggle)="onDropdownToggle($event)">
+              <summary class="site-header__nav-link">
+                {{ item.label }}
+                <span class="site-header__caret" aria-hidden="true"></span>
+              </summary>
+              <div class="site-header__dropdown-menu">
+                @for (child of item.children; track child.key) {
+                  @if (child.route) {
+                    <a
+                      class="site-header__dropdown-item"
+                      [routerLink]="child.route"
+                      (click)="closeAllDropdowns()"
+                    >
+                      <span class="site-header__dropdown-title">{{ child.label }}</span>
+                    </a>
+                  }
+                }
+              </div>
+            </details>
+          } @else if (item.route) {
+            <a
+              class="site-header__nav-link"
+              [routerLink]="item.route"
+              routerLinkActive="site-header__nav-link--active"
+              [routerLinkActiveOptions]="{ exact: item.route === '/' }"
+            >
+              {{ item.label }}
+            </a>
+          }
+        }
+
+        <button
+          type="button"
+          class="site-header__notifications"
+          [class.site-header__notifications--filled]="hasUnreadNotifications()"
+          [class.site-header__notifications--quiet]="!hasNotifications()"
+          (click)="openNotifications()"
+          aria-label="Notificacions"
+        >
+          <svg
+            class="site-header__notifications-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.9"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M7 9a5 5 0 1 1 10 0v3.4c0 .9.3 1.8.9 2.5l.7.9H5.4l.7-.9c.6-.7.9-1.6.9-2.5z" />
+            <path d="M10 18a2 2 0 0 0 4 0" />
+          </svg>
+          @if (unreadNotifications()) {
+            <span class="site-header__notifications-badge">{{ unreadNotifications() }}</span>
+          }
+        </button>
+
         <details class="site-header__dropdown site-header__account" (toggle)="onDropdownToggle($event)">
           <summary class="site-header__account-trigger" aria-label="Compte">
             @if (hasAvatar()) {
@@ -83,6 +110,13 @@
             </button>
           </div>
         </details>
+      } @else {
+        <a
+          class="site-header__nav-link site-header__nav-link--active"
+          routerLink="/login"
+        >
+          Accés
+        </a>
       }
     </nav>
   </div>

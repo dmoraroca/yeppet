@@ -23,6 +23,8 @@ internal sealed class AuthApplicationService(
             return null;
         }
 
+        user.RecordAccess(DateTimeOffset.UtcNow);
+        await userRepository.UpdateAsync(user, cancellationToken);
         return await CreateSessionAsync(user, cancellationToken: cancellationToken);
     }
 
@@ -165,7 +167,9 @@ internal sealed class AuthApplicationService(
                     identity.AvatarUrl),
                 shouldBeAdmin
                     ? new PrivacyConsent(true, DateTimeOffset.UtcNow)
-                    : new PrivacyConsent(false, null));
+                    : new PrivacyConsent(false, null),
+                null,
+                DateTimeOffset.UtcNow);
 
             await userRepository.AddAsync(user, cancellationToken);
         }
@@ -203,6 +207,9 @@ internal sealed class AuthApplicationService(
             {
                 await userRepository.UpdateAsync(user, cancellationToken);
             }
+
+            user.RecordAccess(DateTimeOffset.UtcNow);
+            await userRepository.UpdateAsync(user, cancellationToken);
         }
 
         return await CreateSessionAsync(user, providerKey, cancellationToken);

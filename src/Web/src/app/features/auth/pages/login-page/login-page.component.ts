@@ -1,28 +1,20 @@
-import { AfterViewInit, Component, ElementRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { ErrorNotificationsService } from '../../../../core/services/error-notifications.service';
-import { SectionHeadingComponent } from '../../../../shared/components/section-heading/section-heading.component';
-import { PlaceFiltersComponent } from '../../../places/components/place-filters/place-filters.component';
-import { PlaceMapComponent } from '../../../places/components/place-map/place-map.component';
 import { PlaceFilters } from '../../../places/models/place.model';
 import { PlaceService } from '../../../places/services/place.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login-page',
-  imports: [
-    ReactiveFormsModule,
-    RouterLink,
-    SectionHeadingComponent,
-    PlaceFiltersComponent,
-    PlaceMapComponent
-  ],
+  standalone: true,
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login-page.component.html',
-  styleUrl: './login-page.component.scss'
+  styleUrls: ['./login-page.component.scss']
 })
-export class LoginPageComponent implements AfterViewInit {
+export class LoginPageComponent implements AfterViewInit, OnDestroy {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -70,8 +62,13 @@ export class LoginPageComponent implements AfterViewInit {
 
   @ViewChild('loginSubmitButton') private loginSubmitButton?: ElementRef<HTMLButtonElement>;
   @ViewChild('googleButtonHost') private googleButtonHost?: ElementRef<HTMLDivElement>;
+  @ViewChild('previewMapContainer') private previewMapContainer?: ElementRef<HTMLDivElement>;
   private googleButtonRendered = false;
   private googleScriptPromise: Promise<void> | null = null;
+  private previewMap?: import('leaflet').Map;
+  private readonly isLocalhost =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
   constructor() {
     effect(() => {
@@ -101,13 +98,19 @@ export class LoginPageComponent implements AfterViewInit {
     queueMicrotask(() => {
       void this.tryRenderGoogleButtonAsync();
     });
+    queueMicrotask(() => {
+      void this.ensurePreviewMapAsync();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.previewMap?.remove();
   }
 
   protected async submit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.notifications.notify('Revisa el formulari', 'Cal informar un email vàlid i la contrasenya.');
-
       return;
     }
 
@@ -115,14 +118,68 @@ export class LoginPageComponent implements AfterViewInit {
 
     if (!result.ok) {
       this.notifications.notify('Credencials incorrectes', 'Prova amb admin@admin.adm / Admin123 o user@user.com / Admin123.');
-
       return;
     }
 
-    this.notifications.notify('Sessió iniciada', `Benvingut/da, ${result.user?.name}.`);
-
     const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
     void this.router.navigateByUrl(redirectTo || this.authService.getPostLoginRoute());
+  }
+
+  protected goToPreviewSearch(): void {
+    void this.router.navigate(['/login'], {
+      queryParams: {
+        redirectTo: this.loginPreviewRoute()
+      }
+    });
+  }
+
+  protected async generateRoutesPreview(): Promise<void> {
+    await this.router.navigateByUrl(this.loginPreviewRoute());
+  }
+
+  protected getTypeLabel(type: string): string {
+    return this.placeService.getTypeLabel(type as never);
+  }
+
+  protected updatePreviewFilters(partial: Partial<PlaceFilters>): void {
+    this.previewFiltersState.update((current) => ({
+      ...current,
+      ...partial
+    }));
+  }
+
+  protected onPreviewSearch(event: Event): void {
+    this.updatePreviewFilters({
+      search: (event.target as HTMLInputElement).value
+    });
+  }
+
+  protected onPreviewCity(event: Event): void {
+    this.updatePreviewFilters({
+      city: (event.target as HTMLSelectElement).value
+    });
+  }
+
+  protected onPreviewType(event: Event): void {
+    this.updatePreviewFilters({
+      type: (event.target as HTMLSelectElement).value
+    });
+  }
+
+  protected onPreviewPet(event: Event): void {
+    this.updatePreviewFilters({
+      pet: (event.target as HTMLSelectElement).value as PlaceFilters['pet']
+    });
+  }
+
+  protected startFacebookLogin(): void {
+    const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
+    window.location.href = this.authService.getFacebookStartUrl(redirectTo);
+  }
+
+  protected startLinkedInLogin(): void {
+    const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
+    window.location.href = this.authService.getLinkedInStartUrl(redirectTo);
   }
 
   private async loadProvidersAsync(): Promise<void> {
@@ -134,7 +191,9 @@ export class LoginPageComponent implements AfterViewInit {
       const google = providers.find((provider) => provider.key === 'google' && provider.configured && provider.clientId);
       const linkedIn = providers.find((provider) => provider.key === 'linkedin' && provider.configured);
       const facebook = providers.find((provider) => provider.key === 'facebook' && provider.configured);
-      this.googleProvider.set(google?.clientId ? { clientId: google.clientId } : null);
+      this.googleProvider.set(
+        this.isLocalhost || !google?.clientId ? null : { clientId: google.clientId }
+      );
       this.linkedInProvider.set(Boolean(linkedIn));
       this.facebookProvider.set(Boolean(facebook));
       void this.tryRenderGoogleButtonAsync();
@@ -146,29 +205,34 @@ export class LoginPageComponent implements AfterViewInit {
     }
   }
 
-  protected goToPreviewSearch(): void {
-    void this.router.navigate(['/login'], {
-      queryParams: {
-        redirectTo: this.loginPreviewRoute()
-      }
+  private async ensurePreviewMapAsync(): Promise<void> {
+    if (this.previewMap || !this.previewMapContainer?.nativeElement) {
+      return;
+    }
+
+    const leaflet = await import('leaflet');
+    const map = leaflet.map(this.previewMapContainer.nativeElement, {
+      zoomControl: false,
+      attributionControl: false,
+      scrollWheelZoom: false,
+      dragging: false,
+      doubleClickZoom: false,
+      boxZoom: false,
+      keyboard: false,
+      touchZoom: false
     });
-  }
 
-  protected updatePreviewFilters(partial: Partial<PlaceFilters>): void {
-    this.previewFiltersState.update((current) => ({
-      ...current,
-      ...partial
-    }));
-  }
+    leaflet
+      .tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+      })
+      .addTo(map);
 
-  protected startFacebookLogin(): void {
-    const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
-    window.location.href = this.authService.getFacebookStartUrl(redirectTo);
-  }
-
-  protected startLinkedInLogin(): void {
-    const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
-    window.location.href = this.authService.getLinkedInStartUrl(redirectTo);
+    map.setView([40.25, -3.7], 6);
+    this.previewMap = map;
+    setTimeout(() => {
+      this.previewMap?.invalidateSize();
+    }, 0);
   }
 
   private async tryRenderGoogleButtonAsync(): Promise<void> {
@@ -187,14 +251,17 @@ export class LoginPageComponent implements AfterViewInit {
 
     host.innerHTML = '';
     const submitWidth = this.loginSubmitButton?.nativeElement.getBoundingClientRect().width ?? 0;
-    const fallbackWidth = host.parentElement?.getBoundingClientRect().width ?? host.getBoundingClientRect().width ?? host.clientWidth ?? 320;
+    const fallbackWidth =
+      host.parentElement?.getBoundingClientRect().width ?? host.getBoundingClientRect().width ?? host.clientWidth ?? 320;
     const width = Math.max(280, Math.round(submitWidth || fallbackWidth));
+
     window.google.accounts.id.initialize({
       client_id: provider.clientId,
       callback: ({ credential }) => {
         void this.handleGoogleCredentialAsync(credential);
       }
     });
+
     window.google.accounts.id.renderButton(host, {
       theme: 'outline',
       size: 'large',
@@ -202,6 +269,7 @@ export class LoginPageComponent implements AfterViewInit {
       text: 'signin_with',
       width
     });
+
     this.googleButtonRendered = true;
     this.googleButtonVisible.set(true);
   }
@@ -250,7 +318,6 @@ export class LoginPageComponent implements AfterViewInit {
       return;
     }
 
-    this.notifications.notify('Sessió iniciada', `Benvingut/da, ${result.user?.name}.`);
     const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
     void this.router.navigateByUrl(redirectTo || this.authService.getPostLoginRoute());
   }

@@ -19,7 +19,9 @@ internal static class UserPersistenceMapper
                 record.Country ?? string.Empty,
                 record.Bio ?? string.Empty,
                 record.AvatarUrl),
-            new PrivacyConsent(record.PrivacyAccepted, record.PrivacyAcceptedAtUtc));
+            new PrivacyConsent(record.PrivacyAccepted, record.PrivacyAcceptedAtUtc),
+            record.CreatedAtUtc,
+            record.LastAccessedAtUtc);
     }
 
     public static UserRecord ToRecord(User user)
@@ -42,5 +44,7 @@ internal static class UserPersistenceMapper
         record.AvatarUrl = user.Profile.AvatarUrl;
         record.PrivacyAccepted = user.PrivacyConsent.Accepted;
         record.PrivacyAcceptedAtUtc = user.PrivacyConsent.AcceptedAtUtc;
+        record.CreatedAtUtc = user.CreatedAtUtc;
+        record.LastAccessedAtUtc = user.LastAccessedAtUtc;
     }
 }

@@ -5,13 +5,23 @@ public sealed record AdminUserListItemDto(
     string Email,
     string Role,
     string DisplayName,
-    bool PrivacyAccepted);
+    string City,
+    string Country,
+    string Bio,
+    string? AvatarUrl,
+    bool PrivacyAccepted,
+    DateTimeOffset? PrivacyAcceptedAtUtc,
+    DateTimeOffset CreatedAtUtc,
+    DateTimeOffset? LastAccessedAtUtc);
 
 public sealed record CreateAdminUserRequest(
     string Email,
     string Password,
     string Role,
-    string DisplayName);
+    string DisplayName,
+    string City,
+    string Country,
+    string? AvatarUrl);
 
 public sealed record UpdateUserRoleRequest(string Role);
 

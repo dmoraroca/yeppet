@@ -17,6 +17,37 @@ public sealed class UserProfileUpdateRequestValidator : IValidator<UserProfileUp
         {
             result.Add(nameof(request.DisplayName), "Display name is required.");
         }
+        else if (request.DisplayName.Trim().Length < 3)
+        {
+            result.Add(nameof(request.DisplayName), "Display name must be at least 3 characters long.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.City))
+        {
+            result.Add(nameof(request.City), "City is required.");
+        }
+        else if (request.City.Trim().Length < 2)
+        {
+            result.Add(nameof(request.City), "City must be at least 2 characters long.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Country))
+        {
+            result.Add(nameof(request.Country), "Country is required.");
+        }
+        else if (request.Country.Trim().Length < 2)
+        {
+            result.Add(nameof(request.Country), "Country must be at least 2 characters long.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Bio))
+        {
+            result.Add(nameof(request.Bio), "Bio is required.");
+        }
+        else if (request.Bio.Trim().Length < 12)
+        {
+            result.Add(nameof(request.Bio), "Bio must be at least 12 characters long.");
+        }
 
         if (request.PrivacyAccepted && request.PrivacyAcceptedAtUtc is null)
         {

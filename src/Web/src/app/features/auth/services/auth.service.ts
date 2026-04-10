@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Inject, Injectable, computed, inject, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Observable, firstValueFrom } from 'rxjs';
@@ -23,8 +23,16 @@ export class AuthService {
     this.currentUser$ = toObservable(this.currentUser);
     this.isAuthenticated$ = toObservable(this.isAuthenticated);
 
-    if (this.sessionState()) {
-      void this.loadNavigationMenu();
+    const existingSession = this.sessionState();
+    if (existingSession && this.isSessionExpired(existingSession)) {
+      this.sessionState.set(null);
+      this.navigationMenuState.set([]);
+      this.authStore.saveSession(null);
+      return;
+    }
+
+    if (existingSession && !this.isLoginRoute()) {
+      void this.restoreSessionAsync();
     }
   }
 
@@ -157,6 +165,28 @@ export class AuthService {
     }
   }
 
+  private async restoreSessionAsync(): Promise<void> {
+    try {
+      const session = await firstValueFrom(
+        this.http.get<AuthSessionApiDto>(`${API_BASE_URL}/auth/me`)
+      );
+
+      const mappedSession = this.toSession(session);
+      this.sessionState.set(mappedSession);
+      this.authStore.saveSession(mappedSession);
+      await this.loadNavigationMenu();
+    } catch (error) {
+      if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 404)) {
+        this.sessionState.set(null);
+        this.navigationMenuState.set([]);
+        this.authStore.saveSession(null);
+        return;
+      }
+
+      await this.loadNavigationMenu();
+    }
+  }
+
   getPostLoginRoute(): string {
     const user = this.currentUser();
 
@@ -245,6 +275,28 @@ export class AuthService {
         privacyAcceptedAtUtc: this.readUserField(user, 'privacyAcceptedAtUtc', 'PrivacyAcceptedAtUtc') ?? null
       }
     };
+  }
+
+  private isSessionExpired(session: AuthSession): boolean {
+    if (!session.expiresAtUtc) {
+      return true;
+    }
+
+    const expiresAt = Date.parse(session.expiresAtUtc);
+    if (Number.isNaN(expiresAt)) {
+      return true;
+    }
+
+    return expiresAt <= Date.now();
+  }
+
+  private isLoginRoute(): boolean {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    const path = window.location.pathname;
+    return path === '/login' || path === '/auth/callback';
   }
 
   private readUserField<T>(

@@ -1,140 +1,169 @@
 <main class="login-page">
-  <section class="login-page__panel">
-    <a class="login-page__brand" routerLink="/" aria-label="Tornar a la home de YepPet">
-      <img src="/images/logo.png" alt="YepPet" />
-    </a>
+  <section class="login-page__stage">
+    <aside class="login-page__auth">
+      <section class="login-page__auth-shell">
+        <section class="login-page__auth-card">
+        <div class="login-page__auth-copy">
+          <p class="login-page__auth-eyebrow">Accés</p>
+          <h2>Torna a entrar a YepPet</h2>
+          <p>Continua amb email o amb el teu accés federat.</p>
+        </div>
 
-    <app-section-heading
-      eyebrow="Accés"
-      title="Entra a YepPet i prepara el teu perfil pet-friendly."
-    />
+        <form class="login-form" [formGroup]="form" (ngSubmit)="submit()">
+          <label class="login-form__field">
+            <span>Email</span>
+            <input type="email" formControlName="email" placeholder="admin@admin.adm" />
+          </label>
 
-    <p class="login-page__copy">
-      Primera entrega real d’autenticació de la fase IV. El login estàndard ja valida contra backend
-      i Google queda disponible en desenvolupament. La següent federació activa és LinkedIn, mentre
-      {{ authProviders().join(', ') || 'LinkedIn i Facebook' }} acaba de completar-se de manera incremental.
-    </p>
+          <label class="login-form__field">
+            <span>Contrasenya</span>
+            <input type="password" formControlName="password" placeholder="Admin123" />
+          </label>
 
-    <form class="login-form" [formGroup]="form" (ngSubmit)="submit()">
-      <label class="login-form__field">
-        <span>Email</span>
-        <input type="email" formControlName="email" placeholder="admin@admin.adm" />
-      </label>
+          <button #loginSubmitButton class="login-form__submit" type="submit">Iniciar sessió</button>
+        </form>
 
-      <label class="login-form__field">
-        <span>Contrasenya</span>
-        <input type="password" formControlName="password" placeholder="Admin123" />
-      </label>
+        <div class="login-page__separator"><span>o continua amb</span></div>
 
-      <button #loginSubmitButton class="login-form__submit" type="submit">Iniciar sessió</button>
-    </form>
-
-    <section class="login-page__federated-stack">
-      @if (googleProvider()) {
-        <section class="login-page__federated" [class.login-page__federated--visible]="googleButtonVisible()">
-          <div
-            class="login-page__provider-button login-page__provider-button--google"
-            [class.login-page__provider-button--hidden]="!googleButtonVisible()"
-          >
+        <section class="login-page__providers">
+          @if (googleProvider()) {
             <div
-              #googleButtonHost
-              class="login-page__google-button"
-              [class.login-page__google-button--hidden]="!googleButtonVisible()"
-            ></div>
-            <span class="login-page__provider-button-icon login-page__provider-button-icon--google" aria-hidden="true">
-              G
-            </span>
-            <span class="login-page__provider-button-label">Iniciar amb Google</span>
+              class="login-page__provider login-page__provider--google"
+              [class.login-page__provider--hidden]="!googleButtonVisible()"
+            >
+              <div
+                #googleButtonHost
+                class="login-page__google-button"
+                [class.login-page__google-button--hidden]="!googleButtonVisible()"
+              ></div>
+              <span class="login-page__provider-icon login-page__provider-icon--google" aria-hidden="true">G</span>
+              <span>Google</span>
+            </div>
+          } @else {
+            <div class="login-page__provider login-page__provider--pending">
+              <span class="login-page__provider-icon login-page__provider-icon--google" aria-hidden="true">G</span>
+              <span>Google pendent</span>
+            </div>
+          }
+
+          <button
+            type="button"
+            class="login-page__provider"
+            [disabled]="!linkedInProvider()"
+            (click)="startLinkedInLogin()"
+          >
+            <span class="login-page__provider-icon login-page__provider-icon--linkedin" aria-hidden="true">in</span>
+            <span>{{ linkedInProvider() ? 'LinkedIn' : 'LinkedIn pendent' }}</span>
+          </button>
+
+          <button
+            type="button"
+            class="login-page__provider"
+            [disabled]="!facebookProvider()"
+            (click)="startFacebookLogin()"
+          >
+            <span class="login-page__provider-icon login-page__provider-icon--facebook" aria-hidden="true">f</span>
+            <span>{{ facebookProvider() ? 'Facebook' : 'Facebook pendent' }}</span>
+          </button>
+        </section>
+
+        <p class="login-page__support">
+          Necessites accés?
+          <a routerLink="/contacte">Demana usuari o recuperació de contrasenya</a>
+        </p>
+        </section>
+      </section>
+    </aside>
+
+    <section class="login-page__story">
+      <div class="login-page__hero-grid">
+        <div class="login-page__hero-copy">
+          <a class="login-page__brand" routerLink="/" aria-label="Tornar a la home de YepPet">
+            <img src="/images/logo.png" alt="YepPet" />
+          </a>
+        </div>
+      </div>
+
+      <section class="login-page__explorer">
+        <div class="login-page__explorer-head">
+          <div>
+            <strong>Explora llocs ara mateix</strong>
+            <p>Cerca prèvia oberta des del login, sense tallar el recorregut.</p>
           </div>
-        </section>
-      } @else {
-        <section class="login-page__federated login-page__federated--pending">
-          <strong>Accés amb Google</strong>
-          <p>Configura `Auth:Google:ClientId` al backend per activar el botó federat.</p>
-        </section>
-      }
+          <div class="login-page__explorer-pill">Vista pública</div>
+        </div>
 
-      @if (linkedInProvider()) {
-        <section class="login-page__federated login-page__federated--visible">
-          <button type="button" class="login-page__provider-button login-page__provider-button--linkedin" (click)="startLinkedInLogin()">
-            <span class="login-page__provider-button-icon login-page__provider-button-icon--linkedin" aria-hidden="true">in</span>
-            <span class="login-page__provider-button-label">Iniciar amb LinkedIn</span>
-          </button>
-        </section>
-      }
+        <section class="login-page__filters">
+          <label>
+            <span>Cerca</span>
+            <input
+              type="search"
+              placeholder="Ciutat, tag o lloc"
+              [value]="previewFilters().search"
+              (input)="onPreviewSearch($event)"
+            />
+          </label>
 
-      @if (false && facebookProvider()) {
-        <section class="login-page__federated login-page__federated--visible">
-          <button type="button" class="login-page__provider-button login-page__provider-button--facebook" (click)="startFacebookLogin()">
-            <span class="login-page__provider-button-icon login-page__provider-button-icon--facebook" aria-hidden="true">f</span>
-            <span class="login-page__provider-button-label">Iniciar amb Facebook</span>
-          </button>
+          <label>
+            <span>Ciutat</span>
+            <select [value]="previewFilters().city" (change)="onPreviewCity($event)">
+              <option value="">Totes</option>
+              @for (city of previewCities(); track city) {
+                <option [value]="city">{{ city }}</option>
+              }
+            </select>
+          </label>
+
+          <label>
+            <span>Tipus</span>
+            <select [value]="previewFilters().type" (change)="onPreviewType($event)">
+              <option value="">Tots</option>
+              @for (type of previewTypes; track type.value) {
+                <option [value]="type.value">{{ type.label }}</option>
+              }
+            </select>
+          </label>
+
+          <label>
+            <span>Mascota</span>
+            <select [value]="previewFilters().pet" (change)="onPreviewPet($event)">
+              <option value="all">Totes</option>
+              <option value="dogs">Només gossos</option>
+              <option value="cats">Només gats</option>
+            </select>
+          </label>
         </section>
-      }
+
+        <div class="login-page__explorer-actions">
+          <button type="button" class="login-page__ghost" (click)="goToPreviewSearch()">Obrir cerca</button>
+          <button type="button" class="login-page__primary" (click)="generateRoutesPreview()">Generar rutes</button>
+        </div>
+
+        <section class="login-page__map-preview" aria-label="Mapa inicial d'Espanya">
+          <div class="login-page__map-copy">
+            <strong>Mapa inicial</strong>
+            <p>Sense dades carregades, el punt de partida és Espanya.</p>
+          </div>
+          <div #previewMapContainer class="login-page__map-frame" aria-label="Mapa inicial centrat a Espanya"></div>
+        </section>
+
+        <div class="login-page__mosaic">
+          @for (place of samplePlaces(); track place.id) {
+            <article class="login-page__place-card">
+              <div class="login-page__place-card-top">
+                <p>{{ place.city }} · {{ place.country }}</p>
+                <span>{{ getTypeLabel(place.type) }}</span>
+              </div>
+              <h2>{{ place.name }}</h2>
+              <p>{{ place.shortDescription }}</p>
+              <div class="login-page__place-meta">
+                <span>{{ place.petPolicyLabel }}</span>
+                <span>{{ place.priceLabel }}</span>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
     </section>
-
-    <section class="login-page__support">
-      <div>
-        <strong>Usuari de proves</strong>
-        <p>user@user.com / Admin123</p>
-      </div>
-      <div>
-        <strong>Administrador de proves</strong>
-        <p>admin@admin.adm / Admin123</p>
-      </div>
-      <div>
-        <strong>Administrador Google</strong>
-        <p>yeppetcontact@gmail.com</p>
-      </div>
-      <div>
-        <strong>Administrador LinkedIn</strong>
-        <p>yeppetcontact@gmail.com</p>
-      </div>
-      <div>
-        <strong>Administrador Facebook</strong>
-        <p>yeppetcontact@gmail.com</p>
-      </div>
-      <div>
-        <strong>Necessites accés?</strong>
-        <p><a routerLink="/contacte">Demana usuari o recuperació de contrasenya</a></p>
-      </div>
-    </section>
-
-    <p class="login-page__privacy">
-      Base preparada per tractar consentiments LGPD/GDPR al manteniment de perfil. El login social
-      i la recollida de dades de proveïdors externs s’afegiran només amb permisos explícits.
-    </p>
-  </section>
-
-  <section class="login-page__experience" aria-label="Vista previa del producte">
-    <div class="login-page__experience-copy">
-      <strong>Cerca i mapa en una sola vista</strong>
-      <p>
-        La sessió et permetrà guardar favorits, mantenir perfil i preparar l’accés a capes
-        restringides. La UX es manté alineada amb la cerca real de places.
-      </p>
-    </div>
-
-    <app-place-filters
-      [filters]="previewFilters()"
-      [cities]="previewCities()"
-      [types]="previewTypes"
-      [showCity]="false"
-      [showClearButton]="false"
-      typeLabel="Tipus de local"
-      (filtersChanged)="updatePreviewFilters($event)"
-    />
-
-    <div class="login-page__search-actions">
-      <button type="button" class="login-page__search-button" (click)="goToPreviewSearch()">Filtrar</button>
-    </div>
-
-    <app-place-map
-      [places]="samplePlaces()"
-      height="40rem"
-      emptyTitle="Sense ubicacions"
-      emptyCopy="Quan hi hagi dades, aquí apareixeran les primeres coincidències."
-      [showToolbarActions]="false"
-    />
   </section>
 </main>

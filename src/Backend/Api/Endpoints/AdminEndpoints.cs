@@ -16,6 +16,7 @@ internal static class AdminEndpoints
         group.MapGet("/users", GetUsersAsync);
         group.MapPost("/users", CreateUserAsync);
         group.MapPut("/users/{id:guid}/role", UpdateUserRoleAsync);
+        group.MapDelete("/users/{id:guid}", DeleteUserAsync);
         group.MapGet("/permissions", GetPermissionsAsync);
         group.MapPut("/permissions/{role}", UpdateRolePermissionsAsync);
         group.MapGet("/menus", GetMenusAsync);
@@ -103,6 +104,22 @@ internal static class AdminEndpoints
         }
 
         return TypedResults.Ok(result.Value!);
+    }
+
+    [Authorize]
+    private static async Task<Results<NoContent, ForbidHttpResult>> DeleteUserAsync(
+        ClaimsPrincipal principal,
+        Guid id,
+        IAdminApplicationService service,
+        CancellationToken cancellationToken)
+    {
+        if (!await principal.HasPermissionAsync(service, "action.users.manage", cancellationToken))
+        {
+            return TypedResults.Forbid();
+        }
+
+        await service.DeleteUserAsync(id, cancellationToken);
+        return TypedResults.NoContent();
     }
 
     [Authorize]

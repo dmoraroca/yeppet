@@ -61,9 +61,31 @@
         </div>
 
         <label class="profile-form__field">
-          <span>URL de foto</span>
-          <input type="url" formControlName="avatarUrl" placeholder="https://..." />
+          <span>Imatge de perfil</span>
         </label>
+
+        <section class="profile-avatar-editor">
+          <div
+            class="profile-avatar-editor__dropzone"
+            (dragover)="allowAvatarDrop($event)"
+            (drop)="onAvatarDropped($event)"
+          >
+            @if (previewAvatarUrl()) {
+              <img [src]="previewAvatarUrl()" [alt]="user()?.name || 'Avatar de perfil'" />
+            } @else {
+              <div class="profile-avatar-editor__placeholder" aria-label="Sense foto">
+                <span class="profile-avatar-editor__none">NONE</span>
+              </div>
+            }
+          </div>
+
+          <div class="profile-avatar-editor__controls">
+            <input #profileAvatarInput type="file" accept="image/*" hidden (change)="onAvatarSelected($event)" />
+            <button type="button" (click)="profileAvatarInput.click()">Afegir imatge</button>
+            <button type="button" class="profile-avatar-editor__remove" (click)="removeAvatar()">Treure</button>
+            <p>També pots arrossegar una imatge des del teu ordinador.</p>
+          </div>
+        </section>
 
         <label class="profile-form__field">
           <span>Bio</span>

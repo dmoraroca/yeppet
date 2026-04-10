@@ -66,6 +66,13 @@
     },
     {
       "name": "Docker: Web (Debug)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "xdg-open http://localhost:4200",
+      "preLaunchTask": "web up + ready"
+    },
+    {
+      "name": "Docker: Web (Debug, Brave)",
       "type": "pwa-chrome",
       "request": "launch",
       "url": "http://localhost:4200",
@@ -80,6 +87,12 @@
     },
     {
       "name": "Docker: Web (Debug, from stack)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "xdg-open http://localhost:4200"
+    },
+    {
+      "name": "Docker: Web (Debug, Brave, from stack)",
       "type": "pwa-chrome",
       "request": "launch",
       "url": "http://localhost:4200",

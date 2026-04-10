@@ -4,12 +4,12 @@ namespace YepPet.Application.Validation;
 
 public static class ValidationHelpers
 {
-    public static bool TryParseEnum<TEnum>(string? value, [NotNullWhen(true)] out TEnum? parsed)
+    public static bool TryParseEnum<TEnum>(string? value, [NotNullWhen(true)] out TEnum parsed)
         where TEnum : struct, Enum
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            parsed = null;
+            parsed = default;
             return false;
         }
 
