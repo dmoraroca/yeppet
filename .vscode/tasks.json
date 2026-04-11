@@ -4,7 +4,7 @@
     {
       "label": "docker up all",
       "type": "shell",
-      "command": "docker compose up -d db api web",
+      "command": "docker compose up -d db rabbitmq api web",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -64,7 +64,10 @@
     {
       "label": "wait api ready",
       "type": "shell",
-      "command": "bash -lc 'for i in $(seq 1 120); do if docker exec -i yeppet-api bash -lc \"curl -fsS http://localhost:5211/health/db >/dev/null 2>&1\"; then exit 0; fi; sleep 2; done; echo \"API no ha quedat llesta a :5211\"; exit 1'",
+      "command": "bash \"${workspaceFolder}/.vscode/wait-api-ready.sh\"",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",

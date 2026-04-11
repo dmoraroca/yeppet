@@ -69,6 +69,7 @@ Perfils:
 
 Tasques:
 
+- `wait api ready` comprova `http://127.0.0.1:5211/health/db` des de l'amfitrió (script `.vscode/wait-api-ready.sh`), sense `docker exec`; si `yeppet-api` ha sortit, mostra logs del contenidor
 - `docker up all`
 - `docker up db`
 - `docker up api`
