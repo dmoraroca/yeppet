@@ -1,0 +1,47 @@
+---
+description: SOLID estrictes, patrons de disseny i documentació funcional vs tècnica (YepPet)
+alwaysApply: true
+---
+
+# SOLID, patrons i documentació (YepPet)
+
+Aquests criteris complementen `docs/project-phases.md` (Fase III amb DDD, SOLID estricte, patrons quan aporten valor).
+
+## SOLID (aplicació estricta)
+
+Quan dissenyis o refactoritzis codi (backend `.NET`, frontend Angular, capes de domini / aplicació / infraestructura):
+
+1. **S — Single Responsibility** — Una classe, component o mòdul ha de tenir **una raó principal de canvi**. Si acumula motius diversos (p. ex. barrejar persistència i regles de negoci), separa responsabilitats.
+
+2. **O — Open/Closed** — Obert a extensió (nous tipus, implementacions, `switch`/`map` sobre catàlegs), tancat a modificacions innecessàries del nucli. Preferir composició i estratègies abans que condicionals creixents sense estructura.
+
+3. **L — Liskov Substitution** — Les implementacions d’interfícies o subclasses han de poder substituir el contracte sense trencar el comportament esperat pels consumidors.
+
+4. **I — Interface Segregation** — Interfícies petites i cohesionades; evitar “god interfaces” que obliguen implementacions buides o irrelevantes.
+
+5. **D — Dependency Inversion** — Dependre d’**abstraccions** (`interface`, ports, tokens d’injecció), no de concrecions directes quan això acopla o dificulta proves. El projecte ja usa DI (`Program.cs`, `DependencyInjection`, `inject()` a Angular): respectar-ho i estendre’l coherentment.
+
+## Patrons de disseny
+
+- Prioritza patrons quan **redueixin acoblament**, **augmentin cohesió** o **facilitin proves i evolució** (p. ex. Repository, Factory, Strategy, Adapter, Template method — segons el cas).
+- Quan el patró sigui central per entendre el disseny, **anomena’l** en comentaris tècnics breus (anglès) o a `docs/ca/tecnic-ca.md`, no només “implementació opaca”.
+- Evita **patró per teatre**: no complicar sense benefici clar de mantenibilitat.
+
+## Documentació: funcional vs tècnic
+
+En tancar feina significativa o un punt de treball, **sempre** delimita què va a cada document (català, com a `project-phases.md`):
+
+| Àmbit | Fitxer | Contingut |
+|--------|--------|-----------|
+| **Funcional** | `docs/ca/funcional-ca.md` | Comportament per a l’usuari, fluxos, decisions de producte, abast visible, criteris de negoci entendibles sense llegir codi. |
+| **Tècnic** | `docs/ca/tecnic-ca.md` | Arquitectura, stack, estructura de carpetes, persistència, API, patrons usats, configuració, migracions, detalls d’implementació. |
+
+- Sovint cal **tocar els dos**: canvi visible a usuari → resum funcional; com s’ha implementat (capes, fitxers clau) → tècnic.
+- Si el canvi és només intern (refactor sense efecte visible), pot bastar amb **tecnic-ca** i una línia al funcional només si cal context de producte.
+- L’assistència ha de **proposar o redactar** aquests apartats en el mateix tancament de punt, **sense substituir** la revisió humana final.
+
+## Comentaris dins el codi font
+
+- Els comentaris al codi segueixen `.cursor/rules/clean-code-english.mdc` (**anglès** als `//`, XML doc, etc.).
+- Ús recomanat dels comentaris al codi: **per què** es fa així, invariants, advertències; **no** repetir paràgrafs que pertanyin a `funcional-ca.md` / `tecnic-ca.md`.
+- Regles de domini o de producte llargues → **documentació catalana** als docs adequats, no blocs enormes al codi.

@@ -138,7 +138,7 @@ export class LoginPageComponent implements AfterViewInit, OnDestroy {
   }
 
   protected getTypeLabel(type: string): string {
-    return this.placeService.getTypeLabel(type as never);
+    return this.placeService.resolveTypeLabel(type);
   }
 
   protected updatePreviewFilters(partial: Partial<PlaceFilters>): void {

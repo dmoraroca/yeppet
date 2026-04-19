@@ -7,7 +7,9 @@ import { SiteHeaderComponent } from '../../../../core/layout/components/site-hea
 import { SectionHeadingComponent } from '../../../../shared/components/section-heading/section-heading.component';
 import { PlaceCardComponent } from '../../../places/components/place-card/place-card.component';
 import { PlaceService } from '../../../places/services/place.service';
+import { normalizeSearchQuery, placeMatchesFreeTextSearch } from '../../../places/utils/place-text-search';
 import { FavoritesService } from '../../services/favorites.service';
+import { FavoriteReviewSort, sortPlacesForFavoriteReview } from '../../utils/favorite-places-sort';
 
 @Component({
   selector: 'app-favorites-page',
@@ -25,7 +27,12 @@ import { FavoritesService } from '../../services/favorites.service';
 export class FavoritesPageComponent {
   private readonly placeService = inject(PlaceService);
   private readonly favoritesService = inject(FavoritesService);
-  private readonly reviewState = signal({
+  private readonly reviewState = signal<{
+    search: string;
+    city: string;
+    type: string;
+    sort: FavoriteReviewSort;
+  }>({
     search: '',
     city: '',
     type: '',
@@ -35,29 +42,16 @@ export class FavoritesPageComponent {
   protected readonly allPlaces = computed(() => this.placeService.getFavoritePlaces());
   protected readonly places = computed(() => {
     const { search, city, type, sort } = this.reviewState();
-    const normalizedSearch = search.trim().toLowerCase();
+    const normalizedSearch = normalizeSearchQuery(search);
     const filteredPlaces = this.allPlaces().filter((place) => {
-      const matchesSearch =
-        normalizedSearch.length === 0 ||
-        [place.name, place.city, place.shortDescription, ...place.tags]
-          .join(' ')
-          .toLowerCase()
-          .includes(normalizedSearch);
+      const matchesSearch = placeMatchesFreeTextSearch(place, normalizedSearch);
       const matchesCity = !city || place.city === city;
       const matchesType = !type || place.type === type;
 
       return matchesSearch && matchesCity && matchesType;
     });
 
-    if (sort === 'rating') {
-      return [...filteredPlaces].sort((left, right) => right.rating - left.rating);
-    }
-
-    if (sort === 'name') {
-      return [...filteredPlaces].sort((left, right) => left.name.localeCompare(right.name));
-    }
-
-    return filteredPlaces;
+    return sortPlacesForFavoriteReview(filteredPlaces, sort);
   });
   protected readonly favoritesCount = this.favoritesService.count;
   protected readonly visibleCount = computed(() => this.places().length);
@@ -96,7 +90,7 @@ export class FavoritesPageComponent {
   }
 
   protected getTypeLabel(type: string): string {
-    return this.placeService.getTypeLabel(type as never);
+    return this.placeService.resolveTypeLabel(type);
   }
 
   protected updateReviewSearch(value: string): void {
@@ -112,7 +106,10 @@ export class FavoritesPageComponent {
   }
 
   protected updateReviewSort(value: string): void {
-    this.reviewState.update((current) => ({ ...current, sort: value }));
+    this.reviewState.update((current) => ({
+      ...current,
+      sort: value as FavoriteReviewSort
+    }));
   }
 
   protected resetReviewFilters(): void {

@@ -4,8 +4,9 @@ import { catchError, of } from 'rxjs';
 
 import { API_BASE_URL } from '../../../core/config/api.config';
 import { FavoritesService } from '../../favorites/services/favorites.service';
-import { PetFilter, Place, PlaceFilters } from '../models/place.model';
+import { PetFilter, Place, PlaceFilters, PlaceType } from '../models/place.model';
 import { PLACE_TYPE_LABELS } from '../mock/places.fake';
+import { normalizeSearchQuery, placeMatchesFreeTextSearch } from '../utils/place-text-search';
 
 const DEFAULT_FILTERS: PlaceFilters = {
   search: '',
@@ -29,15 +30,10 @@ export class PlaceService {
 
   getPlaces(filters: Partial<PlaceFilters> = {}): Place[] {
     const safeFilters = { ...DEFAULT_FILTERS, ...filters };
-    const search = safeFilters.search.trim().toLowerCase();
+    const normalizedSearch = normalizeSearchQuery(safeFilters.search);
 
     return this.placesState().filter((place) => {
-      const matchesSearch =
-        search.length === 0 ||
-        [place.name, place.city, place.neighborhood, place.shortDescription, ...place.tags]
-          .join(' ')
-          .toLowerCase()
-          .includes(search);
+      const matchesSearch = placeMatchesFreeTextSearch(place, normalizedSearch);
 
       const matchesCity = !safeFilters.city || place.city === safeFilters.city;
       const matchesType = !safeFilters.type || place.type === safeFilters.type;
@@ -69,8 +65,13 @@ export class PlaceService {
     return Object.entries(PLACE_TYPE_LABELS).map(([value, label]) => ({ value, label }));
   }
 
-  getTypeLabel(type: Place['type']): string {
+  getTypeLabel(type: PlaceType): string {
     return PLACE_TYPE_LABELS[type];
+  }
+
+  /** Label for query-param or form values that may be empty or unknown. */
+  resolveTypeLabel(type: string): string {
+    return type in PLACE_TYPE_LABELS ? PLACE_TYPE_LABELS[type as PlaceType] : type;
   }
 
   reload(): void {

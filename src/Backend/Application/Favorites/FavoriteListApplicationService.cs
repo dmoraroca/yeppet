@@ -14,16 +14,23 @@ internal sealed class FavoriteListApplicationService(IFavoriteListRepository fav
     public async Task<Guid> SavePlaceAsync(Guid ownerUserId, Guid placeId, CancellationToken cancellationToken = default)
     {
         var favoriteList = await favoriteListRepository.GetByOwnerAsync(ownerUserId, cancellationToken);
-        if (favoriteList is null)
+        var isNew = favoriteList is null;
+        if (isNew)
         {
             favoriteList = new FavoriteList(Guid.NewGuid(), ownerUserId);
-            favoriteList.AddPlace(placeId, DateTimeOffset.UtcNow);
-            await favoriteListRepository.AddAsync(favoriteList, cancellationToken);
-            return favoriteList.Id;
         }
 
-        favoriteList.AddPlace(placeId, DateTimeOffset.UtcNow);
-        await favoriteListRepository.UpdateAsync(favoriteList, cancellationToken);
+        favoriteList!.AddPlace(placeId, DateTimeOffset.UtcNow);
+
+        if (isNew)
+        {
+            await favoriteListRepository.AddAsync(favoriteList, cancellationToken);
+        }
+        else
+        {
+            await favoriteListRepository.UpdateAsync(favoriteList, cancellationToken);
+        }
+
         return favoriteList.Id;
     }
 

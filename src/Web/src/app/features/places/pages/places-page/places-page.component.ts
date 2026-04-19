@@ -61,7 +61,7 @@ export class PlacesPageComponent {
     }
 
     if (type.trim()) {
-      labels.push(`Tipus: ${this.placeService.getTypeLabel(type as never)}`);
+      labels.push(`Tipus: ${this.placeService.resolveTypeLabel(type)}`);
     }
 
     if (pet !== 'all') {
@@ -79,7 +79,7 @@ export class PlacesPageComponent {
     const safeCity = city.trim();
     const safeSearch = search.trim();
     const baseLabel = type
-      ? `${this.placeService.getTypeLabel(type as never).toLowerCase()} pet-friendly`
+      ? `${this.placeService.resolveTypeLabel(type).toLowerCase()} pet-friendly`
       : 'llocs pet-friendly';
 
     if (safeSearch) {
@@ -119,7 +119,7 @@ export class PlacesPageComponent {
     }
 
     if (type) {
-      details.push(`tipus ${this.placeService.getTypeLabel(type as never).toLowerCase()}`);
+      details.push(`tipus ${this.placeService.resolveTypeLabel(type).toLowerCase()}`);
     }
 
     if (pet !== 'all') {
@@ -159,7 +159,7 @@ export class PlacesPageComponent {
   }
 
   protected getTypeLabel(type: string): string {
-    return this.placeService.getTypeLabel(type as never);
+    return this.placeService.resolveTypeLabel(type);
   }
 
   protected clearAllFilters(): void {

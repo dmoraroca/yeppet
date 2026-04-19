@@ -26,7 +26,7 @@ export class PlaceCardComponent {
     });
   }
 
-  /** Mostra `<img>` només si hi ha URL i no ha fallat la càrrega (404, xarxa, etc.). */
+  /** Renders `<img>` only when URL is set and loading has not failed (404, network, etc.). */
   protected readonly showCoverImage = computed(() => {
     const url = this.place().imageUrl?.trim();
     return Boolean(url) && !this.coverLoadFailed();

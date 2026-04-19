@@ -8,6 +8,11 @@ import { FavoriteToggleButtonComponent } from '../../../../shared/components/fav
 import { FavoritesService } from '../../../favorites/services/favorites.service';
 import { PlaceMapComponent } from '../../components/place-map/place-map.component';
 import { PlaceService } from '../../services/place.service';
+import {
+  petAccessLabelForPlace,
+  petMatchSummaryForPlace,
+  visitContextForPlaceType
+} from '../../utils/place-detail-copy';
 
 @Component({
   selector: 'app-place-detail-page',
@@ -50,41 +55,11 @@ export class PlaceDetailPageComponent {
   });
   protected readonly petAccessLabel = computed(() => {
     const currentPlace = this.place();
-
-    if (!currentPlace) {
-      return '';
-    }
-
-    if (currentPlace.acceptsDogs && currentPlace.acceptsCats) {
-      return 'Accepta gossos i gats';
-    }
-
-    if (currentPlace.acceptsDogs) {
-      return 'Especialment còmode per a gossos';
-    }
-
-    if (currentPlace.acceptsCats) {
-      return 'Especialment còmode per a gats';
-    }
-
-    return 'Accés per mascotes limitat';
+    return currentPlace ? petAccessLabelForPlace(currentPlace) : '';
   });
   protected readonly visitContext = computed(() => {
     const currentPlace = this.place();
-
-    if (!currentPlace) {
-      return '';
-    }
-
-    if (currentPlace.type === 'hotel' || currentPlace.type === 'apartment') {
-      return 'Bona opció si vols resoldre estada i confort pet-friendly en un sol punt.';
-    }
-
-    if (currentPlace.type === 'park') {
-      return 'Especialment útil com a parada ràpida, descans o passeig durant el dia.';
-    }
-
-    return 'Bona opció per encaixar-la dins d’un recorregut urbà amb la mascota sense complicar-te.';
+    return currentPlace ? visitContextForPlaceType(currentPlace.type) : '';
   });
   protected readonly backToPlacesQueryParams = computed(() => {
     const currentPlace = this.place();
@@ -102,29 +77,12 @@ export class PlaceDetailPageComponent {
   }
 
   protected getTypeLabel(type: string): string {
-    return this.placeService.getTypeLabel(type as never);
+    return this.placeService.resolveTypeLabel(type);
   }
 
   protected getPetMatchSummary(): string {
     const currentPlace = this.place();
-
-    if (!currentPlace) {
-      return '';
-    }
-
-    if (currentPlace.acceptsDogs && currentPlace.acceptsCats) {
-      return 'Compatible amb gossos i gats';
-    }
-
-    if (currentPlace.acceptsDogs) {
-      return 'Pensat sobretot per a persones que es mouen amb gos';
-    }
-
-    if (currentPlace.acceptsCats) {
-      return 'Més adequat per a estades amb gat';
-    }
-
-    return 'Cal validar el cas concret abans d’anar-hi amb mascota';
+    return currentPlace ? petMatchSummaryForPlace(currentPlace) : '';
   }
 
   protected get placeAsArray() {

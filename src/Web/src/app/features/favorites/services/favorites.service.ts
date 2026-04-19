@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable, computed, effect, inject, signal } from '@angular/core';
+import { Inject, Injectable, computed, effect, inject, signal, WritableSignal } from '@angular/core';
 import { catchError, map, of } from 'rxjs';
 
 import { API_BASE_URL } from '../../../core/config/api.config';
@@ -10,7 +10,7 @@ import { FAVORITES_STORE, FavoritesStore } from './favorites-store.token';
 export class FavoritesService {
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
-  private readonly favoriteIdsState: ReturnType<typeof signal<string[]>>;
+  private readonly favoriteIdsState: WritableSignal<string[]>;
 
   constructor(@Inject(FAVORITES_STORE) private readonly favoritesStore: FavoritesStore) {
     this.favoriteIdsState = signal<string[]>(this.favoritesStore.loadFavoriteIds());
@@ -19,20 +19,18 @@ export class FavoritesService {
       const currentUser = this.authService.currentUser();
 
       if (!currentUser) {
-        this.favoriteIdsState.set([]);
-        this.favoritesStore.saveFavoriteIds([]);
+        this.persistFavoriteIds([]);
         return;
       }
 
       this.http
-        .get<FavoriteListDto>(`${API_BASE_URL}/favorites/${currentUser.id}`)
+        .get<FavoriteListDto>(this.favoriteListUrl(currentUser.id))
         .pipe(
           map((favoriteList) => favoriteList.entries.map((entry) => entry.placeId)),
           catchError(() => of([]))
         )
         .subscribe((ids) => {
-          this.favoriteIdsState.set(ids);
-          this.favoritesStore.saveFavoriteIds(ids);
+          this.persistFavoriteIds(ids);
         });
     });
   }
@@ -52,19 +50,15 @@ export class FavoritesService {
     }
 
     if (this.favoriteIdsState().includes(placeId)) {
-      this.http.delete(`${API_BASE_URL}/favorites/${currentUser.id}/places/${placeId}`).subscribe(() => {
-        const nextIds = this.favoriteIdsState().filter((id) => id !== placeId);
-        this.favoriteIdsState.set(nextIds);
-        this.favoritesStore.saveFavoriteIds(nextIds);
+      this.http.delete(this.favoritePlaceUrl(currentUser.id, placeId)).subscribe(() => {
+        this.persistFavoriteIds(this.favoriteIdsState().filter((id) => id !== placeId));
       });
-
       return;
     }
 
-    this.http.post(`${API_BASE_URL}/favorites/${currentUser.id}/places/${placeId}`, {}).subscribe(() => {
+    this.http.post(this.favoritePlaceUrl(currentUser.id, placeId), {}).subscribe(() => {
       const nextIds = [placeId, ...this.favoriteIdsState().filter((id) => id !== placeId)];
-      this.favoriteIdsState.set(nextIds);
-      this.favoritesStore.saveFavoriteIds(nextIds);
+      this.persistFavoriteIds(nextIds);
     });
   }
 
@@ -72,19 +66,29 @@ export class FavoritesService {
     const currentUser = this.authService.currentUser();
 
     if (!currentUser) {
-      this.favoriteIdsState.set([]);
-      this.favoritesStore.saveFavoriteIds([]);
+      this.persistFavoriteIds([]);
       return;
     }
 
     const ids = [...this.favoriteIdsState()];
-
     ids.forEach((placeId) => {
-      this.http.delete(`${API_BASE_URL}/favorites/${currentUser.id}/places/${placeId}`).subscribe();
+      this.http.delete(this.favoritePlaceUrl(currentUser.id, placeId)).subscribe();
     });
 
-    this.favoriteIdsState.set([]);
-    this.favoritesStore.saveFavoriteIds([]);
+    this.persistFavoriteIds([]);
+  }
+
+  private favoriteListUrl(userId: string): string {
+    return `${API_BASE_URL}/favorites/${userId}`;
+  }
+
+  private favoritePlaceUrl(userId: string, placeId: string): string {
+    return `${API_BASE_URL}/favorites/${userId}/places/${placeId}`;
+  }
+
+  private persistFavoriteIds(ids: string[]): void {
+    this.favoriteIdsState.set(ids);
+    this.favoritesStore.saveFavoriteIds(ids);
   }
 }
 
