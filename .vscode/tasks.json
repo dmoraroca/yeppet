@@ -106,7 +106,7 @@
     {
       "label": "install vsdbg (api)",
       "type": "shell",
-      "command": "docker exec -i yeppet-api bash -lc 'rm -rf /vsdbg && mkdir -p /vsdbg && curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l /vsdbg'",
+      "command": "docker exec -i zuppeto-api bash -lc 'rm -rf /vsdbg && mkdir -p /vsdbg && curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l /vsdbg'",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",

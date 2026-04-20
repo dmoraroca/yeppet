@@ -103,7 +103,7 @@ En l'estat actual:
 - ja existeixen consultes i altes basiques reals sobre HTTP per `places`, `favorites`, `users` i `reviews`
 - el focus funcional visible avui se centra en `places`, `place detail`, `favorites` i `perfil` recolzats en dades reals, mentre el login continua sent una porta d'entrada controlada i local
 - el login ja mostra botó Google si el `ClientId` de desenvolupament està configurat
-- `yeppetcontact@gmail.com` queda reservat com a administrador federat de desenvolupament
+- `info@zuppeto.com` queda reservat com a administrador federat de desenvolupament
 - la stack Docker de l'`Api` ja llegeix la configuració real de `Development`, incloent el `ClientId` de Google
 - la `LoginPage` ja pinta el botó Google un cop el contenidor visual queda disponible
 - el botó Google queda alineat en amplada amb el CTA principal de login
@@ -425,7 +425,7 @@ El punt d'autenticacio pròpia i federada queda funcionalment entès aixi:
 - `Google` queda configurat en desenvolupament amb `ClientId` local i botó visible a `login`
 - l'entrada per Google pot crear usuari nou o sincronitzar-ne un d'existent
 - la credencial local de Google queda fora de versionat
-- `yeppetcontact@gmail.com` queda reservat com a administrador federat de desenvolupament
+- `info@zuppeto.com` queda reservat com a administrador federat de desenvolupament
 - `LinkedIn` queda ja validat dins el mateix patró federat
 - `Facebook` queda expressament aparcat fins després de publicacio
 

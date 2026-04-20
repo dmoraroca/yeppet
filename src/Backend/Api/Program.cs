@@ -25,7 +25,7 @@ static string ApiProjectLogsDirectory()
         return null;
     }
 
-    var envDir = Environment.GetEnvironmentVariable("YEPPET_LOGS_DIR");
+    var envDir = Environment.GetEnvironmentVariable("ZUPPETO_LOGS_DIR");
     if (!string.IsNullOrWhiteSpace(envDir))
         return Path.GetFullPath(envDir.Trim());
 
@@ -68,7 +68,7 @@ builder.Host.UseSerilog((context, services, loggerConfiguration) =>
     var fileLogsEnabled = context.HostingEnvironment.IsDevelopment()
         || context.Configuration.GetValue("YepPet:WriteLogsToFile", false)
         || string.Equals(
-            Environment.GetEnvironmentVariable("YEPPET_FILE_LOGS"),
+            Environment.GetEnvironmentVariable("ZUPPETO_FILE_LOGS"),
             "true",
             StringComparison.OrdinalIgnoreCase);
 
@@ -113,7 +113,7 @@ builder.Host.UseSerilog((context, services, loggerConfiguration) =>
     else
     {
         Console.Error.WriteLine(
-            "[YepPet] Logs a disc desactivats. Per activar-los: ASPNETCORE_ENVIRONMENT=Development, o YepPet:WriteLogsToFile=true, o YEPPET_FILE_LOGS=true.");
+            "[YepPet] Logs a disc desactivats. Per activar-los: ASPNETCORE_ENVIRONMENT=Development, o YepPet:WriteLogsToFile=true, o ZUPPETO_FILE_LOGS=true.");
     }
 
     loggerConfiguration
@@ -177,7 +177,7 @@ var app = builder.Build();
 var apiLogsPath = ApiProjectLogsDirectory();
 var fileLogsActive = app.Environment.IsDevelopment()
     || app.Configuration.GetValue("YepPet:WriteLogsToFile", false)
-    || string.Equals(Environment.GetEnvironmentVariable("YEPPET_FILE_LOGS"), "true", StringComparison.OrdinalIgnoreCase);
+    || string.Equals(Environment.GetEnvironmentVariable("ZUPPETO_FILE_LOGS"), "true", StringComparison.OrdinalIgnoreCase);
 
 Log.Information(
     "YepPet API iniciada; entorn {Environment}; logs a disc (Backend/Api/logs): actius={FileLogs}; directori={ApiLogs} (patró: yeppet-YYYYMMDD.log); ContentRoot={ContentRoot}",

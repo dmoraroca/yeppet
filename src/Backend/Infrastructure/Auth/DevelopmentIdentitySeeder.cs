@@ -190,6 +190,7 @@ public sealed class DevelopmentIdentitySeeder(
 
     public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
+        await EnsureRolesCatalogStorageAsync(cancellationToken);
         await EnsureRolesAsync(cancellationToken);
         await EnsurePermissionCatalogAsync(cancellationToken);
         await EnsureMenuCatalogAsync(cancellationToken);
@@ -220,6 +221,23 @@ public sealed class DevelopmentIdentitySeeder(
         await EnsureRolePermissionsAsync(cancellationToken);
         await EnsureMenuRolesAsync(cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task EnsureRolesCatalogStorageAsync(CancellationToken cancellationToken)
+    {
+        await dbContext.Database.ExecuteSqlRawAsync(
+            """
+            CREATE TABLE IF NOT EXISTS roles (
+                id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+                key character varying(32) NOT NULL,
+                display_name character varying(120) NOT NULL,
+                is_active boolean NOT NULL DEFAULT TRUE,
+                created_at_utc timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at_utc timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE UNIQUE INDEX IF NOT EXISTS uq_roles_key ON roles (key);
+            """,
+            cancellationToken);
     }
 
     private async Task EnsureRolesAsync(CancellationToken cancellationToken)

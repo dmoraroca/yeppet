@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:17
-    container_name: yeppet-db
+    container_name: zuppeto-db
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-yeppet}
@@ -10,7 +10,7 @@ services:
     ports:
       - "${POSTGRES_PORT:-5433}:5432"
     volumes:
-      - yeppet_pg_data:/var/lib/postgresql/data
+      - zuppeto_pg_data:/var/lib/postgresql/data
       - ./sql/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app} -d ${POSTGRES_DB:-yeppet}"]
@@ -20,7 +20,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:4-management
-    container_name: yeppet-rabbitmq
+    container_name: zuppeto-rabbitmq
     restart: unless-stopped
     ports:
       - "${RABBITMQ_PORT:-5672}:5672"
@@ -29,7 +29,7 @@ services:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
     volumes:
-      - yeppet_rabbitmq_data:/var/lib/rabbitmq
+      - zuppeto_rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 10s
@@ -40,8 +40,8 @@ services:
     build:
       context: .
       dockerfile: docker/api/Dockerfile.dev
-    image: yeppet-api-dev
-    container_name: yeppet-api
+    image: zuppeto-api-dev
+    container_name: zuppeto-api
     working_dir: /app
     volumes:
       - ./:/app:cached
@@ -54,7 +54,7 @@ services:
       - "${API_PORT:-5211}:${API_PORT:-5211}"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      YEPPET_FILE_LOGS: "true"
+      ZUPPETO_FILE_LOGS: "true"
       ConnectionStrings__YepPet: Host=db;Port=5432;Database=${POSTGRES_DB:-yeppet};Username=${POSTGRES_USER:-app};Password=${POSTGRES_PASSWORD:-app}
       RabbitMq__Enabled: "true"
       RabbitMq__HostName: rabbitmq
@@ -76,12 +76,12 @@ services:
     build:
       context: .
       dockerfile: docker/web/Dockerfile.dev
-    image: yeppet-web-dev
-    container_name: yeppet-web
+    image: zuppeto-web-dev
+    container_name: zuppeto-web
     working_dir: /app/src/Web
     volumes:
       - ./:/app:cached
-      - yeppet_web_node_modules:/app/src/Web/node_modules
+      - zuppeto_web_node_modules:/app/src/Web/node_modules
     entrypoint: ["/bin/bash", "-lc"]
     command:
       [
@@ -99,26 +99,26 @@ services:
 
   e2e:
     image: mcr.microsoft.com/playwright:v1.53.0-jammy
-    container_name: yeppet-e2e
+    container_name: zuppeto-e2e
     working_dir: /app/e2e
     profiles: ["e2e"]
     volumes:
       - ./:/app:cached
-      - yeppet_e2e_node_modules:/app/e2e/node_modules
+      - zuppeto_e2e_node_modules:/app/e2e/node_modules
     entrypoint: ["/bin/bash", "-lc"]
     command:
       [
         "if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ]; then npm ci; fi && npx playwright test"
       ]
     environment:
-      E2E_BASE_URL: "http://yeppet-web:4200"
-      E2E_API_URL: "http://yeppet-api:5211"
+      E2E_BASE_URL: "http://zuppeto-web:4200"
+      E2E_API_URL: "http://zuppeto-api:5211"
     depends_on:
       web:
         condition: service_started
 
 volumes:
-  yeppet_rabbitmq_data:
-  yeppet_pg_data:
-  yeppet_web_node_modules:
-  yeppet_e2e_node_modules:
+  zuppeto_rabbitmq_data:
+  zuppeto_pg_data:
+  zuppeto_web_node_modules:
+  zuppeto_e2e_node_modules:

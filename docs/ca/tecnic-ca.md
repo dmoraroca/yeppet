@@ -579,7 +579,7 @@ Resum del diagrama:
 - el backend emet el token i defineix la sessió real
 - el frontend només consumeix i propaga aquesta sessió
 - el login federat comparteix el mateix model de sessió que el login propi
-- `yeppetcontact@gmail.com` queda elevat a `ADMIN` per configuració de desenvolupament quan entra per Google
+- `info@zuppeto.com` queda elevat a `ADMIN` per configuració de desenvolupament quan entra per Google
 
 ### 3.1 Principis
 

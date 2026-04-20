@@ -19,7 +19,7 @@ Aquest document recull la base real d'autenticació de la Fase IV i el tancament
 - endpoint de sessió actual via `GET /api/auth/me`
 - catàleg inicial de proveïdors via `GET /api/auth/providers`
 - `Google` configurat amb `ClientId` local i botó visible a la `LoginPage`
-- `yeppetcontact@gmail.com` reservat com a administrador federat de desenvolupament
+- `info@zuppeto.com` reservat com a administrador federat de desenvolupament
 - base preparada per federació futura amb `Facebook` i altres proveïdors `OAuth/OIDC`
 - `Facebook` queda aparcat expressament fins després de publicar la web
 - la `LoginPage` torna a intentar el render del botó Google un cop el `ViewChild` del contenidor ja existeix

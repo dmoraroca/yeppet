@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "YepPet API (local, F5)",
+      "name": "Zuppeto API (local, F5)",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build api (local)",
@@ -24,7 +24,7 @@
       "name": "Docker: DB",
       "type": "node-terminal",
       "request": "launch",
-      "command": "echo 'yeppet-db disponible a localhost:5433'",
+      "command": "echo 'zuppeto-db disponible a localhost:5433'",
       "preLaunchTask": "docker up db"
     },
     {
@@ -38,7 +38,7 @@
         "pipeArgs": [
           "exec",
           "-i",
-          "yeppet-api"
+          "zuppeto-api"
         ],
         "debuggerPath": "/vsdbg/vsdbg",
         "pipeCwd": "${workspaceFolder}",
@@ -60,7 +60,7 @@
         "pipeArgs": [
           "exec",
           "-i",
-          "yeppet-api"
+          "zuppeto-api"
         ],
         "debuggerPath": "/vsdbg/vsdbg",
         "pipeCwd": "${workspaceFolder}",
