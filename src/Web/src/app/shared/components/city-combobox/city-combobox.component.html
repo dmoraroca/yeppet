@@ -1,0 +1,55 @@
+<div class="city-combobox" [class.city-combobox--open]="isOpenForDisplay()">
+  <div class="city-combobox__field">
+    <input
+      class="city-combobox__input"
+      type="text"
+      [id]="inputId()"
+      [attr.aria-autocomplete]="'list'"
+      [attr.aria-expanded]="isOpenForDisplay()"
+      [value]="text()"
+      (input)="onInput($event)"
+      (focus)="onInputFocus()"
+      (blur)="onInputBlur()"
+    />
+    <button
+      type="button"
+      class="city-combobox__toggle"
+      [attr.aria-label]="'Obrir o tancar suggeriments de ciutat'"
+      (mousedown)="preventLoseTextFocus($event)"
+      (click)="toggleButtonClick()"
+    >
+      <span class="city-combobox__chevron" aria-hidden="true">▾</span>
+    </button>
+  </div>
+  @if (isOpenForDisplay()) {
+    <ul class="city-combobox__list" [attr.id]="inputId() + '-listbox'" role="listbox">
+      @if (remoteLoading() && text().trim().length >= minCharsForRemote()) {
+        <li class="city-combobox__hint">Carregant…</li>
+      }
+      @for (city of filteredStaticOptions(); track city) {
+        <li>
+          <button
+            type="button"
+            class="city-combobox__option"
+            (mousedown)="preventLoseTextFocus($event)"
+            (click)="selectStaticOption(city)"
+          >
+            {{ city }}
+          </button>
+        </li>
+      }
+      @for (s of apiSuggestions(); track s.city + s.displayLabel) {
+        <li>
+          <button
+            type="button"
+            class="city-combobox__option"
+            (mousedown)="preventLoseTextFocus($event)"
+            (click)="selectApiSuggestion(s)"
+          >
+            {{ s.displayLabel }}
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <!-- Avoid permission issues on root-owned obj/bin created by dockerized builds. -->
+    <BaseIntermediateOutputPath>obj-local/</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>obj-local/</MSBuildProjectExtensionsPath>
+    <BaseOutputPath>bin-local/</BaseOutputPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);**/obj/**;**/bin/**;**/obj-local/**;**/bin-local/**</DefaultItemExcludes>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+  </PropertyGroup>
+</Project>

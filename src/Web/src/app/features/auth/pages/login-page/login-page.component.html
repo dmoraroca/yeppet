@@ -106,12 +106,11 @@
 
           <label>
             <span>Ciutat</span>
-            <select [value]="previewFilters().city" (change)="onPreviewCity($event)">
-              <option value="">Totes</option>
-              @for (city of previewCities(); track city) {
-                <option [value]="city">{{ city }}</option>
-              }
-            </select>
+            <app-city-combobox
+              [value]="previewFilters().city"
+              (valueChange)="onPreviewCityChange($event)"
+              [staticOptions]="previewCities()"
+            />
           </label>
 
           <label>

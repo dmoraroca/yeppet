@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using YepPet.Domain.Abstractions;
+using YepPet.Domain.Geography;
 using YepPet.Domain.Places;
 using YepPet.Infrastructure.Persistence.Entities;
 using YepPet.Infrastructure.Persistence.Specifications;
@@ -60,13 +61,48 @@ internal sealed class PlaceRepository(YepPetDbContext dbContext) : IPlaceReposit
 
     public async Task<IReadOnlyCollection<string>> GetAvailableCitiesAsync(CancellationToken cancellationToken = default)
     {
+        var codes = EuropeanCountryCodes.Iso3166Alpha2;
+
         return await dbContext.Places
             .AsNoTracking()
+            .Where(place => place.City != string.Empty)
+            .Where(place => dbContext.Countries
+                .Any(c => codes.Contains(c.Code) && c.Name.ToLower() == place.Country.ToLower()))
             .Select(place => place.City)
-            .Where(city => city != string.Empty)
             .Distinct()
             .OrderBy(city => city)
             .ToArrayAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<IPlaceRepository.CityCatalogItem>> SearchAvailableCitiesAsync(
+        string normalizedQueryFragment,
+        int limit,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrEmpty(normalizedQueryFragment))
+        {
+            return [];
+        }
+
+        var pattern = $"%{normalizedQueryFragment}%";
+        var codes = EuropeanCountryCodes.Iso3166Alpha2;
+
+        var rows = await dbContext.Places
+            .AsNoTracking()
+            .Where(place => place.City != string.Empty)
+            .Where(place => EF.Functions.ILike(place.City, pattern))
+            .Where(place => dbContext.Countries
+                .Any(c => codes.Contains(c.Code) && c.Name.ToLower() == place.Country.ToLower()))
+            .Select(place => new { place.City, place.Country })
+            .Distinct()
+            .OrderBy(row => row.City)
+            .ThenBy(row => row.Country)
+            .Take(limit)
+            .ToArrayAsync(cancellationToken);
+
+        return rows
+            .Select(row => new IPlaceRepository.CityCatalogItem(row.City, row.Country))
+            .ToArray();
     }
 
     public async Task AddAsync(Place place, CancellationToken cancellationToken = default)

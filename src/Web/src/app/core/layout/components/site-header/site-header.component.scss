@@ -1,3 +1,7 @@
+:host {
+  display: block;
+}
+
 .site-header {
   position: sticky;
   top: 0;
@@ -8,9 +12,12 @@
 }
 
 .site-header__inner {
-  max-width: var(--yp-max-width);
-  margin: 0 auto;
-  padding: 0.85rem 1.5rem 0.75rem;
+  /* Full viewport width so the logo aligns with the left edge (minus horizontal padding), not a centered narrow column */
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  box-sizing: border-box;
+  padding: 0.85rem clamp(1rem, 4vw, 1.5rem) 0.75rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -28,7 +35,11 @@
   display: block;
   height: clamp(2.2rem, 1.9rem + 1vw, 3rem);
   width: auto;
+  min-width: 0;
+  max-width: min(14rem, 55vw);
   object-fit: contain;
+  object-position: left center;
+  /* Use the PNG as-is; long filter chains (brightness(0) + invert…) can hide or flatten the mark on some GPUs */
 }
 
 .site-header__nav {

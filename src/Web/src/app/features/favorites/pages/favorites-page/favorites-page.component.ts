@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 
 import { SiteFooterComponent } from '../../../../core/layout/components/site-footer/site-footer.component';
 import { SiteHeaderComponent } from '../../../../core/layout/components/site-header/site-header.component';
+import { CityComboboxComponent } from '../../../../shared/components/city-combobox/city-combobox.component';
 import { SectionHeadingComponent } from '../../../../shared/components/section-heading/section-heading.component';
 import { PlaceCardComponent } from '../../../places/components/place-card/place-card.component';
 import { PlaceService } from '../../../places/services/place.service';
@@ -19,6 +20,7 @@ import { FavoriteReviewSort, sortPlacesForFavoriteReview } from '../../utils/fav
     SiteHeaderComponent,
     SiteFooterComponent,
     SectionHeadingComponent,
+    CityComboboxComponent,
     PlaceCardComponent
   ],
   templateUrl: './favorites-page.component.html',
@@ -97,8 +99,8 @@ export class FavoritesPageComponent {
     this.reviewState.update((current) => ({ ...current, search: value }));
   }
 
-  protected updateReviewCity(value: string): void {
-    this.reviewState.update((current) => ({ ...current, city: value }));
+  protected updateReviewCity(city: string): void {
+    this.reviewState.update((current) => ({ ...current, city }));
   }
 
   protected updateReviewType(value: string): void {
@@ -120,4 +122,5 @@ export class FavoritesPageComponent {
       sort: 'recent'
     });
   }
+
 }

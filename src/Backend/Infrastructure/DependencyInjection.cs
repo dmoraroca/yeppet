@@ -4,8 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using YepPet.Application.Auth;
+using YepPet.Application.Places;
 using YepPet.Domain.Abstractions;
 using YepPet.Infrastructure.Auth;
+using YepPet.Infrastructure.GeoNames;
 using YepPet.Infrastructure.Persistence;
 using YepPet.Infrastructure.Persistence.Repositories;
 using YepPet.Infrastructure.RabbitMq;
@@ -73,7 +75,9 @@ public static class DependencyInjection
 
         services.AddSingleton(Options.Create(authOptions));
         services.AddRabbitMq(configuration);
+        services.AddMemoryCache();
         services.AddDataProtection();
+        services.Configure<GeoNamesOptions>(configuration.GetSection(GeoNamesOptions.SectionName));
         services.AddDbContext<YepPetDbContext>((sp, options) =>
         {
             options.UseNpgsql(connectionString);
@@ -85,6 +89,12 @@ public static class DependencyInjection
         });
         services.AddHttpClient<ILinkedInOAuthClient, LinkedInOAuthClient>();
         services.AddHttpClient<IFacebookOAuthClient, FacebookOAuthClient>();
+        services.AddHttpClient<IExternalCitySuggestionProvider, GeoNamesCitySuggestionProvider>((sp, client) =>
+        {
+            var geoOptions = sp.GetRequiredService<IOptions<GeoNamesOptions>>().Value;
+            client.BaseAddress = new Uri(geoOptions.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(2, geoOptions.TimeoutSeconds));
+        });
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IAccessTokenIssuer, JwtAccessTokenIssuer>();
         services.AddScoped<IGoogleIdTokenVerifier, GoogleIdTokenVerifier>();

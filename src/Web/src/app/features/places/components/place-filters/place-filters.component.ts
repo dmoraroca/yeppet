@@ -1,9 +1,12 @@
 import { Component, input, output } from '@angular/core';
 
+import { CityComboboxComponent } from '../../../../shared/components/city-combobox/city-combobox.component';
 import { PlaceFilters } from '../../models/place.model';
 
 @Component({
   selector: 'app-place-filters',
+  standalone: true,
+  imports: [CityComboboxComponent],
   templateUrl: './place-filters.component.html',
   styleUrl: './place-filters.component.scss'
 })
@@ -24,9 +27,8 @@ export class PlaceFiltersComponent {
     this.filtersChanged.emit({ search: value });
   }
 
-  protected onCity(event: Event): void {
-    const value = (event.target as HTMLSelectElement).value;
-    this.filtersChanged.emit({ city: value });
+  protected onCityChange(city: string): void {
+    this.filtersChanged.emit({ city });
   }
 
   protected onType(event: Event): void {

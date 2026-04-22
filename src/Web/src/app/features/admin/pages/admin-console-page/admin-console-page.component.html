@@ -679,8 +679,21 @@
           </form>
           <div class="admin-console-modal__footer">
             <div class="admin-console-modal__footer-band">
+              <label class="admin-console-privacy-check">
+                <input
+                  type="checkbox"
+                  [checked]="createMaintenancePrivacyAccepted()"
+                  (change)="createMaintenancePrivacyAccepted.set($any($event.target).checked)"
+                />
+                <span>Accepto les condicions de privacitat d'aquest entorn intern.</span>
+              </label>
               <div class="admin-console-modal__footer-actions">
-                <button type="submit" form="admin-create-permission-form" class="admin-console-primary" [disabled]="!canSubmitCreatePermission()">
+                <button
+                  type="submit"
+                  form="admin-create-permission-form"
+                  class="admin-console-primary admin-console-role-strip__button"
+                  [disabled]="!canSubmitCreatePermission() || !createMaintenancePrivacyAccepted()"
+                >
                   Crear
                 </button>
                 <button
@@ -742,6 +755,16 @@
           </div>
           <div class="admin-console-modal__footer">
             <div class="admin-console-modal__footer-band">
+              @if (roleIsNew()) {
+                <label class="admin-console-privacy-check">
+                  <input
+                    type="checkbox"
+                    [checked]="createMaintenancePrivacyAccepted()"
+                    (change)="createMaintenancePrivacyAccepted.set($any($event.target).checked)"
+                  />
+                  <span>Accepto les condicions de privacitat d'aquest entorn intern.</span>
+                </label>
+              }
               <div class="admin-console-modal__footer-actions">
                 @if (rolePermissionsEditMode()) {
                   <button type="button" class="admin-console-primary admin-console-role-strip__button" (click)="saveRolePermissionsDraft()">
@@ -1134,8 +1157,23 @@
 
             <div class="admin-console-modal__footer">
               <div class="admin-console-modal__footer-band">
+                <label class="admin-console-privacy-check">
+                  <input
+                    type="checkbox"
+                    [checked]="createMaintenancePrivacyAccepted()"
+                    (change)="createMaintenancePrivacyAccepted.set($any($event.target).checked)"
+                  />
+                  <span>Accepto les condicions de privacitat d'aquest entorn intern.</span>
+                </label>
                 <div class="admin-console-modal__footer-actions">
-                  <button type="button" class="admin-console-primary" (click)="saveMenu()">Desar menú</button>
+                  <button
+                    type="button"
+                    class="admin-console-primary admin-console-role-strip__button"
+                    [disabled]="!createMaintenancePrivacyAccepted()"
+                    (click)="saveMenu()"
+                  >
+                    Desar menú
+                  </button>
                   <button
                     type="button"
                     class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button"
@@ -1323,18 +1361,20 @@
                     <button
                       type="button"
                       class="admin-console-icon-button"
-                      title="Editar"
-                      aria-label="Editar"
+                      title="Veure detall"
+                      aria-label="Veure detall"
                       (click)="selectRoleForEdit(role); $event.stopPropagation()"
                     >
                       <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path
-                          d="M4 20h4l10.5-10.5-4-4L4 16v4ZM12.7 6.3l4 4L21 6l-4-4-4.3 4.3Z"
+                          d="M1.5 12s3.8-7 10.5-7 10.5 7 10.5 7-3.8 7-10.5 7S1.5 12 1.5 12Z"
                           fill="none"
                           stroke="currentColor"
-                          stroke-width="1.6"
+                          stroke-linecap="round"
                           stroke-linejoin="round"
+                          stroke-width="1.8"
                         />
+                        <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8" />
                       </svg>
                     </button>
                     <button
@@ -1369,8 +1409,8 @@
         <section class="admin-console-modal admin-console-modal--detail admin-console-modal--create" (click)="$event.stopPropagation()">
           <div class="admin-console-modal__header">
             <div>
-              <p class="admin-console-kicker">{{ roleIsNew() ? 'Alta' : 'Edició' }}</p>
-              <h3>{{ roleIsNew() ? 'Nou rol' : 'Editar rol' }}</h3>
+              <p class="admin-console-kicker">{{ roleIsNew() ? 'Alta' : roleDetailEditMode() ? 'Edició' : 'Detall' }}</p>
+              <h3>{{ roleIsNew() ? 'Nou rol' : roleDetailEditMode() ? 'Editar rol' : 'Detall de rol' }}</h3>
             </div>
           </div>
           <div class="admin-console-form admin-console-form--inline">
@@ -1386,6 +1426,7 @@
             <label>
               <span>Nom visible <strong class="admin-console-required">*</strong></span>
               <input
+                [readonly]="!roleIsNew() && !roleDetailEditMode()"
                 [ngModel]="editableRole().displayName"
                 (ngModelChange)="editableRole.set({ ...editableRole(), displayName: $event })"
               />
@@ -1393,6 +1434,7 @@
             <label class="admin-console-inline">
               <input
                 type="checkbox"
+                [disabled]="!roleIsNew() && !roleDetailEditMode()"
                 [ngModel]="editableRole().isActive"
                 (ngModelChange)="editableRole.set({ ...editableRole(), isActive: !!$event })"
               />
@@ -1402,14 +1444,26 @@
           <div class="admin-console-modal__footer">
             <div class="admin-console-modal__footer-band">
               <div class="admin-console-modal__footer-actions">
-                <button type="button" class="admin-console-primary" (click)="saveRole()">Desar</button>
-                <button
-                  type="button"
-                  class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button"
-                  (click)="closeRoleModal()"
-                >
-                  Tancar
-                </button>
+                @if (roleIsNew() || roleDetailEditMode()) {
+                  <button
+                    type="button"
+                    class="admin-console-primary admin-console-role-strip__button"
+                    [disabled]="roleIsNew() && !createMaintenancePrivacyAccepted()"
+                    (click)="saveRole()"
+                  >
+                    Desar
+                  </button>
+                  <button
+                    type="button"
+                    class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button"
+                    (click)="roleIsNew() ? closeRoleModal() : cancelRoleDetailEdit()"
+                  >
+                    {{ roleIsNew() ? 'Tancar' : 'Cancel·lar' }}
+                  </button>
+                } @else {
+                  <button type="button" class="admin-console-primary admin-console-role-strip__button" (click)="beginRoleDetailEdit()">Modificar</button>
+                  <button type="button" class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button" (click)="closeRoleModal()">Tancar</button>
+                }
               </div>
             </div>
           </div>
@@ -1487,18 +1541,20 @@
                     <button
                       type="button"
                       class="admin-console-icon-button"
-                      title="Editar"
-                      aria-label="Editar"
+                      title="Veure detall"
+                      aria-label="Veure detall"
                       (click)="selectPlaceForEdit(place); $event.stopPropagation()"
                     >
                       <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path
-                          d="M4 20h4l10.5-10.5-4-4L4 16v4ZM12.7 6.3l4 4L21 6l-4-4-4.3 4.3Z"
+                          d="M1.5 12s3.8-7 10.5-7 10.5 7 10.5 7-3.8 7-10.5 7S1.5 12 1.5 12Z"
                           fill="none"
                           stroke="currentColor"
-                          stroke-width="1.6"
+                          stroke-linecap="round"
                           stroke-linejoin="round"
+                          stroke-width="1.8"
                         />
+                        <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8" />
                       </svg>
                     </button>
                     <button
@@ -1533,37 +1589,59 @@
         <section class="admin-console-modal admin-console-modal--detail admin-console-modal--create" (click)="$event.stopPropagation()">
           <div class="admin-console-modal__header">
             <div>
-              <p class="admin-console-kicker">{{ placeIsNew() ? 'Alta' : 'Edició' }}</p>
-              <h3>{{ placeIsNew() ? 'Nou lloc' : 'Editar lloc' }}</h3>
+              <p class="admin-console-kicker">{{ placeIsNew() ? 'Alta' : placeDetailEditMode() ? 'Edició' : 'Detall' }}</p>
+              <h3>{{ placeIsNew() ? 'Nou lloc' : placeDetailEditMode() ? 'Editar lloc' : 'Detall de lloc' }}</h3>
             </div>
           </div>
           <div class="admin-console-form admin-console-form--inline">
-            <label><span>Nom <strong class="admin-console-required">*</strong></span><input [ngModel]="editablePlace().name" (ngModelChange)="editablePlace.set({ ...editablePlace(), name: $event })" /></label>
-            <label><span>Tipus <strong class="admin-console-required">*</strong></span><input [ngModel]="editablePlace().type" (ngModelChange)="editablePlace.set({ ...editablePlace(), type: $event })" /></label>
-            <label><span>Ciutat <strong class="admin-console-required">*</strong></span><input [ngModel]="editablePlace().city" (ngModelChange)="editablePlace.set({ ...editablePlace(), city: $event })" /></label>
-            <label><span>País <strong class="admin-console-required">*</strong></span><input [ngModel]="editablePlace().country" (ngModelChange)="editablePlace.set({ ...editablePlace(), country: $event })" /></label>
-            <label><span>Adreça <strong class="admin-console-required">*</strong></span><input [ngModel]="editablePlace().addressLine1" (ngModelChange)="editablePlace.set({ ...editablePlace(), addressLine1: $event })" /></label>
-            <label><span>Barri <strong class="admin-console-required">*</strong></span><input [ngModel]="editablePlace().neighborhood" (ngModelChange)="editablePlace.set({ ...editablePlace(), neighborhood: $event })" /></label>
-            <label><span>Latitud <strong class="admin-console-required">*</strong></span><input [ngModel]="editablePlace().latitude" (ngModelChange)="editablePlace.set({ ...editablePlace(), latitude: $event })" /></label>
-            <label><span>Longitud <strong class="admin-console-required">*</strong></span><input [ngModel]="editablePlace().longitude" (ngModelChange)="editablePlace.set({ ...editablePlace(), longitude: $event })" /></label>
-            <label><span>Preu <strong class="admin-console-required">*</strong></span><input [ngModel]="editablePlace().pricingLabel" (ngModelChange)="editablePlace.set({ ...editablePlace(), pricingLabel: $event })" /></label>
-            <label><span>Rating</span><input [ngModel]="editablePlace().ratingAverage" (ngModelChange)="editablePlace.set({ ...editablePlace(), ratingAverage: $event })" /></label>
-            <label><span>Reviews</span><input [ngModel]="editablePlace().reviewCount" (ngModelChange)="editablePlace.set({ ...editablePlace(), reviewCount: $event })" /></label>
-            <label class="admin-console-inline"><input type="checkbox" [ngModel]="editablePlace().acceptsDogs" (ngModelChange)="editablePlace.set({ ...editablePlace(), acceptsDogs: !!$event })" /><span>Accepta gossos</span></label>
-            <label class="admin-console-inline"><input type="checkbox" [ngModel]="editablePlace().acceptsCats" (ngModelChange)="editablePlace.set({ ...editablePlace(), acceptsCats: !!$event })" /><span>Accepta gats</span></label>
-            <label><span>Política mascotes <strong class="admin-console-required">*</strong></span><input [ngModel]="editablePlace().petPolicyLabel" (ngModelChange)="editablePlace.set({ ...editablePlace(), petPolicyLabel: $event })" /></label>
-            <label><span>Cover URL <strong class="admin-console-required">*</strong></span><input [ngModel]="editablePlace().coverImageUrl" (ngModelChange)="editablePlace.set({ ...editablePlace(), coverImageUrl: $event })" /></label>
-            <label><span>Tags (coma)</span><input [ngModel]="editablePlace().tags" (ngModelChange)="editablePlace.set({ ...editablePlace(), tags: $event })" /></label>
-            <label><span>Features (coma)</span><input [ngModel]="editablePlace().features" (ngModelChange)="editablePlace.set({ ...editablePlace(), features: $event })" /></label>
-            <label class="admin-console-form admin-console-form--readonly"><span>Descripció curta <strong class="admin-console-required">*</strong></span><textarea rows="2" [ngModel]="editablePlace().shortDescription" (ngModelChange)="editablePlace.set({ ...editablePlace(), shortDescription: $event })"></textarea></label>
-            <label class="admin-console-form admin-console-form--readonly"><span>Descripció <strong class="admin-console-required">*</strong></span><textarea rows="4" [ngModel]="editablePlace().description" (ngModelChange)="editablePlace.set({ ...editablePlace(), description: $event })"></textarea></label>
-            <label class="admin-console-form admin-console-form--readonly"><span>Notes política mascotes</span><textarea rows="3" [ngModel]="editablePlace().petPolicyNotes" (ngModelChange)="editablePlace.set({ ...editablePlace(), petPolicyNotes: $event })"></textarea></label>
+            <label><span>Nom <strong class="admin-console-required">*</strong></span><input [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().name" (ngModelChange)="editablePlace.set({ ...editablePlace(), name: $event })" /></label>
+            <label><span>Tipus <strong class="admin-console-required">*</strong></span><input [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().type" (ngModelChange)="editablePlace.set({ ...editablePlace(), type: $event })" /></label>
+            <label><span>Ciutat <strong class="admin-console-required">*</strong></span><input [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().city" (ngModelChange)="editablePlace.set({ ...editablePlace(), city: $event })" /></label>
+            <label><span>País <strong class="admin-console-required">*</strong></span><input [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().country" (ngModelChange)="editablePlace.set({ ...editablePlace(), country: $event })" /></label>
+            <label><span>Adreça <strong class="admin-console-required">*</strong></span><input [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().addressLine1" (ngModelChange)="editablePlace.set({ ...editablePlace(), addressLine1: $event })" /></label>
+            <label><span>Barri <strong class="admin-console-required">*</strong></span><input [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().neighborhood" (ngModelChange)="editablePlace.set({ ...editablePlace(), neighborhood: $event })" /></label>
+            <label><span>Latitud <strong class="admin-console-required">*</strong></span><input [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().latitude" (ngModelChange)="editablePlace.set({ ...editablePlace(), latitude: $event })" /></label>
+            <label><span>Longitud <strong class="admin-console-required">*</strong></span><input [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().longitude" (ngModelChange)="editablePlace.set({ ...editablePlace(), longitude: $event })" /></label>
+            <label><span>Preu <strong class="admin-console-required">*</strong></span><input [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().pricingLabel" (ngModelChange)="editablePlace.set({ ...editablePlace(), pricingLabel: $event })" /></label>
+            <label><span>Rating</span><input [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().ratingAverage" (ngModelChange)="editablePlace.set({ ...editablePlace(), ratingAverage: $event })" /></label>
+            <label><span>Reviews</span><input [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().reviewCount" (ngModelChange)="editablePlace.set({ ...editablePlace(), reviewCount: $event })" /></label>
+            <label class="admin-console-inline"><input type="checkbox" [disabled]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().acceptsDogs" (ngModelChange)="editablePlace.set({ ...editablePlace(), acceptsDogs: !!$event })" /><span>Accepta gossos</span></label>
+            <label class="admin-console-inline"><input type="checkbox" [disabled]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().acceptsCats" (ngModelChange)="editablePlace.set({ ...editablePlace(), acceptsCats: !!$event })" /><span>Accepta gats</span></label>
+            <label><span>Política mascotes <strong class="admin-console-required">*</strong></span><input [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().petPolicyLabel" (ngModelChange)="editablePlace.set({ ...editablePlace(), petPolicyLabel: $event })" /></label>
+            <label><span>Cover URL <strong class="admin-console-required">*</strong></span><input [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().coverImageUrl" (ngModelChange)="editablePlace.set({ ...editablePlace(), coverImageUrl: $event })" /></label>
+            <label><span>Tags (coma)</span><input [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().tags" (ngModelChange)="editablePlace.set({ ...editablePlace(), tags: $event })" /></label>
+            <label><span>Features (coma)</span><input [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().features" (ngModelChange)="editablePlace.set({ ...editablePlace(), features: $event })" /></label>
+            <label class="admin-console-form admin-console-form--readonly"><span>Descripció curta <strong class="admin-console-required">*</strong></span><textarea rows="2" [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().shortDescription" (ngModelChange)="editablePlace.set({ ...editablePlace(), shortDescription: $event })"></textarea></label>
+            <label class="admin-console-form admin-console-form--readonly"><span>Descripció <strong class="admin-console-required">*</strong></span><textarea rows="4" [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().description" (ngModelChange)="editablePlace.set({ ...editablePlace(), description: $event })"></textarea></label>
+            <label class="admin-console-form admin-console-form--readonly"><span>Notes política mascotes</span><textarea rows="3" [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().petPolicyNotes" (ngModelChange)="editablePlace.set({ ...editablePlace(), petPolicyNotes: $event })"></textarea></label>
           </div>
           <div class="admin-console-modal__footer">
             <div class="admin-console-modal__footer-band">
+              @if (placeIsNew()) {
+                <label class="admin-console-privacy-check">
+                  <input
+                    type="checkbox"
+                    [checked]="createMaintenancePrivacyAccepted()"
+                    (change)="createMaintenancePrivacyAccepted.set($any($event.target).checked)"
+                  />
+                  <span>Accepto les condicions de privacitat d'aquest entorn intern.</span>
+                </label>
+              }
               <div class="admin-console-modal__footer-actions">
-                <button type="button" class="admin-console-primary" (click)="savePlace()">Desar</button>
-                <button type="button" class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button" (click)="closePlaceModal()">Tancar</button>
+                @if (placeIsNew() || placeDetailEditMode()) {
+                  <button
+                    type="button"
+                    class="admin-console-primary admin-console-role-strip__button"
+                    [disabled]="placeIsNew() && !createMaintenancePrivacyAccepted()"
+                    (click)="savePlace()"
+                  >
+                    Desar
+                  </button>
+                  <button type="button" class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button" (click)="placeIsNew() ? closePlaceModal() : cancelPlaceDetailEdit()">{{ placeIsNew() ? 'Tancar' : 'Cancel·lar' }}</button>
+                } @else {
+                  <button type="button" class="admin-console-primary admin-console-role-strip__button" (click)="beginPlaceDetailEdit()">Modificar</button>
+                  <button type="button" class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button" (click)="closePlaceModal()">Tancar</button>
+                }
               </div>
             </div>
           </div>
@@ -1622,18 +1700,20 @@
                     <button
                       type="button"
                       class="admin-console-icon-button"
-                      title="Editar"
-                      aria-label="Editar"
+                      title="Veure detall"
+                      aria-label="Veure detall"
                       (click)="selectCountryForEdit(country); $event.stopPropagation()"
                     >
                       <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path
-                          d="M4 20h4l10.5-10.5-4-4L4 16v4ZM12.7 6.3l4 4L21 6l-4-4-4.3 4.3Z"
+                          d="M1.5 12s3.8-7 10.5-7 10.5 7 10.5 7-3.8 7-10.5 7S1.5 12 1.5 12Z"
                           fill="none"
                           stroke="currentColor"
-                          stroke-width="1.6"
+                          stroke-linecap="round"
                           stroke-linejoin="round"
+                          stroke-width="1.8"
                         />
+                        <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8" />
                       </svg>
                     </button>
                     <button
@@ -1668,14 +1748,15 @@
         <section class="admin-console-modal admin-console-modal--detail admin-console-modal--create" (click)="$event.stopPropagation()">
           <div class="admin-console-modal__header">
             <div>
-              <p class="admin-console-kicker">{{ countryIsNew() ? 'Alta' : 'Edició' }}</p>
-              <h3>{{ countryIsNew() ? 'Nou país' : 'Editar país' }}</h3>
+              <p class="admin-console-kicker">{{ countryIsNew() ? 'Alta' : countryDetailEditMode() ? 'Edició' : 'Detall' }}</p>
+              <h3>{{ countryIsNew() ? 'Nou país' : countryDetailEditMode() ? 'Editar país' : 'Detall de país' }}</h3>
             </div>
           </div>
           <div class="admin-console-form admin-console-form--inline">
             <label>
               <span>Codi <strong class="admin-console-required">*</strong></span>
               <input
+                [readonly]="!countryIsNew() && !countryDetailEditMode()"
                 [ngModel]="editableCountry().code"
                 (ngModelChange)="editableCountry.set({ ...editableCountry(), code: $event })"
                 placeholder="p. ex. ES"
@@ -1684,6 +1765,7 @@
             <label>
               <span>Nom <strong class="admin-console-required">*</strong></span>
               <input
+                [readonly]="!countryIsNew() && !countryDetailEditMode()"
                 [ngModel]="editableCountry().name"
                 (ngModelChange)="editableCountry.set({ ...editableCountry(), name: $event })"
               />
@@ -1692,6 +1774,7 @@
               <span>Ordre</span>
               <input
                 type="number"
+                [readonly]="!countryIsNew() && !countryDetailEditMode()"
                 [ngModel]="editableCountry().sortOrder"
                 (ngModelChange)="editableCountry.set({ ...editableCountry(), sortOrder: +$event })"
               />
@@ -1699,6 +1782,7 @@
             <label class="admin-console-inline">
               <input
                 type="checkbox"
+                [disabled]="!countryIsNew() && !countryDetailEditMode()"
                 [ngModel]="editableCountry().isActive"
                 (ngModelChange)="editableCountry.set({ ...editableCountry(), isActive: !!$event })"
               />
@@ -1707,15 +1791,37 @@
           </div>
           <div class="admin-console-modal__footer">
             <div class="admin-console-modal__footer-band">
+              @if (countryIsNew()) {
+                <label class="admin-console-privacy-check">
+                  <input
+                    type="checkbox"
+                    [checked]="createMaintenancePrivacyAccepted()"
+                    (change)="createMaintenancePrivacyAccepted.set($any($event.target).checked)"
+                  />
+                  <span>Accepto les condicions de privacitat d'aquest entorn intern.</span>
+                </label>
+              }
               <div class="admin-console-modal__footer-actions">
-                <button type="button" class="admin-console-primary" (click)="saveCountry()">Desar</button>
-                <button
-                  type="button"
-                  class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button"
-                  (click)="closeCountryModal()"
-                >
-                  Tancar
-                </button>
+                @if (countryIsNew() || countryDetailEditMode()) {
+                  <button
+                    type="button"
+                    class="admin-console-primary admin-console-role-strip__button"
+                    [disabled]="countryIsNew() && !createMaintenancePrivacyAccepted()"
+                    (click)="saveCountry()"
+                  >
+                    Desar
+                  </button>
+                  <button
+                    type="button"
+                    class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button"
+                    (click)="countryIsNew() ? closeCountryModal() : cancelCountryDetailEdit()"
+                  >
+                    {{ countryIsNew() ? 'Tancar' : 'Cancel·lar' }}
+                  </button>
+                } @else {
+                  <button type="button" class="admin-console-primary admin-console-role-strip__button" (click)="beginCountryDetailEdit()">Modificar</button>
+                  <button type="button" class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button" (click)="closeCountryModal()">Tancar</button>
+                }
               </div>
             </div>
           </div>
@@ -1795,18 +1901,20 @@
                     <button
                       type="button"
                       class="admin-console-icon-button"
-                      title="Editar"
-                      aria-label="Editar"
+                      title="Veure detall"
+                      aria-label="Veure detall"
                       (click)="selectCityForEdit(city); $event.stopPropagation()"
                     >
                       <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path
-                          d="M4 20h4l10.5-10.5-4-4L4 16v4ZM12.7 6.3l4 4L21 6l-4-4-4.3 4.3Z"
+                          d="M1.5 12s3.8-7 10.5-7 10.5 7 10.5 7-3.8 7-10.5 7S1.5 12 1.5 12Z"
                           fill="none"
                           stroke="currentColor"
-                          stroke-width="1.6"
+                          stroke-linecap="round"
                           stroke-linejoin="round"
+                          stroke-width="1.8"
                         />
+                        <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8" />
                       </svg>
                     </button>
                     <button
@@ -1841,8 +1949,8 @@
         <section class="admin-console-modal admin-console-modal--detail admin-console-modal--create" (click)="$event.stopPropagation()">
           <div class="admin-console-modal__header">
             <div>
-              <p class="admin-console-kicker">{{ cityIsNew() ? 'Alta' : 'Edició' }}</p>
-              <h3>{{ cityIsNew() ? 'Nova ciutat' : 'Editar ciutat' }}</h3>
+              <p class="admin-console-kicker">{{ cityIsNew() ? 'Alta' : cityDetailEditMode() ? 'Edició' : 'Detall' }}</p>
+              <h3>{{ cityIsNew() ? 'Nova ciutat' : cityDetailEditMode() ? 'Editar ciutat' : 'Detall de ciutat' }}</h3>
             </div>
           </div>
           <div class="admin-console-form admin-console-form--inline">
@@ -1851,11 +1959,11 @@
                 <span>País <strong class="admin-console-required">*</strong></span>
                 <select
                   [ngModel]="editableCity().countryId"
-                  (ngModelChange)="editableCity.set({ ...editableCity(), countryId: $event })"
+                  (ngModelChange)="onCityCountryChange($event)"
                 >
                   <option value="" disabled>Selecciona</option>
-                  @for (c of geographicCountries(); track c.id) {
-                    <option [value]="c.id">{{ c.name }} ({{ c.code }})</option>
+                  @for (countryOption of createCityCountryOptions(); track countryOption.value) {
+                    <option [value]="countryOption.value">{{ countryOption.label }}</option>
                   }
                 </select>
               </label>
@@ -1868,13 +1976,22 @@
             <label>
               <span>Nom <strong class="admin-console-required">*</strong></span>
               <input
+                [readonly]="!cityIsNew() && !cityDetailEditMode()"
                 [ngModel]="editableCity().name"
-                (ngModelChange)="editableCity.set({ ...editableCity(), name: $event })"
+                list="admin-city-name-suggestions"
+                (ngModelChange)="onCityNameInput($event)"
+                (change)="onCityNameSelected($any($event.target).value)"
               />
+              <datalist id="admin-city-name-suggestions">
+                @for (suggestion of cityNameSuggestions(); track suggestion.name + suggestion.countryCode) {
+                  <option [value]="suggestion.displayLabel">{{ suggestion.displayLabel }}</option>
+                }
+              </datalist>
             </label>
             <label>
               <span>Latitud</span>
               <input
+                [readonly]="!cityIsNew() && !cityDetailEditMode()"
                 [ngModel]="editableCity().latitude"
                 (ngModelChange)="editableCity.set({ ...editableCity(), latitude: $event })"
                 placeholder="Opcional"
@@ -1883,6 +2000,7 @@
             <label>
               <span>Longitud</span>
               <input
+                [readonly]="!cityIsNew() && !cityDetailEditMode()"
                 [ngModel]="editableCity().longitude"
                 (ngModelChange)="editableCity.set({ ...editableCity(), longitude: $event })"
                 placeholder="Opcional"
@@ -1892,6 +2010,7 @@
               <span>Ordre</span>
               <input
                 type="number"
+                [readonly]="!cityIsNew() && !cityDetailEditMode()"
                 [ngModel]="editableCity().sortOrder"
                 (ngModelChange)="editableCity.set({ ...editableCity(), sortOrder: +$event })"
               />
@@ -1899,6 +2018,7 @@
             <label class="admin-console-inline">
               <input
                 type="checkbox"
+                [disabled]="!cityIsNew() && !cityDetailEditMode()"
                 [ngModel]="editableCity().isActive"
                 (ngModelChange)="editableCity.set({ ...editableCity(), isActive: !!$event })"
               />
@@ -1907,15 +2027,37 @@
           </div>
           <div class="admin-console-modal__footer">
             <div class="admin-console-modal__footer-band">
+              @if (cityIsNew()) {
+                <label class="admin-console-privacy-check">
+                  <input
+                    type="checkbox"
+                    [checked]="createMaintenancePrivacyAccepted()"
+                    (change)="createMaintenancePrivacyAccepted.set($any($event.target).checked)"
+                  />
+                  <span>Accepto les condicions de privacitat d'aquest entorn intern.</span>
+                </label>
+              }
               <div class="admin-console-modal__footer-actions">
-                <button type="button" class="admin-console-primary" (click)="saveCity()">Desar</button>
-                <button
-                  type="button"
-                  class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button"
-                  (click)="closeCityModal()"
-                >
-                  Tancar
-                </button>
+                @if (cityIsNew() || cityDetailEditMode()) {
+                  <button
+                    type="button"
+                    class="admin-console-primary admin-console-role-strip__button"
+                    [disabled]="cityIsNew() && !createMaintenancePrivacyAccepted()"
+                    (click)="saveCity()"
+                  >
+                    Desar
+                  </button>
+                  <button
+                    type="button"
+                    class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button"
+                    (click)="cityIsNew() ? closeCityModal() : cancelCityDetailEdit()"
+                  >
+                    {{ cityIsNew() ? 'Tancar' : 'Cancel·lar' }}
+                  </button>
+                } @else {
+                  <button type="button" class="admin-console-primary admin-console-role-strip__button" (click)="beginCityDetailEdit()">Modificar</button>
+                  <button type="button" class="admin-console-primary admin-console-primary--secondary admin-console-role-strip__button" (click)="closeCityModal()">Tancar</button>
+                }
               </div>
             </div>
           </div>

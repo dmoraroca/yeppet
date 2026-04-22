@@ -12,7 +12,7 @@ internal static class GeographicAdminEndpoints
 {
     public static IEndpointRouteBuilder MapGeographicAdminEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/admin").RequireAuthorization();
+        var group = app.MapGroup("/api/admin").RequireAuthorization().WithTags("Geographic admin");
 
         group.MapGet("/countries", ListCountriesAsync);
         group.MapGet("/countries/{id:guid}", GetCountryAsync);

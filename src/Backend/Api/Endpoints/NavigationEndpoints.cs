@@ -9,7 +9,7 @@ internal static class NavigationEndpoints
 {
     public static IEndpointRouteBuilder MapNavigationEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/navigation").RequireAuthorization();
+        var group = app.MapGroup("/api/navigation").RequireAuthorization().WithTags("Navigation");
         group.MapGet("/menu", GetMenuAsync);
         return app;
     }

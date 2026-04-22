@@ -4,8 +4,19 @@ using YepPet.Domain.Places.ValueObjects;
 
 namespace YepPet.Application.Places;
 
-internal sealed class PlaceApplicationService(IPlaceRepository placeRepository) : IPlaceApplicationService
+internal sealed class PlaceApplicationService : IPlaceApplicationService
 {
+    private readonly IPlaceRepository placeRepository;
+    private readonly IExternalCitySuggestionProvider externalCitySuggestionProvider;
+
+    public PlaceApplicationService(
+        IPlaceRepository placeRepository,
+        IExternalCitySuggestionProvider externalCitySuggestionProvider)
+    {
+        this.placeRepository = placeRepository;
+        this.externalCitySuggestionProvider = externalCitySuggestionProvider;
+    }
+
     public async Task<PlaceDetailDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var place = await placeRepository.GetByIdAsync(id, cancellationToken);
@@ -29,6 +40,46 @@ internal sealed class PlaceApplicationService(IPlaceRepository placeRepository) 
     public Task<IReadOnlyCollection<string>> GetAvailableCitiesAsync(CancellationToken cancellationToken = default)
     {
         return placeRepository.GetAvailableCitiesAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<PlaceCitySuggestionDto>> SearchAvailableCitiesAsync(
+        PlaceCitySearchRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var normalized = PlaceCityQueryNormalizer.Normalize(request.Q);
+        var limit = Math.Clamp(request.Limit ?? PlaceCitySearchDefaults.DefaultLimit, 1, PlaceCitySearchDefaults.MaxLimit);
+
+        var fromCatalog = await placeRepository.SearchAvailableCitiesAsync(normalized, limit, cancellationToken);
+        var catalogSuggestions = fromCatalog
+            .Select(item => new PlaceCitySuggestionDto(
+                item.City,
+                item.Country,
+                null,
+                PlaceCitySuggestionFormatter.BuildDisplayLabel(item.City, item.Country),
+                "catalog"))
+            .ToArray();
+
+        if (catalogSuggestions.Length >= limit)
+        {
+            return catalogSuggestions;
+        }
+
+        var remaining = limit - catalogSuggestions.Length;
+        var fromExternal = await externalCitySuggestionProvider.SearchCitiesAsync(normalized, remaining, cancellationToken);
+        if (fromExternal.Count == 0)
+        {
+            return catalogSuggestions;
+        }
+
+        return catalogSuggestions
+            .Concat(fromExternal)
+            .Where(item => !string.IsNullOrWhiteSpace(item.City))
+            .GroupBy(
+                item => $"{item.City.Trim().ToLowerInvariant()}|{item.Country.Trim().ToLowerInvariant()}",
+                StringComparer.Ordinal)
+            .Select(group => group.First())
+            .Take(limit)
+            .ToArray();
     }
 
     public async Task<Guid> SaveAsync(PlaceUpsertRequest request, CancellationToken cancellationToken = default)
@@ -141,5 +192,19 @@ internal sealed class PlaceApplicationService(IPlaceRepository placeRepository) 
         return string.IsNullOrWhiteSpace(petCategory)
             ? PetCategory.All
             : Enum.Parse<PetCategory>(petCategory, ignoreCase: true);
+    }
+
+    /// <summary>
+    /// Null-object fallback used when no external provider is configured.
+    /// </summary>
+    private sealed class NullExternalCitySuggestionProvider : IExternalCitySuggestionProvider
+    {
+        public Task<IReadOnlyCollection<PlaceCitySuggestionDto>> SearchCitiesAsync(
+            string normalizedQuery,
+            int limit,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<IReadOnlyCollection<PlaceCitySuggestionDto>>([]);
+        }
     }
 }

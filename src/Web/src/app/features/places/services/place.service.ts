@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { catchError, of } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 import { API_BASE_URL } from '../../../core/config/api.config';
 import { FavoritesService } from '../../favorites/services/favorites.service';
@@ -58,6 +59,34 @@ export class PlaceService {
   getAvailableCities(): string[] {
     return [...new Set(this.placesState().map((place) => place.city))].sort((a, b) =>
       a.localeCompare(b)
+    );
+  }
+
+  async searchCitySuggestions(query: string, limit = 10): Promise<CitySuggestion[]> {
+    const normalized = query.trim();
+    if (normalized.length < 3) {
+      return [];
+    }
+
+    return await firstValueFrom(
+      this.http
+        .get<CitySuggestionApiDto[]>(`${API_BASE_URL}/places/cities/search`, {
+          params: {
+            q: normalized,
+            limit
+          }
+        })
+        .pipe(
+          catchError(() => of([])),
+        ),
+    ).then((items) =>
+      items.map((item) => ({
+        city: item.city,
+        country: this.resolveCountryName(item.country, item.countryCode),
+        countryCode: item.countryCode,
+        displayLabel: this.resolveDisplayLabel(item),
+        source: item.source
+      })),
     );
   }
 
@@ -123,6 +152,35 @@ export class PlaceService {
       }
     };
   }
+
+  private resolveDisplayLabel(item: CitySuggestionApiDto): string {
+    const apiLabel = item.displayLabel?.trim() ?? '';
+    if (apiLabel && apiLabel.includes('(')) {
+      return apiLabel;
+    }
+
+    const city = item.city.trim();
+    const country = this.resolveCountryName(item.country, item.countryCode);
+    return country ? `${city} (${country})` : city;
+  }
+
+  private resolveCountryName(country: string, countryCode: string | null): string {
+    const direct = country?.trim() ?? '';
+    if (direct) {
+      return direct;
+    }
+
+    const code = countryCode?.trim().toUpperCase() ?? '';
+    if (!code) {
+      return '';
+    }
+
+    try {
+      return new Intl.DisplayNames(['ca'], { type: 'region' }).of(code) ?? code;
+    } catch {
+      return code;
+    }
+  }
 }
 
 interface PlaceApiSummaryDto {
@@ -147,4 +205,20 @@ interface PlaceApiSummaryDto {
   reviewCount: number;
   tags: string[];
   features: string[];
+}
+
+interface CitySuggestionApiDto {
+  city: string;
+  country: string;
+  countryCode: string | null;
+  displayLabel: string;
+  source: string;
+}
+
+export interface CitySuggestion {
+  city: string;
+  country: string;
+  countryCode: string | null;
+  displayLabel: string;
+  source: string;
 }

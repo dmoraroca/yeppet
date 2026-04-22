@@ -254,7 +254,7 @@ La Fase I va servir per validar la primera forma usable de YepPet sense dependre
 
 La base funcional que queda consolidada en aquesta fase es:
 
-- projecte base a `yeppet`
+- projecte base a `yeppetº`
 - frontend Angular a `src/Web`
 - `header` i `footer` com a estructura estable de navegacio
 - `home` separada per seccions i no com a una sola peça monolitica

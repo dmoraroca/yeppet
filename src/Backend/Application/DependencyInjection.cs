@@ -57,6 +57,7 @@ public static class DependencyInjection
         services.AddSingleton<IValidator<UserRegistrationRequest>, UserRegistrationRequestValidator>();
         services.AddSingleton<IValidator<UserProfileUpdateRequest>, UserProfileUpdateRequestValidator>();
         services.AddSingleton<IValidator<PlaceUpsertRequest>, PlaceUpsertRequestValidator>();
+        services.AddSingleton<IValidator<PlaceCitySearchRequest>, PlaceCitySearchRequestValidator>();
 
         return services;
     }

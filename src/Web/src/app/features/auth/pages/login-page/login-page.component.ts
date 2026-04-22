@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { ErrorNotificationsService } from '../../../../core/services/error-notifications.service';
+import { CityComboboxComponent } from '../../../../shared/components/city-combobox/city-combobox.component';
 import { PlaceFilters } from '../../../places/models/place.model';
 import { PlaceService } from '../../../places/services/place.service';
 import { AuthService } from '../../services/auth.service';
@@ -10,7 +11,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-login-page',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, CityComboboxComponent],
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.scss']
 })
@@ -154,9 +155,9 @@ export class LoginPageComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  protected onPreviewCity(event: Event): void {
+  protected onPreviewCityChange(city: string): void {
     this.updatePreviewFilters({
-      city: (event.target as HTMLSelectElement).value
+      city
     });
   }
 

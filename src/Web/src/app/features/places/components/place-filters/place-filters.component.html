@@ -14,12 +14,11 @@
   @if (showCity()) {
     <label>
       <span>Ciutat</span>
-      <select [value]="filters().city" (change)="onCity($event)">
-        <option value="">Totes</option>
-        @for (city of cities(); track city) {
-          <option [value]="city">{{ city }}</option>
-        }
-      </select>
+      <app-city-combobox
+        [value]="filters().city"
+        (valueChange)="onCityChange($event)"
+        [staticOptions]="cities()"
+      />
     </label>
   }
 

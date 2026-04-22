@@ -61,6 +61,8 @@
 .login-page__brand img {
   width: 11rem;
   height: auto;
+  max-width: 100%;
+  /* Same as site header: avoid filter stack that can blank the logo */
 }
 
 .login-page__auth-eyebrow {

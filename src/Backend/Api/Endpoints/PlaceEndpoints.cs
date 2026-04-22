@@ -12,10 +12,18 @@ internal static class PlaceEndpoints
 {
     public static IEndpointRouteBuilder MapPlaceEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/places");
-        var adminGroup = app.MapGroup("/api/admin/places").RequireAuthorization();
+        var group = app.MapGroup("/api/places").WithTags("Places");
+        var adminGroup = app.MapGroup("/api/admin/places").RequireAuthorization().WithTags("Places");
 
         group.MapGet("/", SearchAsync);
+        group.MapGet("/cities/search", SearchAvailableCitiesAsync)
+            .WithName("SearchAvailablePlaceCities")
+            .WithSummary("Search distinct cities that have at least one place (typeahead).")
+            .WithDescription(
+                "Returns city names (distinct) whose places match the substring q (case-insensitive). " +
+                "Requires at least 3 valid characters in q after normalization. " +
+                "Optional limit: default 50, maximum 100.");
+
         group.MapGet("/cities", GetAvailableCitiesAsync);
         group.MapGet("/{id:guid}", GetByIdAsync);
         group.MapPost("/", SaveAsync);
@@ -46,6 +54,22 @@ internal static class PlaceEndpoints
         CancellationToken cancellationToken)
     {
         var result = await service.GetAvailableCitiesAsync(cancellationToken);
+        return TypedResults.Ok(result);
+    }
+
+    private static async Task<Results<Ok<IReadOnlyCollection<PlaceCitySuggestionDto>>, ValidationProblem>> SearchAvailableCitiesAsync(
+        [AsParameters] PlaceCitySearchRequest query,
+        IValidator<PlaceCitySearchRequest> validator,
+        IPlaceApplicationService service,
+        CancellationToken cancellationToken)
+    {
+        var validation = validator.Validate(query);
+        if (!validation.IsValid)
+        {
+            return validation.ToValidationProblem();
+        }
+
+        var result = await service.SearchAvailableCitiesAsync(query, cancellationToken);
         return TypedResults.Ok(result);
     }
 

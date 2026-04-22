@@ -212,6 +212,19 @@ export interface UpdateCityRequest {
   sortOrder: number;
 }
 
+export interface GeoNamesCountryOption {
+  code: string;
+  name: string;
+}
+
+export interface GeoNamesCityOption {
+  name: string;
+  countryCode: string;
+  countryName: string;
+  adminName1: string;
+  displayLabel: string;
+}
+
 export interface RoleDefinition {
   id: string;
   key: string;
@@ -505,6 +518,92 @@ export class AdminService {
     return await firstValueFrom(
       this.http.get<CityAdminDto[]>(`${API_BASE_URL}/admin/cities`, { params })
     );
+  }
+
+  async listEuCountriesFromGeoNames(username = 'zuppeto'): Promise<GeoNamesCountryOption[]> {
+    const EU_COUNTRY_CODES = new Set([
+      'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE',
+      'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE'
+    ]);
+
+    try {
+      const payload = await firstValueFrom(
+        this.http.get<{ geonames?: Array<{ countryCode?: string; countryName?: string }> }>(
+          `https://secure.geonames.org/countryInfoJSON?username=${encodeURIComponent(username)}`
+        )
+      );
+
+      const countries = payload.geonames ?? [];
+      return countries
+        .map((country) => ({
+          code: (country.countryCode ?? '').trim().toUpperCase(),
+          name: (country.countryName ?? '').trim()
+        }))
+        .filter((country) => country.code && country.name && EU_COUNTRY_CODES.has(country.code))
+        .sort((left, right) => left.name.localeCompare(right.name, 'ca', { sensitivity: 'base' }));
+    } catch {
+      return [];
+    }
+  }
+
+  async searchCitiesByCountryFromGeoNames(
+    query: string,
+    countryCode: string,
+    limit = 8,
+    username = 'zuppeto'
+  ): Promise<GeoNamesCityOption[]> {
+    const normalizedQuery = query.trim();
+    const normalizedCode = countryCode.trim().toUpperCase();
+    if (normalizedQuery.length < 3 || !normalizedCode) {
+      return [];
+    }
+
+    try {
+      const params = new HttpParams()
+        .set('name_startsWith', normalizedQuery)
+        .set('country', normalizedCode)
+        .set('featureClass', 'P')
+        .set('orderby', 'population')
+        .set('style', 'FULL')
+        .set('maxRows', String(limit))
+        .set('username', username);
+
+      const payload = await firstValueFrom(
+        this.http.get<{
+          geonames?: Array<{
+            name?: string;
+            countryCode?: string;
+            countryName?: string;
+            adminName1?: string;
+          }>;
+        }>('https://secure.geonames.org/searchJSON', { params })
+      );
+
+      const items = payload.geonames ?? [];
+      return items
+        .filter((item) => (item.name ?? '').trim().length > 0)
+        .map((item) => {
+          const name = (item.name ?? '').trim();
+          const resolvedCountryCode = (item.countryCode ?? normalizedCode).trim().toUpperCase();
+          const countryName = (item.countryName ?? '').trim();
+          const adminName1 = (item.adminName1 ?? '').trim();
+          const regionPrefix = resolvedCountryCode === 'ES' && adminName1 ? `${adminName1}, ` : '';
+          const countryPart = countryName ? `${regionPrefix}${countryName}` : resolvedCountryCode;
+          return {
+            name,
+            countryCode: resolvedCountryCode,
+            countryName,
+            adminName1,
+            displayLabel: countryPart ? `${name} (${countryPart})` : name
+          };
+        })
+        .filter(
+          (item, index, all) =>
+            all.findIndex((candidate) => candidate.name.toLowerCase() === item.name.toLowerCase()) === index
+        );
+    } catch {
+      return [];
+    }
   }
 
   async createCity(request: CreateCityRequest): Promise<CityAdminDto> {

@@ -64,12 +64,11 @@
 
         <label class="favorites-page__review-field">
           <span>Ciutat</span>
-          <select [ngModel]="reviewFilters().city" (ngModelChange)="updateReviewCity($event)">
-            <option value="">Totes</option>
-            @for (city of favoriteCities(); track city) {
-              <option [value]="city">{{ city }}</option>
-            }
-          </select>
+          <app-city-combobox
+            [value]="reviewFilters().city"
+            (valueChange)="updateReviewCity($event)"
+            [staticOptions]="favoriteCities()"
+          />
         </label>
 
         <label class="favorites-page__review-field">
