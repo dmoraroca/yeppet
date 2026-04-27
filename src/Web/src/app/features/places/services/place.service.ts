@@ -141,6 +141,12 @@ export class PlaceService {
       shortDescription: place.shortDescription,
       description: place.description,
       imageUrl: place.coverImageUrl,
+      dataProvenance: place.dataProvenance,
+      googlePlaceId: place.googlePlaceId,
+      googleCoordinatesCachedUntil: place.googleCoordinatesCachedUntil,
+      lastGoogleSyncAt: place.lastGoogleSyncAt,
+      googleCoordinatesCacheExpired: place.googleCoordinatesCacheExpired,
+      requiresGoogleMapForGoogleCoordinates: place.requiresGoogleMapForGoogleCoordinates,
       acceptsDogs: place.acceptsDogs,
       acceptsCats: place.acceptsCats,
       rating: place.ratingAverage,
@@ -201,6 +207,12 @@ interface PlaceApiSummaryDto {
   neighborhood: string;
   latitude: number;
   longitude: number;
+  dataProvenance?: string;
+  googlePlaceId?: string | null;
+  googleCoordinatesCachedUntil?: string | null;
+  lastGoogleSyncAt?: string | null;
+  googleCoordinatesCacheExpired?: boolean;
+  requiresGoogleMapForGoogleCoordinates?: boolean;
   acceptsDogs: boolean;
   acceptsCats: boolean;
   petPolicyLabel: string;

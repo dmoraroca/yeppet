@@ -191,6 +191,77 @@
   color: var(--yp-color-primary-dark);
 }
 
+/* Nested accordion: Negoci / Tècnic (click summary to expand links) */
+.site-header__nav-submenu {
+  border-radius: 0.95rem;
+  border: 1px solid rgba(209, 213, 219, 0.55);
+  background: rgba(248, 250, 252, 0.85);
+  margin-bottom: 0.45rem;
+  overflow: hidden;
+}
+
+.site-header__nav-submenu:last-child {
+  margin-bottom: 0;
+}
+
+.site-header__nav-submenu summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--yp-color-text-subtle, #6b7280);
+  user-select: none;
+}
+
+.site-header__nav-submenu summary::-webkit-details-marker {
+  display: none;
+}
+
+.site-header__nav-submenu[open] .site-header__nav-submenu-summary {
+  background: rgba(45, 212, 191, 0.1);
+  color: var(--yp-color-primary-dark, #0f766e);
+}
+
+.site-header__nav-submenu-caret {
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-1px);
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+.site-header__nav-submenu[open] .site-header__nav-submenu-caret {
+  transform: rotate(225deg) translateY(-1px);
+}
+
+.site-header__nav-submenu-panel {
+  padding: 0.15rem 0.35rem 0.45rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.site-header__dropdown-item--in-section {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 0.35rem;
+  margin-left: 0;
+  font-size: 0.95rem;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 600;
+}
+
 .site-header__session {
   display: inline-flex;
   align-items: center;

@@ -16,6 +16,12 @@ export interface Place {
   shortDescription: string;
   description: string;
   imageUrl: string;
+  dataProvenance?: string;
+  googlePlaceId?: string | null;
+  googleCoordinatesCachedUntil?: string | null;
+  lastGoogleSyncAt?: string | null;
+  googleCoordinatesCacheExpired?: boolean;
+  requiresGoogleMapForGoogleCoordinates?: boolean;
   acceptsDogs: boolean;
   acceptsCats: boolean;
   rating: number;

@@ -31,6 +31,7 @@ internal static class AdminEndpoints
         group.MapPut("/permissions/{role:regex(^(?i)(admin|user|viewer|developer)$)}", UpdateRolePermissionsAsync);
         group.MapGet("/menus", GetMenusAsync);
         group.MapPut("/menus/{key}", SaveMenuAsync);
+        group.MapDelete("/menus/{key}", DeleteMenuAsync);
         group.MapGet("/roles", GetRoleDefinitionsAsync);
         group.MapPost("/roles", CreateRoleDefinitionAsync);
         group.MapPut("/roles/{key}", UpdateRoleDefinitionAsync);
@@ -406,6 +407,32 @@ internal static class AdminEndpoints
         }
 
         return TypedResults.Ok(await service.SaveMenuAsync(normalized, cancellationToken));
+    }
+
+    [Authorize]
+    private static async Task<Results<Ok<AdminMenuCatalogDto>, NotFound, Conflict<string>, ForbidHttpResult>> DeleteMenuAsync(
+        ClaimsPrincipal principal,
+        string key,
+        IAdminApplicationService service,
+        CancellationToken cancellationToken)
+    {
+        if (!await principal.HasPermissionAsync(service, "action.permissions.manage", cancellationToken))
+        {
+            return TypedResults.Forbid();
+        }
+
+        var result = await service.DeleteMenuAsync(key, cancellationToken);
+        if (!result.IsSuccess && result.Failure?.Kind == FailureKind.NotFound)
+        {
+            return TypedResults.NotFound();
+        }
+
+        if (!result.IsSuccess)
+        {
+            return TypedResults.Conflict(result.Failure?.Message ?? "Unable to delete menu.");
+        }
+
+        return TypedResults.Ok(result.Value!);
     }
 
     [Authorize]

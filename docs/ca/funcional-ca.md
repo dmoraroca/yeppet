@@ -809,6 +809,17 @@ Regles funcionals del manteniment:
 - l'ordre s'ha de governar de forma explícita i no quedar implícit
 - l'activació d'un menú no ha d'ignorar els permisos: una entrada activa pot continuar oculta per manca de rol
 
+Estructura d'exemple sota el menú d'administració (criteri de producte: separar **Negoci** i **Tècnic** sense multiplicar pantalles):
+
+- Contenidor **Negoci** (`admin.negoci`): dada de producte, operativa, navegació i **territori** (documentació, usuaris, menús, catàleg de llocs, **països**, **ciutats**).
+- Contenidor **Tècnic** (`admin.tecnic`): govern de plataforma (p. ex. **permisos** i **rols**).
+- Aquests contenidors no canvien per si sols el model de **permisos** (`page.*`, `action.*`); guien l'**ordre i el grup** al desplegable de navegació. El detall de claus, seed i API queda a `docs/ca/tecnic-ca.md` (**§2.11.5**).
+
+Esborrat d'una entrada de menú:
+
+- ha de ser possible esborrar una entrada que ja no calgui, sempre que no tingui **submenús** dependents; si en té, cal reubicar o esborrar els fills abans (regla de coherència del catàleg).
+- l'operació d'esborrat respecta el mateix govern de rols i permisos que la resta de manteniments d'administració (només usuaris amb permís adequat; veure tècnic **§2.11.5**).
+
 L'objectiu funcional d'aquesta pantalla és governar la navegació interna i funcional del producte amb criteri explícit, evitant dependències amagades o configuracions disperses al codi.
 
 ### 3.13 Manteniment de permisos
@@ -1665,12 +1676,65 @@ Rutes internes actuals:
 - `/admin/permisos`
 - `/admin/menus`
 
-## 12. Referencia documental
+## 12. Política de contingut extern (Google Places i Google Search)
+
+Per al bloc de llocs, es defineix aquesta regla funcional de compliment:
+
+- el **cataleg de producte** es basa en llocs persistits a `Zuppeto` (dades pròpies i regles de governança), amb suport extern quan calgui cobertura o enriquiment.
+- `Google Places` es fa servir com a **font de descobriment i fitxa de referencia** quan cal completar el cataleg (incloent identificador extern i dades d'emplaçament segons el cas), no com a substitut del model de dades intern.
+- `Google Search` es pot usar com a suport de context (snippets/enllaços), no com a font de veritat unica per al camp `pet friendly`.
+- qualsevol contingut de tercers es mostra subjecte als termes vigents del proveidor i amb atribucio quan sigui requerida.
+
+### 12.1 Text base per a politica de privacitat (esborrany funcional)
+
+`Zuppeto` pot consultar APIs externes de Google (`Google Places` i, quan pertoqui, `Google Search`) per enriquir resultats de locals. Aquestes consultes es fan amb finalitat de descoberta i millora de qualitat del cataleg, aplicant minimitzacio de dades i sense enviar mes dades personals de les estrictament necessaries per al servei.
+
+### 12.2 Text base per a avis legal / copyright (esborrany funcional)
+
+Part de la informacio de fitxa i del contingut visual dels locals pot provenir de serveis de Google. Aquest contingut es mostra d'acord amb els termes de `Google Maps Platform` i/o dels serveis de cerca aplicables, incloent atribucio quan sigui obligatoria. `Zuppeto` mantindra mecanismes de revisio i retirada de contingut davant reclamacions justificades de drets.
+
+### 12.3 Regles funcionals per a imatges de locals
+
+- font prioritaria: fotos oficials obtingudes via API oficial (`Google Places Photo`) o fonts propies verificades.
+- no es considera valid reutilitzar imatges extretes directament de cercadors sense marc legal clar.
+- per cada imatge s'ha de conservar traca minima de font i atribucio per poder auditar origen i condicions d'us.
+
+### 12.4 Decisio funcional: cataleg Zuppeto + Google + enriquiment Gemini
+
+Per al producte actual, es fixa aquesta decisio funcional:
+
+- el **nucli** del producte es el cataleg intern de `Zuppeto` (identitat, politica pet-friendly, favorits, cerca, etc.).
+- `Google Places` es la font externa principal per **descobrir i completar** locals quan el cataleg no en te prou (incloent identificador extern estable i dades d'emplaçament segons el cas d'us).
+- `Gemini` es fa servir com a capa d'enriquiment (resums, context i senyals complementaries), no com a substitut de la fitxa base.
+- els camps inferits per IA s'han de marcar com a generats automaticament i amb nivell de confianca.
+- per al criteri `pet friendly`, preval sempre la regla `manual > auto`.
+
+### 12.5 Alineament amb Google Maps Platform (regles de producte)
+
+Objectiu: compatibilitat amb l'esperit dels termes d'us de `Google Maps Platform` sense confondre l'usuari.
+
+- **Procedencia explícita per local**: cada fitxa ha de saber si el contingut d'emplaçament i identitat pro ve majoritariament de `Zuppeto` o si inclou dades de `Google Places` (fins i tot com a metadada visible en disseny, si cal).
+- **Mapa OSM (actual) = capa "Zuppeto"**: el mapa amb `OpenStreetMap` mostra **només** el que el producte tracta com a coordenades **pròpies** o del cataleg intern (no com a re-presentacio d'un servei "mirall" de Google).
+- **Contingut Google = capa "Google"**: quan un local es basa en dades de `Google Places`, el producte ofereix una **experiencia de mapa/ fitxa d'acord amb el que exigeix Google** (incloent, si escau, atribucio visible i el paquet d'UI que imposi el cas: mapa Google o elements de brand/powered-by segons el disseny tancat).
+- **No "barrejar" en la mateixa capa de mapa sense regles**: no es reprojecta el pin de Google sobre el mapa OSM com a solucio per defecte; es separa en dues visualitzacions o en estats de producte clars.
+- **Caché i coordenades**: el que es pugui emmagatzemar de Google es fa amb **cicles de refresh** (no com a "base permanent sense control"), especialment per coordenades; el identificador estable (`place_id` / clau de procedencia) i la traça de sync son part del disseny. Els detalls de període i camp es concretaran al tecnic segons el ToS vigent.
+- **Model de dades intern**: el catàleg pot persistir **procedència de dades** (p. ex. intern vs integració Google), **identificador de lloc Google** quan apliqui, i **metadades de caché o sincronització** de coordenades, per alinear la UI (dues capes de mapa, expiració, etc.) amb aquestes regles. El disseny de columnes, migració i DTOs està a `docs/ca/tecnic-ca.md` (**§2.11.4**).
+- **Contingut mostrat "tal qual"** quan la font es Google: no es reescriu el nom/adreces/categories d'origen Google com si fossin creades per `Zuppeto`; la capa de valor de `Zuppeto` (pet friendly, comunitat, IA) es mostra a banda o clarament etiquetada.
+
+### 12.6 Diferenciacio funcional Free vs PRO
+
+Aquest model es planifica com a diferenciador de producte:
+
+- versio Free: consulta i visualitzacio de dades **base** del local al cataleg `Zuppeto` (amb descobriment/integracio Google on calgui, sense convertir l'app en un substitut de Google Maps).
+- versio PRO: enriquiment amb IA (`Gemini`) per facilitar decisio (context ampliat, resum intel-ligent i millor prioritzacio de resultats), sempre amb traça de procedencia i `manual > auto` on toqui.
+- el valor PRO no es "tenir un local", sino obtenir millor qualitat de decisio i estalvi de temps.
+
+## 13. Referencia documental
 
 Document tecnic:
 
-- [`tecnic-ca.md`](/home/dmoraroca/Documents/_DATA/repos/yeppet/docs/ca/tecnic-ca.md)
+- [`tecnic-ca.md`](tecnic-ca.md)
 
 Document de fases:
 
-- [`project-phases.md`](/home/dmoraroca/Documents/_DATA/repos/yeppet/docs/project-phases.md)
+- [`../project-phases.md`](../project-phases.md)

@@ -20,4 +20,8 @@ public interface IMenuRepository
         string menuKey,
         IReadOnlyCollection<string> roles,
         CancellationToken cancellationToken = default);
+
+    Task<bool> HasChildMenusAsync(string parentKey, CancellationToken cancellationToken = default);
+
+    Task<bool> TryDeleteByKeyAsync(string key, CancellationToken cancellationToken = default);
 }

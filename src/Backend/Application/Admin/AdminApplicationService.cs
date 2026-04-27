@@ -246,6 +246,30 @@ internal sealed class AdminApplicationService(
         return await GetMenusAsync(cancellationToken);
     }
 
+    public async Task<Result<AdminMenuCatalogDto>> DeleteMenuAsync(string key, CancellationToken cancellationToken = default)
+    {
+        var normalized = (key ?? string.Empty).Trim();
+        if (string.IsNullOrEmpty(normalized))
+        {
+            return Result<AdminMenuCatalogDto>.Fail(FailureKind.Conflict, "La clau del menú és obligatòria.");
+        }
+
+        if (await menuRepository.HasChildMenusAsync(normalized, cancellationToken))
+        {
+            return Result<AdminMenuCatalogDto>.Fail(
+                FailureKind.Conflict,
+                "No es pot esborrar: aquest menú té submenús. Esborra o reubica els fills primer.");
+        }
+
+        var deleted = await menuRepository.TryDeleteByKeyAsync(normalized, cancellationToken);
+        if (!deleted)
+        {
+            return Result<AdminMenuCatalogDto>.Fail(FailureKind.NotFound, "Menú no trobat.");
+        }
+
+        return Result<AdminMenuCatalogDto>.Success(await GetMenusAsync(cancellationToken));
+    }
+
     public async Task<IReadOnlyCollection<string>> GetPermissionKeysByRoleAsync(
         string role,
         CancellationToken cancellationToken = default)

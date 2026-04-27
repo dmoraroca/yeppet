@@ -19,7 +19,11 @@ public sealed class Place : AggregateRoot<Guid>
         GeoLocation location,
         PetPolicy petPolicy,
         Pricing pricing,
-        RatingSnapshot rating) : base(id)
+        RatingSnapshot rating,
+        PlaceDataProvenance dataProvenance = PlaceDataProvenance.Internal,
+        string? googlePlaceId = null,
+        DateTimeOffset? googleCoordinatesCachedUntil = null,
+        DateTimeOffset? lastGoogleSyncAt = null) : base(id)
     {
         Rename(name);
         UpdateDescriptions(shortDescription, description);
@@ -30,6 +34,7 @@ public sealed class Place : AggregateRoot<Guid>
         PetPolicy = petPolicy;
         Pricing = pricing;
         Rating = rating;
+        SetDataProvenance(dataProvenance, googlePlaceId, googleCoordinatesCachedUntil, lastGoogleSyncAt);
     }
 
     public string Name { get; private set; } = string.Empty;
@@ -55,6 +60,20 @@ public sealed class Place : AggregateRoot<Guid>
     public IReadOnlyCollection<string> Tags => _tags.AsReadOnly();
 
     public IReadOnlyCollection<string> Features => _features.AsReadOnly();
+
+    public PlaceDataProvenance DataProvenance { get; private set; } = PlaceDataProvenance.Internal;
+
+    /// <summary>
+    /// Google Places <c>place_id</c> when the record is linked to Google Places content.
+    /// </summary>
+    public string? GooglePlaceId { get; private set; }
+
+    /// <summary>
+    /// Upper bound for caching Google-sourced coordinates (operational compliance control).
+    /// </summary>
+    public DateTimeOffset? GoogleCoordinatesCachedUntil { get; private set; }
+
+    public DateTimeOffset? LastGoogleSyncAt { get; private set; }
 
     public void Rename(string name)
     {
@@ -123,6 +142,23 @@ public sealed class Place : AggregateRoot<Guid>
     {
         _features.Clear();
         _features.AddRange(NormalizeLabels(features));
+    }
+
+    public void SetDataProvenance(
+        PlaceDataProvenance dataProvenance,
+        string? googlePlaceId,
+        DateTimeOffset? googleCoordinatesCachedUntil,
+        DateTimeOffset? lastGoogleSyncAt)
+    {
+        DataProvenance = dataProvenance;
+        GooglePlaceId = string.IsNullOrWhiteSpace(googlePlaceId) ? null : googlePlaceId.Trim();
+        GoogleCoordinatesCachedUntil = googleCoordinatesCachedUntil;
+        LastGoogleSyncAt = lastGoogleSyncAt;
+
+        if (DataProvenance is PlaceDataProvenance.GooglePlaces or PlaceDataProvenance.Mixed && string.IsNullOrWhiteSpace(GooglePlaceId))
+        {
+            throw new DomainRuleException("Google Place ID is required when data provenance references Google Places.");
+        }
     }
 
     private static IReadOnlyCollection<string> NormalizeLabels(IEnumerable<string> values)

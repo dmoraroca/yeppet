@@ -102,6 +102,27 @@ public sealed class PlaceConfiguration : IEntityTypeConfiguration<PlaceRecord>
             .HasDefaultValue(0)
             .IsRequired();
 
+        builder.Property(place => place.DataProvenance)
+            .HasColumnName("data_provenance")
+            .HasMaxLength(40)
+            .HasDefaultValue("Internal")
+            .IsRequired();
+
+        builder.Property(place => place.GooglePlaceId)
+            .HasColumnName("google_place_id")
+            .HasMaxLength(256);
+
+        builder.Property(place => place.GoogleCoordinatesCachedUntil)
+            .HasColumnName("google_coordinates_cached_until");
+
+        builder.Property(place => place.LastGoogleSyncAt)
+            .HasColumnName("last_google_sync_at");
+
+        builder.HasIndex(place => place.GooglePlaceId)
+            .IsUnique()
+            .HasDatabaseName("ux_places_google_place_id")
+            .HasFilter("google_place_id IS NOT NULL");
+
         builder.HasIndex(place => place.City)
             .HasDatabaseName("ix_places_city");
 

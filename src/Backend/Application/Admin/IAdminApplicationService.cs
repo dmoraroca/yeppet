@@ -40,6 +40,8 @@ public interface IAdminApplicationService
         SaveMenuRequest request,
         CancellationToken cancellationToken = default);
 
+    Task<Result<AdminMenuCatalogDto>> DeleteMenuAsync(string key, CancellationToken cancellationToken = default);
+
     Task<IReadOnlyCollection<string>> GetPermissionKeysByRoleAsync(
         string role,
         CancellationToken cancellationToken = default);

@@ -242,5 +242,6 @@ erDiagram
 - Integritat:
   - claus uniques de cataleg (`permissions.key`, `menus.key`, `tags.code`, `features.code`, `countries.code`, etc.).
   - restriccions a `places` i `place_reviews` (rang score/rating, review_count no negatiu, etc.).
+- `places` (ampliació recents): metadates de **procedència** i vincle amb **Google** quan apliqui (`data_provenance`, `google_place_id`, caché de coordenades i darrera sincronització), amb **índex únic parcial** sobre `google_place_id` on no sigui `NULL`. Resum tècnic: `docs/ca/tecnic-ca.md` (**§2.11.4**).
 - `permissions.scope_payload` es tracta com a JSON lògic de domini, encara que físicament sigui `text`.
 - `place_search_queries` i `place_search_query_results` s'utilitzen com a cache persistent i traçabilitat de cerques de `places` (patró lazy).

@@ -27,7 +27,11 @@ internal static class PlacePersistenceMapper
                 record.PetPolicyLabel,
                 record.PetPolicyNotes ?? string.Empty),
             new Pricing(record.PricingLabel),
-            new RatingSnapshot(record.RatingAverage, record.ReviewCount));
+            new RatingSnapshot(record.RatingAverage, record.ReviewCount),
+            ParseDataProvenance(record.DataProvenance),
+            record.GooglePlaceId,
+            record.GoogleCoordinatesCachedUntil,
+            record.LastGoogleSyncAt);
 
         place.ReplaceTags(
             record.PlaceTags
@@ -68,6 +72,10 @@ internal static class PlacePersistenceMapper
         record.PricingLabel = place.Pricing.DisplayLabel;
         record.RatingAverage = place.Rating.Average;
         record.ReviewCount = place.Rating.ReviewCount;
+        record.DataProvenance = place.DataProvenance.ToString();
+        record.GooglePlaceId = place.GooglePlaceId;
+        record.GoogleCoordinatesCachedUntil = place.GoogleCoordinatesCachedUntil;
+        record.LastGoogleSyncAt = place.LastGoogleSyncAt;
     }
 
     public static void SyncCollections(Place place, PlaceRecord record)
@@ -136,5 +144,17 @@ internal static class PlacePersistenceMapper
             .Where(value => !string.IsNullOrWhiteSpace(value))
             .Select(value => value.Trim())
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static PlaceDataProvenance ParseDataProvenance(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return PlaceDataProvenance.Internal;
+        }
+
+        return Enum.TryParse<PlaceDataProvenance>(value, ignoreCase: true, out var parsed)
+            ? parsed
+            : PlaceDataProvenance.Internal;
     }
 }

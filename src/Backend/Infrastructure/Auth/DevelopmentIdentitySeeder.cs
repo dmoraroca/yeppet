@@ -122,14 +122,16 @@ public sealed class DevelopmentIdentitySeeder(
         new("help.general", "Com funciona", "/ajuda", "help", 10, true),
         new("help.contact", "Contacta'ns", "/contacte", "help", 20, true),
         new("admin", "Del administrador", null, null, 60, true),
-        new("admin.documentation", "Documentació", "/admin/documentacio", "admin", 10, true),
-        new("admin.users", "Usuaris", "/admin/usuaris", "admin", 20, true),
-        new("admin.permissions", "Permisos", "/admin/permisos", "admin", 30, true),
-        new("admin.roles", "Rols", "/admin/rols", "admin", 35, true),
-        new("admin.menus", "Menús", "/admin/menus", "admin", 40, true),
-        new("admin.places", "Llocs", "/admin/llocs", "admin", 50, true),
-        new("admin.countries", "Països", "/admin/paisos", "admin", 60, true),
-        new("admin.cities", "Ciutats", "/admin/ciutats", "admin", 70, true)
+        new("admin.negoci", "Negoci", null, "admin", 10, true),
+        new("admin.tecnic", "Permisos i rols", null, "admin", 20, true),
+        new("admin.documentation", "Documentació", "/admin/documentacio", "admin.negoci", 10, true),
+        new("admin.users", "Usuaris", "/admin/usuaris", "admin.negoci", 20, true),
+        new("admin.menus", "Menús", "/admin/menus", "admin.negoci", 30, true),
+        new("admin.places", "Catàleg de llocs", "/admin/llocs", "admin.negoci", 40, true),
+        new("admin.countries", "Països", "/admin/paisos", "admin.negoci", 50, true),
+        new("admin.cities", "Ciutats", "/admin/ciutats", "admin.negoci", 60, true),
+        new("admin.permissions", "Permisos", "/admin/permisos", "admin.tecnic", 10, true),
+        new("admin.roles", "Rols", "/admin/rols", "admin.tecnic", 20, true)
     ];
 
     private static readonly IReadOnlyDictionary<string, string[]> MenuRoleSeeds =
@@ -165,6 +167,7 @@ public sealed class DevelopmentIdentitySeeder(
                 "help.general",
                 "help.contact",
                 "admin",
+                "admin.negoci",
                 "admin.documentation"
             ],
             ["Admin"] =
@@ -177,12 +180,14 @@ public sealed class DevelopmentIdentitySeeder(
                 "help.general",
                 "help.contact",
                 "admin",
+                "admin.negoci",
+                "admin.tecnic",
                 "admin.documentation",
                 "admin.users",
+                "admin.places",
                 "admin.permissions",
                 "admin.roles",
                 "admin.menus",
-                "admin.places",
                 "admin.countries",
                 "admin.cities"
             ]

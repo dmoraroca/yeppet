@@ -162,7 +162,8 @@ export class AuthService {
         this.http.get<NavigationMenuItem[]>(`${API_BASE_URL}/navigation/menu`)
       );
 
-      const withGeographic = this.ensureGeographicAdminLinks(menu);
+      const withReparented = this.reparentGeographicMenuItemsToNegoci(menu);
+      const withGeographic = this.ensureGeographicAdminLinks(withReparented);
       const normalized = this.normalizeNavigationMenu(withGeographic);
       this.navigationMenuState.set(normalized.length > 0 ? normalized : this.buildFallbackNavigationMenu());
     } catch {
@@ -384,44 +385,67 @@ export class AuthService {
       }
     ];
 
-    const adminChildren: NavigationMenuItem[] = [];
-
+    const negoci: NavigationMenuItem[] = [];
     if (this.canAccessDocumentation()) {
-      adminChildren.push({
+      negoci.push({
         key: 'admin.documentation',
         label: 'Documentació',
         route: '/admin/documentacio',
         children: []
       });
     }
-
     if (this.canManageUsers()) {
-      adminChildren.push({
+      negoci.push({
         key: 'admin.users',
         label: 'Usuaris',
         route: '/admin/usuaris',
         children: []
       });
     }
-
     if (this.canManagePermissions()) {
-      adminChildren.push({
-        key: 'admin.permissions',
-        label: 'Permisos',
-        route: '/admin/permisos',
-        children: []
-      });
-
-      adminChildren.push({
+      negoci.push({
         key: 'admin.menus',
         label: 'Menús',
         route: '/admin/menus',
         children: []
       });
     }
+    if (this.canManagePlaces()) {
+      negoci.push({
+        key: 'admin.places',
+        label: 'Catàleg de llocs',
+        route: '/admin/llocs',
+        children: []
+      });
+    }
+    if (this.canManageCountryCatalog()) {
+      negoci.push({
+        key: 'admin.countries',
+        label: 'Països',
+        route: '/admin/paisos',
+        children: []
+      });
+    }
+    if (this.canManageCityCatalog()) {
+      negoci.push({
+        key: 'admin.cities',
+        label: 'Ciutats',
+        route: '/admin/ciutats',
+        children: []
+      });
+    }
 
+    const tecnic: NavigationMenuItem[] = [];
+    if (this.canManagePermissions()) {
+      tecnic.push({
+        key: 'admin.permissions',
+        label: 'Permisos',
+        route: '/admin/permisos',
+        children: []
+      });
+    }
     if (this.canManageRoles()) {
-      adminChildren.push({
+      tecnic.push({
         key: 'admin.roles',
         label: 'Rols',
         route: '/admin/rols',
@@ -429,31 +453,12 @@ export class AuthService {
       });
     }
 
-    if (this.canManagePlaces()) {
-      adminChildren.push({
-        key: 'admin.places',
-        label: 'Llocs',
-        route: '/admin/llocs',
-        children: []
-      });
+    const adminChildren: NavigationMenuItem[] = [];
+    if (negoci.length > 0) {
+      adminChildren.push({ key: 'admin.negoci', label: 'Negoci', route: null, children: negoci });
     }
-
-    if (this.canManageCountryCatalog()) {
-      adminChildren.push({
-        key: 'admin.countries',
-        label: 'Països',
-        route: '/admin/paisos',
-        children: []
-      });
-    }
-
-    if (this.canManageCityCatalog()) {
-      adminChildren.push({
-        key: 'admin.cities',
-        label: 'Ciutats',
-        route: '/admin/ciutats',
-        children: []
-      });
+    if (tecnic.length > 0) {
+      adminChildren.push({ key: 'admin.tecnic', label: 'Permisos i rols', route: null, children: tecnic });
     }
 
     if (this.canAccessAdminMenu() || adminChildren.length > 0) {
@@ -469,6 +474,75 @@ export class AuthService {
   }
 
   /**
+   * If the API still returns `admin.countries` / `admin.cities` under `admin.tecnic` (stale DB or
+   * cache), move them under `admin.negoci` in-memory so the UI matches the intended catalog.
+   */
+  private reparentGeographicMenuItemsToNegoci(items: NavigationMenuItem[]): NavigationMenuItem[] {
+    return items.map((item) => {
+      if (item.key !== 'admin' || item.children.length === 0) {
+        return item;
+      }
+
+      const negoci = item.children.find((c) => c.key === 'admin.negoci');
+      const tecnic = item.children.find((c) => c.key === 'admin.tecnic');
+      if (!negoci || !tecnic) {
+        return item;
+      }
+
+      const moveKeys = new Set(['admin.countries', 'admin.cities']);
+      const fromTecnic = tecnic.children.filter((ch) => moveKeys.has(ch.key));
+      if (fromTecnic.length === 0) {
+        return item;
+      }
+
+      const tecnicRest = tecnic.children.filter((ch) => !moveKeys.has(ch.key));
+      const byKey = new Map(negoci.children.map((c) => [c.key, c] as const));
+      for (const ch of fromTecnic) {
+        byKey.set(ch.key, ch);
+      }
+
+      const keyOrder = [
+        'admin.documentation',
+        'admin.users',
+        'admin.menus',
+        'admin.places',
+        'admin.countries',
+        'admin.cities'
+      ] as const;
+      const orderIndex = (k: string): number => {
+        const i = (keyOrder as readonly string[]).indexOf(k);
+        return i >= 0 ? i : 200;
+      };
+
+      const ordered: NavigationMenuItem[] = [];
+      for (const k of keyOrder) {
+        const n = byKey.get(k);
+        if (n) {
+          ordered.push(n);
+          byKey.delete(k);
+        }
+      }
+      for (const n of byKey.values()) {
+        ordered.push(n);
+      }
+      ordered.sort((a, b) => orderIndex(a.key) - orderIndex(b.key));
+
+      return {
+        ...item,
+        children: item.children.map((c) => {
+          if (c.key === 'admin.negoci') {
+            return { ...c, children: ordered };
+          }
+          if (c.key === 'admin.tecnic') {
+            return { ...c, children: tecnicRest, label: 'Permisos i rols' };
+          }
+          return c;
+        })
+      };
+    });
+  }
+
+  /**
    * El menú des de l’API ve de les taules `menus` / `menu_roles`. Si encara no s’han afegit
    * entrades d’admin al seed però el rol ja té permisos de pàgina al JWT, injectem
    * enllaços de manteniment intern aquí.
@@ -479,38 +553,69 @@ export class AuthService {
         return item;
       }
 
-      let children = item.children.map((c) => ({ ...c, children: c.children.map((x) => ({ ...x })) }));
+      let next = { ...item, children: item.children.map((c) => this.cloneMenuBranch(c)) };
 
-      if (this.canManagePlaces() && !children.some((c) => c.key === 'admin.places')) {
-        children = [
-          ...children,
-          { key: 'admin.places', label: 'Llocs', route: '/admin/llocs', children: [] }
-        ];
+      const inject = (link: NavigationMenuItem, underGroup: 'admin.negoci' | 'admin.tecnic'): void => {
+        if (this.adminMenuContainsKeyDeep(next, link.key)) {
+          return;
+        }
+        const groupIndex = next.children.findIndex((c) => c.key === underGroup);
+        if (groupIndex < 0) {
+          next = {
+            ...next,
+            children: [...next.children, link]
+          };
+          return;
+        }
+        const group = next.children[groupIndex]!;
+        next = {
+          ...next,
+          children: next.children.map((c, i) =>
+            i === groupIndex
+              ? { ...c, children: [...c.children, { ...link, children: link.children.map((x) => ({ ...x })) }] }
+              : c
+          )
+        };
+      };
+
+      if (this.canManagePlaces() && !this.adminMenuContainsKeyDeep(next, 'admin.places')) {
+        inject(
+          { key: 'admin.places', label: 'Catàleg de llocs', route: '/admin/llocs', children: [] },
+          'admin.negoci'
+        );
       }
 
-      if (this.canManageCountryCatalog() && !children.some((c) => c.key === 'admin.countries')) {
-        children = [
-          ...children,
-          { key: 'admin.countries', label: 'Països', route: '/admin/paisos', children: [] }
-        ];
+      if (this.canManageCountryCatalog() && !this.adminMenuContainsKeyDeep(next, 'admin.countries')) {
+        inject(
+          { key: 'admin.countries', label: 'Països', route: '/admin/paisos', children: [] },
+          'admin.negoci'
+        );
       }
 
-      if (this.canManageCityCatalog() && !children.some((c) => c.key === 'admin.cities')) {
-        children = [
-          ...children,
-          { key: 'admin.cities', label: 'Ciutats', route: '/admin/ciutats', children: [] }
-        ];
+      if (this.canManageCityCatalog() && !this.adminMenuContainsKeyDeep(next, 'admin.cities')) {
+        inject(
+          { key: 'admin.cities', label: 'Ciutats', route: '/admin/ciutats', children: [] },
+          'admin.negoci'
+        );
       }
 
-      if (this.canManageRoles() && !children.some((c) => c.key === 'admin.roles')) {
-        children = [
-          ...children,
-          { key: 'admin.roles', label: 'Rols', route: '/admin/rols', children: [] }
-        ];
+      if (this.canManageRoles() && !this.adminMenuContainsKeyDeep(next, 'admin.roles')) {
+        inject({ key: 'admin.roles', label: 'Rols', route: '/admin/rols', children: [] }, 'admin.tecnic');
       }
 
-      return { ...item, children };
+      return next;
     });
+  }
+
+  private cloneMenuBranch(node: NavigationMenuItem): NavigationMenuItem {
+    return { ...node, children: node.children.map((c) => this.cloneMenuBranch(c)) };
+  }
+
+  private adminMenuContainsKeyDeep(node: NavigationMenuItem, key: string): boolean {
+    if (node.key === key) {
+      return true;
+    }
+    return node.children.some((c) => this.adminMenuContainsKeyDeep(c, key));
   }
 
   private normalizeNavigationMenu(items: NavigationMenuItem[]): NavigationMenuItem[] {
@@ -527,7 +632,12 @@ export class AuthService {
         return {
           ...item,
           label: this.role()?.toLowerCase() === 'developer' ? 'Del desenvolupador' : 'Del administrador',
-          children: item.children.map((child) => ({ ...child }))
+          children: item.children.map((child) => {
+            if (child.key === 'admin.tecnic') {
+              return { ...child, label: 'Permisos i rols' };
+            }
+            return { ...child };
+          })
         };
       });
   }

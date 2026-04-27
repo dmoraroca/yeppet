@@ -460,6 +460,20 @@ Resum del diagrama:
 - el domini **no** referencia el client AMQP
 - només `Infrastructure` pot obrir connexió cap al servidor; quan s'afegeixin publicadors o consumidors, han de viure en aquesta capa o en adaptadors cridats des de `Application` mitjançant interfícies pròpies, no des del domini
 
+### 2.10.3 Build .NET a l'host i permisos a `obj-local` / `bin-local`
+
+Quan l'`API` o altres processos s'executen dins de **Docker** amb volums muntats al codi del repositori, les carpetes de sortida de build (sovint `obj-local` i `bin-local` sota `src/Backend/**`) poden quedar creades amb un **uid/gid** que no coincideixen amb l'usuari de desenvolupament a la màquina host (p. ex. `nobody` / `root`).
+
+Efecte típic: `dotnet build`, `dotnet restore` o `dotnet ef` fallen amb **“Permission denied”** en escriure a `obj`/`obj-local`.
+
+Mesures habituals a l'entorn de desenvolupament:
+
+- Ajustar **propietat** d'aquestes carpetes a l'usuari que compila a l'host, o
+- **Eliminar-les** (quan sigui segur) abans d'un build net a l'host, o
+- Fer `dotnet build` **només** dins del mateix entorn (contenidor) que les va generar, sense barrejar amb build a l'host sobre el mateix arbre de fitxers.
+
+Això afecta sobretot la reproductibilitat d'`Entity Framework` i l'arrencada de l'API quan l'entrada aplica `database update` al iniciar: si el model no compila o la migració no s'aplica, el contenidor d'API pot sortir i la web (p. ex. després d'un F5) es queda sense backend.
+
 ## 3. Arquitectura aplicada
 
 ### 2.11 Obertura tècnica de Fase IV
@@ -486,7 +500,7 @@ La decisió de base per al model de rols queda fixada així:
 - `USER`: sense accés a documentació interna ni a fitxers `.md`
 - `DEVELOPER`: amb accés funcional al producte (`places`, `place detail` i resta de fluxos funcionals)
 - `DEVELOPER`: accés de lectura a informació funcional i a fitxers `.md` de documentació interna
-- `DEVELOPER`: veurà el menú `ADMIN` només com a contenidor d'entrada a `Documentació`
+- `DEVELOPER`: veurà el menú `ADMIN` com a contenidor, amb accés a `Documentació` dins del grup **Negoci** (veure **§2.11.5** per a l’arbre de seed)
 - `DEVELOPER`: perfil pensat per consulta interna, no necessàriament per administració funcional
 - `ADMIN`: accés complet a totes les operacions actuals i futures
 - `ADMIN`: visibilitat i accés al menú `ADMIN`
@@ -617,6 +631,91 @@ Exemple de payload de resposta (preview extern):
   }
 ]
 ```
+
+Decisio tecnica acordada per al següent increment (alineada amb funcional):
+
+- el cataleg persistent de `places` queda com a **font de producte**; `Google Places` queda com a **proveïdor de descobriment i completar dades** quan calgui (incloent identificador estable `place_id` / `externalId` i camps d'emplaçament segons el cas).
+- el client actual mostra mapa amb `Leaflet` + `OpenStreetMap` com a **capa "Zuppeto"**; el disseny funcional exigeix separar la presentacio de contingut **origen Google** (veure `docs/ca/funcional-ca.md` **§12.5**).
+- `Gemini` queda com a capa d'enriquiment (resum, context i senyals inferits), mai com a substitut de la fitxa base.
+- la sortida inferida per IA s'ha de persistir amb metadades de traçabilitat (`source`, `confidence`, `generatedAtUtc`, versio de prompt/estrategia).
+- la governanca del camp `pet friendly` manté regla estricta `manual > auto`.
+
+Contracte tecnic objectiu per enriquiment IA (proposta v1):
+
+```json
+{
+  "placeId": "uuid-intern",
+  "externalSource": "google_places",
+  "externalId": "google-place-id",
+  "ai": {
+    "provider": "gemini",
+    "summary": "text curt d'enriquiment",
+    "petFriendlyAuto": "yes|no|unknown",
+    "confidence": 0.0,
+    "generatedAtUtc": "2026-04-26T00:00:00Z",
+    "strategyVersion": "v1"
+  }
+}
+```
+
+Diferenciacio tecnica prevista de producte:
+
+- Free: consulta de fitxa base (`places`) sobre cataleg intern; `Google Places` com a suport de cobertura quan calgui, sense convertir l'API en un reemplaç de Google Maps.
+- PRO: habilitacio d'enriquiment IA (`Gemini`) amb control de quota, cache i refresh asíncron.
+
+Compliment i contingut visual (resum tecnic):
+
+- les imatges de locals han de venir d'API oficial (`Google Places Photo`) o fonts amb llicencia verificable.
+- no es considera valida la reutilitzacio d'imatges extretes directament de cercadors sense marc legal clar.
+- el runtime ha de conservar metadades minimes per auditoria (`sourceType`, `externalId`, `attributionText`, `fetchedAtUtc`, `termsScope`).
+
+### 2.11.4 Persistència: procedència de dades i metadates Google a `places`
+
+Objectiu tècnic: donar suport al criteri funcional de **dues capes** (catàleg intern vs dades Google) i a la **traçabilitat** d’identificadors i caché, sense barrejar conceptes a la mateixa columna de negoci.
+
+**Base de dades (PostgreSQL), taula `places`:**
+
+- `data_provenance` — text (p. ex. valor per defecte `Internal` al catàleg).
+- `google_place_id` — opcional; **índex únic parcial** quan no és null (`ux_places_google_place_id`), alineat amb `PlaceConfiguration` i el model EF.
+- `google_coordinates_cached_until` — opcional; caducitat de caché de coordenades d’origen Google quan apliqui.
+- `last_google_sync_at` — opcional; traça d’última sincronització amb font Google.
+
+**Migració** (nom calibrat al repositori): `20260427120000_AddPlaceProvenance` amb fitxer `Designer` alineat amb `YepPetDbContextModelSnapshot` (el snapshot ha de reflectir el mateix model que el runtime EF; altrament `dotnet ef database update` a l’arrencada pot avisar de canvis de model pendents o fallar).
+
+**Codi (resum d’ubicacions):**
+
+- Domini: `PlaceDataProvenance`, `Place` (incloent mètode `SetDataProvenance` on escaigui).
+- Infraestructura: `PlaceRecord`, `PlaceConfiguration`, `PlacePersistenceMapper`.
+- Aplicació / API: DTOs de lloc (resum i detall) i càlculs derivats a `PlaceApplicationService` (p. ex. expiració de caché, requisit de mostrar mapa Google quan apliqui). El front pot exposar propietats opcionals al model `place` i al servei HTTP corresponent.
+
+Remissió funcional: `docs/ca/funcional-ca.md` (**§12.5**).
+
+### 2.11.5 Menús d’administració: API, esborrat, seed `Negoci` / `Tècnic`, client
+
+Objectiu: documentar el **manteniment de menús** com a peça completa: contracte HTTP, repositori, seed de desenvolupament i alineament del **menú de navegació** (API com a font de veritat, fallback al client quan calgui).
+
+**Endpoints (`Api` · `AdminEndpoints`, grup `/api/admin`, tots amb autorització):**
+
+- `GET /menus` — catàleg de definicions de menú + assignacions rol ↔ menú (`AdminMenuCatalogDto`). Requereix `action.permissions.manage`.
+- `PUT /menus/{key}` — crea o actualitza un menú (cos `SaveMenuRequest`, clau coherent amb la de la URL). Requereix el mateix permís. Retorna el catàleg sencer actualitzat.
+- `DELETE /menus/{key}` — suprimeix el menú `key` i les seves files a `menu_roles` (cascade). Retorna el catàleg sencer. **No** es permet si encara hi ha un altre menú amb `parent_key` igual a `key` (restricció d’integritat i regla de negoci: cal reubica o esborra fills primer). Requereix el mateix permís.
+
+**Capa d’aplicació:** `IAdminApplicationService` / `AdminApplicationService` — `GetMenusAsync`, `SaveMenuAsync`, `DeleteMenuAsync`.
+
+**Repositori:** `IMenuRepository` / `MenuRepository` — inclou `HasChildMenusAsync` i `TryDeleteByKeyAsync` a més de `SaveDefinitionAsync` i `ReplaceMenuRolesAsync`.
+
+**Navegació pública (rol):** el menú lateral/capçal es construeix a `NavigationApplicationService` a partir de `GetMenuItemsByRoleAsync` (unió `menus` + `menu_roles`, respectant `is_active` i l’arbre per `parent_key`).
+
+**Seed de desenvolupament** (`DevelopmentIdentitySeeder`):
+
+- Sota la clau `admin`, s’defineixen dos contenidors: `admin.negoci` (**Negoci**) i `admin.tecnic` (**Tècnic**), sense ruta, amb fills assignats a grup:
+  - **Negoci:** `admin.documentation`, `admin.users`, `admin.menus` (catàleg de navegació), `admin.places` (**Catàleg de llocs**), `admin.countries`, `admin.cities`.
+  - **Tècnic:** `admin.permissions`, `admin.roles`.
+- Els rols al diccionari `MenuRoleSeeds` inclouen `admin.negoci` i `admin.tecnic` on cal (p. ex. `Admin` tots els accessos; `Developer` almenys `admin` + `admin.negoci` + documentació, segons criteri actual).
+
+**Frontend (Angular):** pantalla de manteniment `admin/menus` dins de `admin-console-page`; servei `adminService.deleteMenu` consumeix `DELETE`. El `AuthService` munta un **menú de fallback** (`buildFallbackNavigationMenu`) i enriqueix enllaços geogràfics (`ensureGeographicAdminLinks`) amb el **mateix repartiment** Negoci / Tècnic perquè, si la crida a `GET /api/navigation/menu` falla, l’estructura no contradigui el disseny de producte.
+
+Remissió funcional: `docs/ca/funcional-ca.md` (**§3.12**).
 
 ### 2.11.1 Base implementada del punt d'autenticació
 
@@ -1802,10 +1901,16 @@ Historic d'execucions:
 
 Rutes internes governades per permisos:
 
-- `/admin/documentacio` (DEVELOPER + ADMIN)
-- `/admin/usuaris` (ADMIN)
-- `/admin/permisos` (ADMIN)
-- `/admin/menus` (ADMIN)
+- `/admin/documentacio` (DEVELOPER + ADMIN; `page.admin.documentation`)
+- `/admin/usuaris` (ADMIN; `page.admin.users`)
+- `/admin/permisos` (ADMIN; `page.admin.permissions`)
+- `/admin/menus` (manteniment de menús; `action.permissions.manage`)
+- `/admin/rols` (catàleg de rols; `page.admin.roles`)
+- `/admin/llocs` (manteniment de llocs; `page.admin.places`)
+- `/admin/paisos` (catàleg de països; `page.admin.countries`)
+- `/admin/ciutats` (catàleg de ciutats; `page.admin.cities`)
+
+Estructura de navegació per defecte (desplegable `admin`, veure **§2.11.5**): contenidors **Negoci** i **Tècnic** amb els manteniments agrupats segons criteri de producte.
 
 Proteccio:
 
@@ -1828,8 +1933,8 @@ E2E:
 
 Document funcional:
 
-- [`funcional-ca.md`](/home/dmoraroca/Documents/_DATA/repos/yeppet/docs/ca/funcional-ca.md)
+- [`funcional-ca.md`](funcional-ca.md)
 
 Document de fases:
 
-- [`project-phases.md`](/home/dmoraroca/Documents/_DATA/repos/yeppet/docs/project-phases.md)
+- [`../project-phases.md`](../project-phases.md)

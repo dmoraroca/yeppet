@@ -183,6 +183,7 @@ internal sealed class PlaceApplicationService : IPlaceApplicationService
 
     private static PlaceSummaryDto ToSummaryDto(Place place)
     {
+        var (cacheExpired, requiresGoogleMap) = ComputeGoogleCoordinateFlags(place);
         return new PlaceSummaryDto(
             place.Id,
             place.Name,
@@ -196,6 +197,12 @@ internal sealed class PlaceApplicationService : IPlaceApplicationService
             place.Address.Neighborhood,
             place.Location.Latitude,
             place.Location.Longitude,
+            place.DataProvenance.ToString(),
+            place.GooglePlaceId,
+            place.GoogleCoordinatesCachedUntil,
+            place.LastGoogleSyncAt,
+            cacheExpired,
+            requiresGoogleMap,
             place.PetPolicy.AcceptsDogs,
             place.PetPolicy.AcceptsCats,
             place.PetPolicy.Label,
@@ -209,6 +216,7 @@ internal sealed class PlaceApplicationService : IPlaceApplicationService
 
     private static PlaceDetailDto ToDetailDto(Place place)
     {
+        var (cacheExpired, requiresGoogleMap) = ComputeGoogleCoordinateFlags(place);
         return new PlaceDetailDto(
             place.Id,
             place.Name,
@@ -222,6 +230,12 @@ internal sealed class PlaceApplicationService : IPlaceApplicationService
             place.Address.Neighborhood,
             place.Location.Latitude,
             place.Location.Longitude,
+            place.DataProvenance.ToString(),
+            place.GooglePlaceId,
+            place.GoogleCoordinatesCachedUntil,
+            place.LastGoogleSyncAt,
+            cacheExpired,
+            requiresGoogleMap,
             place.PetPolicy.AcceptsDogs,
             place.PetPolicy.AcceptsCats,
             place.PetPolicy.Label,
@@ -231,6 +245,23 @@ internal sealed class PlaceApplicationService : IPlaceApplicationService
             place.Rating.ReviewCount,
             place.Tags.ToArray(),
             place.Features.ToArray());
+    }
+
+    private static (bool CacheExpired, bool RequiresGoogleMap) ComputeGoogleCoordinateFlags(Place place)
+    {
+        var now = DateTimeOffset.UtcNow;
+        if (place.DataProvenance is not (PlaceDataProvenance.GooglePlaces or PlaceDataProvenance.Mixed))
+        {
+            return (CacheExpired: false, RequiresGoogleMap: false);
+        }
+
+        if (place.GoogleCoordinatesCachedUntil is null)
+        {
+            return (CacheExpired: true, RequiresGoogleMap: false);
+        }
+
+        var expired = now > place.GoogleCoordinatesCachedUntil.Value;
+        return (CacheExpired: expired, RequiresGoogleMap: !expired);
     }
 
     private static PlaceType? ParsePlaceType(string? type)

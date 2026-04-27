@@ -114,4 +114,28 @@ internal sealed class MenuRepository(YepPetDbContext dbContext) : IMenuRepositor
 
         await dbContext.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<bool> HasChildMenusAsync(string parentKey, CancellationToken cancellationToken = default)
+    {
+        var normalized = parentKey.Trim();
+        return await dbContext.Menus
+            .AsNoTracking()
+            .AnyAsync(menu => menu.ParentKey == normalized, cancellationToken);
+    }
+
+    public async Task<bool> TryDeleteByKeyAsync(string key, CancellationToken cancellationToken = default)
+    {
+        var normalized = key.Trim();
+        var entity = await dbContext.Menus
+            .FirstOrDefaultAsync(menu => menu.Key == normalized, cancellationToken);
+
+        if (entity is null)
+        {
+            return false;
+        }
+
+        dbContext.Menus.Remove(entity);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return true;
+    }
 }

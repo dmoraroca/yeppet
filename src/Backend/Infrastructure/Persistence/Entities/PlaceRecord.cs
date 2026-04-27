@@ -40,6 +40,14 @@ public sealed class PlaceRecord
 
     public int ReviewCount { get; set; }
 
+    public string DataProvenance { get; set; } = "Internal";
+
+    public string? GooglePlaceId { get; set; }
+
+    public DateTimeOffset? GoogleCoordinatesCachedUntil { get; set; }
+
+    public DateTimeOffset? LastGoogleSyncAt { get; set; }
+
     public ICollection<FavoriteEntryRecord> FavoriteEntries { get; set; } = [];
 
     public ICollection<PlaceFeatureRecord> PlaceFeatures { get; set; } = [];
