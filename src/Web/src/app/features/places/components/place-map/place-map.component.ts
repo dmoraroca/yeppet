@@ -37,10 +37,11 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
   private map?: LeafletMap;
   private markersLayer?: LeafletLayerGroup;
   private readonly markers = new Map<string, import('leaflet').CircleMarker>();
+  private mapInitialization?: Promise<void>;
 
   /** Europe-wide default (aligned with the login map preview) when there are no markers. */
   private static readonly defaultMapCenter: [number, number] = [40.25, -3.7];
-  private static readonly defaultMapZoom = 6;
+  private static readonly defaultMapZoom = 5;
 
   async ngAfterViewInit(): Promise<void> {
     await this.ensureMap();
@@ -53,6 +54,9 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.map?.remove();
+    this.map = undefined;
+    this.markersLayer = undefined;
+    this.mapInitialization = undefined;
   }
 
   protected get hasPlaces(): boolean {
@@ -87,24 +91,40 @@ export class PlaceMapComponent implements AfterViewInit, OnChanges, OnDestroy {
   }
 
   private async ensureMap(): Promise<void> {
-    if (this.map || !this.mapContainer?.nativeElement) {
+    const container = this.mapContainer?.nativeElement;
+    if (this.map || !container) {
       return;
     }
 
-    this.leaflet = await import('leaflet');
-    this.map = this.leaflet.map(this.mapContainer.nativeElement, {
-      zoomControl: true,
-      scrollWheelZoom: false
-    });
+    if (this.mapInitialization) {
+      await this.mapInitialization;
+      return;
+    }
 
-    this.leaflet
-      .tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap contributors'
-      })
-      .addTo(this.map);
+    this.mapInitialization = (async () => {
+      this.leaflet = await import('leaflet');
 
-    this.markersLayer = this.leaflet.layerGroup().addTo(this.map);
+      // Leaflet can keep container metadata across fast re-renders or HMR in dev mode.
+      if ('_leaflet_id' in container) {
+        delete (container as HTMLDivElement & { _leaflet_id?: number })._leaflet_id;
+      }
+
+      this.map = this.leaflet.map(container, {
+        zoomControl: true,
+        scrollWheelZoom: false
+      });
+
+      this.leaflet
+        .tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap contributors'
+        })
+        .addTo(this.map);
+
+      this.markersLayer = this.leaflet.layerGroup().addTo(this.map);
+    })();
+
+    await this.mapInitialization;
   }
 
   private renderMap(): void {

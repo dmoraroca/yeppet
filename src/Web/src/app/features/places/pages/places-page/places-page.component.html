@@ -10,8 +10,18 @@
     [filters]="filters()"
     [cities]="cities()"
     [types]="types"
+    [showClearButton]="false"
     (filtersChanged)="updateFilters($event)"
   />
+
+  <section class="places-page__search-actions" aria-label="Accions de cerca">
+    <button type="button" class="places-page__search-primary" (click)="openSearchResults()">
+      Obrir cerca
+    </button>
+    <button type="button" class="places-page__search-secondary" (click)="clearAllFilters()">
+      Netejar
+    </button>
+  </section>
 
   <section class="places-page__map-block">
     <div class="places-page__map-copy">
@@ -76,7 +86,7 @@
     </div>
   </section>
 
-  <section class="places-page__results">
+  <section class="places-page__results" #resultsSection>
     <div class="places-page__summary">
       <strong>{{ places().length }} llocs</strong>
       <a routerLink="/favorites">Veure favorits</a>

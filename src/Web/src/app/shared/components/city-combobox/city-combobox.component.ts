@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 
 import { CitySuggestion, PlaceService } from '../../../features/places/services/place.service';
 import { extractCityNameFromTypeaheadValue } from '../../../features/places/utils/city-typeahead.utils';
@@ -30,6 +30,34 @@ export class CityComboboxComponent {
   protected readonly open = signal(false);
   protected readonly apiSuggestions = signal<CitySuggestion[]>([]);
   protected readonly remoteLoading = signal(false);
+  protected readonly filteredStaticOptions = computed(() => {
+    const q = this.text().trim().toLowerCase();
+    const all = this.staticOptions();
+    if (all.length === 0) {
+      return [];
+    }
+    if (q.length === 0) {
+      return all.slice(0, 20);
+    }
+    return all.filter((city) => city.toLowerCase().includes(q)).slice(0, 20);
+  });
+  protected readonly isOpenForDisplay = computed(() => {
+    if (!this.open()) {
+      return false;
+    }
+
+    const min = this.minCharsForRemote();
+    const t = this.text().trim();
+    if (this.remoteLoading() && t.length >= min) {
+      return true;
+    }
+
+    if (this.filteredStaticOptions().length > 0) {
+      return true;
+    }
+
+    return t.length >= min && this.apiSuggestions().length > 0;
+  });
 
   private remoteDebounce: ReturnType<typeof setTimeout> | null = null;
   private blurCloseTimer: ReturnType<typeof setTimeout> | null = null;
@@ -40,33 +68,6 @@ export class CityComboboxComponent {
       const v = (this.value() ?? '').trim();
       this.text.set(v);
     });
-  }
-
-  protected filteredStaticOptions(): string[] {
-    const q = this.text().trim().toLowerCase();
-    const all = this.staticOptions();
-    if (all.length === 0) {
-      return [];
-    }
-    if (q.length === 0) {
-      return all.slice(0, 20);
-    }
-    return all.filter((city) => city.toLowerCase().includes(q)).slice(0, 20);
-  }
-
-  protected isOpenForDisplay(): boolean {
-    if (!this.open()) {
-      return false;
-    }
-    const min = this.minCharsForRemote();
-    const t = this.text().trim();
-    if (this.remoteLoading() && t.length >= min) {
-      return true;
-    }
-    if (this.filteredStaticOptions().length > 0) {
-      return true;
-    }
-    return t.length >= min && this.apiSuggestions().length > 0;
   }
 
   protected onInput(event: Event): void {

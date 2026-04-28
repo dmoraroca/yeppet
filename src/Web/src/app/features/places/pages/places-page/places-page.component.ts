@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
@@ -27,6 +27,8 @@ import { PlaceService } from '../../services/place.service';
   styleUrl: './places-page.component.scss'
 })
 export class PlacesPageComponent {
+  @ViewChild('resultsSection') private readonly resultsSection?: ElementRef<HTMLElement>;
+
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly placeService = inject(PlaceService);
@@ -184,6 +186,13 @@ export class PlacesPageComponent {
 
   protected clearMapSelection(): void {
     this.selectedPlaceIdState.set(null);
+  }
+
+  protected openSearchResults(): void {
+    this.resultsSection?.nativeElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
   }
 
   protected openSelectedPlaceDetail(): void {

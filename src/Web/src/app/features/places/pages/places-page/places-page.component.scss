@@ -13,6 +13,31 @@
   line-height: 1.7;
 }
 
+.places-page__search-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.places-page__search-actions button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.places-page__search-primary {
+  background: var(--yp-color-primary-dark);
+  color: #fff;
+}
+
+.places-page__search-secondary {
+  background: rgba(15, 118, 110, 0.08);
+  color: var(--yp-color-primary-dark);
+  border: 1px solid rgba(15, 118, 110, 0.2);
+}
+
 .places-page__map-block {
   display: grid;
   gap: 0.9rem;
@@ -191,6 +216,15 @@
   .places-page__summary {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .places-page__search-actions {
+    justify-content: stretch;
+    flex-direction: column;
+  }
+
+  .places-page__search-actions button {
+    width: 100%;
   }
 
   .places-page__active-filters-header {
