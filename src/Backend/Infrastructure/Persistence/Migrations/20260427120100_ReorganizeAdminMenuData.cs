@@ -35,6 +35,7 @@ namespace Infrastructure.Persistence.Migrations
                 SELECT gen_random_uuid(), 'admin.negoci', 'Admin'
                 WHERE NOT EXISTS (SELECT 1 FROM menu_roles WHERE menu_key = 'admin.negoci' AND role = 'Admin');
 
+
                 INSERT INTO menu_roles (id, menu_key, role)
                 SELECT gen_random_uuid(), 'admin.tecnic', 'Admin'
                 WHERE NOT EXISTS (SELECT 1 FROM menu_roles WHERE menu_key = 'admin.tecnic' AND role = 'Admin');
