@@ -1,12 +1,12 @@
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Roles;
-using YepPet.Application.Admin.Commands;
-using YepPet.Application.Commands;
-using YepPet.Application.Factories;
-using YepPet.Application.Results;
-using YepPet.Domain.Permissions;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Roles;
+using Zuppeto.Application.Admin.Commands;
+using Zuppeto.Application.Commands;
+using Zuppeto.Application.Factories;
+using Zuppeto.Application.Results;
+using Zuppeto.Domain.Permissions;
 
-namespace YepPet.Application.Admin;
+namespace Zuppeto.Application.Admin;
 
 internal sealed class AdminApplicationService(
     IUserRepository userRepository,

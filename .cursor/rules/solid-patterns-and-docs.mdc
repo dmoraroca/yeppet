@@ -1,9 +1,9 @@
 ---
-description: SOLID estrictes, patrons de disseny i documentació funcional vs tècnica (YepPet)
+description: SOLID estrictes, patrons de disseny i documentació funcional vs tècnica (Zuppeto)
 alwaysApply: true
 ---
 
-# SOLID, patrons i documentació (YepPet)
+# SOLID, patrons i documentació (Zuppeto)
 
 Aquests criteris complementen `docs/project-phases.md` (Fase III amb DDD, SOLID estricte, patrons quan aporten valor).
 

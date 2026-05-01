@@ -1,6 +1,6 @@
-using YepPet.Domain.Places;
+using Zuppeto.Domain.Places;
 
-namespace YepPet.Domain.Abstractions;
+namespace Zuppeto.Domain.Abstractions;
 
 public interface IPlaceRepository
 {

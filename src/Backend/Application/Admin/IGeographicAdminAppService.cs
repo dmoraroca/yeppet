@@ -1,6 +1,6 @@
-using YepPet.Application.Results;
+using Zuppeto.Application.Results;
 
-namespace YepPet.Application.Admin;
+namespace Zuppeto.Application.Admin;
 
 public interface IGeographicAdminAppService
 {

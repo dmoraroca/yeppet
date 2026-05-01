@@ -1,4 +1,4 @@
-namespace YepPet.Domain.Places;
+namespace Zuppeto.Domain.Places;
 
 /// <summary>
 /// Indicates where persisted place coordinates and listing identity primarily come from for compliance and UI routing.

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
-using YepPet.Application.Events;
+using Zuppeto.Application.Events;
 
-namespace YepPet.Application.Admin.Events;
+namespace Zuppeto.Application.Admin.Events;
 
 public sealed class AuditUserEventsHandler(ILogger<AuditUserEventsHandler> logger)
     : IEventHandler<UserCreatedEvent>, IEventHandler<UserRoleChangedEvent>

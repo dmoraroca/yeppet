@@ -1,7 +1,7 @@
-using YepPet.Domain.Common;
-using YepPet.Domain.Places.ValueObjects;
+using Zuppeto.Domain.Common;
+using Zuppeto.Domain.Places.ValueObjects;
 
-namespace YepPet.Domain.Places;
+namespace Zuppeto.Domain.Places;
 
 public sealed class Place : AggregateRoot<Guid>
 {

@@ -37,7 +37,7 @@ export class HelpPageComponent {
   protected readonly faqs = [
     {
       badge: 'Accés',
-      body: 'YepPet treballa ara mateix amb login fake per validar navegació, perfil i accessos per rol.'
+      body: 'Zuppeto treballa ara mateix amb login fake per validar navegació, perfil i accessos per rol.'
     },
     {
       badge: 'Favorits',

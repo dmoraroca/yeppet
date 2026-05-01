@@ -1,13 +1,13 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using YepPet.Infrastructure.Persistence;
+using Zuppeto.Infrastructure.Persistence;
 
 #nullable disable
 
 namespace Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(YepPetDbContext))]
+    [DbContext(typeof(ZuppetoDbContext))]
     [Migration("20260405121500_AddUserLifecycleMetadata")]
     public partial class AddUserLifecycleMetadata : Migration
     {

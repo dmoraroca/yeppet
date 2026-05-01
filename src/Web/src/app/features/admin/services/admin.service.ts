@@ -4,10 +4,10 @@ import { firstValueFrom } from 'rxjs';
 
 import { API_BASE_URL } from '../../../core/config/api.config';
 
-/** Traça a consola (filtra per «YepPet admin» al DevTools). */
+/** Traça a consola (filtra per «Zuppeto admin» al DevTools). */
 const adminLog = (msg: string, extra?: unknown): void => {
   if (typeof console !== 'undefined') {
-    console.log(`[YepPet admin] ${msg}`, extra !== undefined ? extra : '');
+    console.log(`[Zuppeto admin] ${msg}`, extra !== undefined ? extra : '');
   }
 };
 

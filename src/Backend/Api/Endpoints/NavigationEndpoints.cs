@@ -1,9 +1,9 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
-using YepPet.Application.Navigation;
+using Zuppeto.Application.Navigation;
 
-namespace YepPet.Api.Endpoints;
+namespace Zuppeto.Api.Endpoints;
 
 internal static class NavigationEndpoints
 {

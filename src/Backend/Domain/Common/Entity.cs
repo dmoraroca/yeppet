@@ -1,4 +1,4 @@
-namespace YepPet.Domain.Common;
+namespace Zuppeto.Domain.Common;
 
 public abstract class Entity<TId> where TId : notnull
 {

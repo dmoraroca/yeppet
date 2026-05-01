@@ -1,6 +1,6 @@
-using YepPet.Application.Validation;
+using Zuppeto.Application.Validation;
 
-namespace YepPet.Application.Users.Validators;
+namespace Zuppeto.Application.Users.Validators;
 
 public sealed class UserProfileUpdateRequestValidator : IValidator<UserProfileUpdateRequest>
 {

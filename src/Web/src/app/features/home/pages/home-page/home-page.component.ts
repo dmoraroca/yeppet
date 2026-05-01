@@ -6,7 +6,7 @@ import { SiteHeaderComponent } from '../../../../core/layout/components/site-hea
 import { HomeHeroSectionComponent } from '../../components/home-hero-section/home-hero-section.component';
 import { TrendingCitiesSectionComponent } from '../../components/trending-cities-section/trending-cities-section.component';
 import { HomeHeroContent } from '../../models/home-content.model';
-import { WhyYepPetSectionComponent } from '../../components/why-yeppet-section/why-yeppet-section.component';
+import { WhyZuppetoSectionComponent } from '../../components/why-zuppeto-section/why-zuppeto-section.component';
 import {
   HOME_HERO_FAKE,
   HOME_TRENDING_CITIES_FAKE,
@@ -23,7 +23,7 @@ import { PlaceService } from '../../../places/services/place.service';
     SiteFooterComponent,
     HomeHeroSectionComponent,
     TrendingCitiesSectionComponent,
-    WhyYepPetSectionComponent
+    WhyZuppetoSectionComponent
   ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'

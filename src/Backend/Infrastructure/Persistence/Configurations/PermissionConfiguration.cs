@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using YepPet.Infrastructure.Persistence.Entities;
+using Zuppeto.Infrastructure.Persistence.Entities;
 
-namespace YepPet.Infrastructure.Persistence.Configurations;
+namespace Zuppeto.Infrastructure.Persistence.Configurations;
 
 public sealed class PermissionConfiguration : IEntityTypeConfiguration<PermissionRecord>
 {

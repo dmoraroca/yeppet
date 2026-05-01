@@ -4,11 +4,11 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.WebUtilities;
-using YepPet.Application.Auth;
-using YepPet.Application.Validation;
-using YepPet.Api.Validation;
+using Zuppeto.Application.Auth;
+using Zuppeto.Application.Validation;
+using Zuppeto.Api.Validation;
 
-namespace YepPet.Api.Endpoints;
+namespace Zuppeto.Api.Endpoints;
 
 internal static class AuthEndpoints
 {

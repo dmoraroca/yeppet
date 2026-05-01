@@ -1,6 +1,6 @@
 // Afegir als `using` (prop de `namespace`):
-//   using YepPet.Application.Admin;
-//   using YepPet.Application.Admin.Validators;
+//   using Zuppeto.Application.Admin;
+//   using Zuppeto.Application.Admin.Validators;
 
 // Dins de AddApplication(), amb la resta de `AddScoped` / `AddSingleton`:
         services.AddScoped<IGeographicAdminAppService, GeographicAdminAppService>();

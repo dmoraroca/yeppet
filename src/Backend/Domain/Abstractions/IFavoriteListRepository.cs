@@ -1,6 +1,6 @@
-using YepPet.Domain.Favorites;
+using Zuppeto.Domain.Favorites;
 
-namespace YepPet.Domain.Abstractions;
+namespace Zuppeto.Domain.Abstractions;
 
 public interface IFavoriteListRepository
 {

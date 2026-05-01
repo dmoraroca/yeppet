@@ -1,6 +1,6 @@
-using YepPet.Domain.Users;
+using Zuppeto.Domain.Users;
 
-namespace YepPet.Domain.Abstractions;
+namespace Zuppeto.Domain.Abstractions;
 
 public interface IUserRepository
 {

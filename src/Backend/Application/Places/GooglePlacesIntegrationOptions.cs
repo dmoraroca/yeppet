@@ -1,4 +1,4 @@
-namespace YepPet.Application.Places;
+namespace Zuppeto.Application.Places;
 
 /// <summary>
 /// Application-level settings for Google Places integration (reads the same configuration section as Infrastructure).

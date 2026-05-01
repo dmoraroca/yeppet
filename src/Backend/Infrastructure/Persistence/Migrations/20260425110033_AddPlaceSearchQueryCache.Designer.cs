@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using YepPet.Infrastructure.Persistence;
+using Zuppeto.Infrastructure.Persistence;
 
 #nullable disable
 
 namespace Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(YepPetDbContext))]
+    [DbContext(typeof(ZuppetoDbContext))]
     [Migration("20260425110033_AddPlaceSearchQueryCache")]
     partial class AddPlaceSearchQueryCache
     {
@@ -26,7 +26,7 @@ namespace Infrastructure.Persistence.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pgcrypto");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.CityRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.CityRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -85,7 +85,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("cities", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.CountryRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.CountryRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -130,7 +130,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("countries", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.FavoriteEntryRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.FavoriteEntryRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -164,7 +164,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("favorite_entries", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.FavoriteListRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.FavoriteListRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -185,7 +185,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("favorite_lists", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.FeatureRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.FeatureRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -214,7 +214,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("features", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.MenuRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.MenuRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -265,7 +265,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("menus", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.MenuRoleRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.MenuRoleRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -296,7 +296,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("menu_roles", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PermissionRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PermissionRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -349,7 +349,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("permissions", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PlaceFeatureRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PlaceFeatureRecord", b =>
                 {
                     b.Property<Guid>("PlaceId")
                         .HasColumnType("uuid")
@@ -367,7 +367,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("place_features", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PlaceRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PlaceRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -495,7 +495,7 @@ namespace Infrastructure.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PlaceReviewRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PlaceReviewRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -543,7 +543,7 @@ namespace Infrastructure.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PlaceSearchQueryRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PlaceSearchQueryRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -618,7 +618,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("place_search_queries", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PlaceSearchQueryResultRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PlaceSearchQueryResultRecord", b =>
                 {
                     b.Property<Guid>("QueryId")
                         .HasColumnType("uuid")
@@ -646,7 +646,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("place_search_query_results", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PlaceTagRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PlaceTagRecord", b =>
                 {
                     b.Property<Guid>("PlaceId")
                         .HasColumnType("uuid")
@@ -664,7 +664,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("place_tags", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PrivacyConsentEventRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PrivacyConsentEventRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -698,7 +698,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("privacy_consent_events", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.RolePermissionRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.RolePermissionRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -729,7 +729,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("role_permissions", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.RoleRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.RoleRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -776,7 +776,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("roles", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.TagRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.TagRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -805,7 +805,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("tags", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.UserRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.UserRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -885,9 +885,9 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.CityRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.CityRecord", b =>
                 {
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.CountryRecord", "Country")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.CountryRecord", "Country")
                         .WithMany("Cities")
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -896,15 +896,15 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Country");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.FavoriteEntryRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.FavoriteEntryRecord", b =>
                 {
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.FavoriteListRecord", "FavoriteList")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.FavoriteListRecord", "FavoriteList")
                         .WithMany("Entries")
                         .HasForeignKey("FavoriteListId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.PlaceRecord", "Place")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.PlaceRecord", "Place")
                         .WithMany("FavoriteEntries")
                         .HasForeignKey("PlaceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -915,36 +915,36 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Place");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.FavoriteListRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.FavoriteListRecord", b =>
                 {
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.UserRecord", "OwnerUser")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.UserRecord", "OwnerUser")
                         .WithOne("FavoriteList")
-                        .HasForeignKey("YepPet.Infrastructure.Persistence.Entities.FavoriteListRecord", "OwnerUserId")
+                        .HasForeignKey("Zuppeto.Infrastructure.Persistence.Entities.FavoriteListRecord", "OwnerUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("OwnerUser");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.MenuRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.MenuRecord", b =>
                 {
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.MenuRecord", null)
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.MenuRecord", null)
                         .WithMany()
                         .HasForeignKey("ParentKey")
                         .HasPrincipalKey("Key")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.MenuRoleRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.MenuRoleRecord", b =>
                 {
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.MenuRecord", "Menu")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.MenuRecord", "Menu")
                         .WithMany("MenuRoles")
                         .HasForeignKey("MenuKey")
                         .HasPrincipalKey("Key")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.RoleRecord", "RoleRef")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.RoleRecord", "RoleRef")
                         .WithMany("MenuRoles")
                         .HasForeignKey("Role")
                         .HasPrincipalKey("Key")
@@ -956,15 +956,15 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("RoleRef");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PlaceFeatureRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PlaceFeatureRecord", b =>
                 {
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.FeatureRecord", "Feature")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.FeatureRecord", "Feature")
                         .WithMany("PlaceFeatures")
                         .HasForeignKey("FeatureId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.PlaceRecord", "Place")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.PlaceRecord", "Place")
                         .WithMany("PlaceFeatures")
                         .HasForeignKey("PlaceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -975,15 +975,15 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Place");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PlaceReviewRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PlaceReviewRecord", b =>
                 {
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.UserRecord", "AuthorUser")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.UserRecord", "AuthorUser")
                         .WithMany("Reviews")
                         .HasForeignKey("AuthorUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.PlaceRecord", "Place")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.PlaceRecord", "Place")
                         .WithMany("Reviews")
                         .HasForeignKey("PlaceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -994,15 +994,15 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Place");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PlaceSearchQueryResultRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PlaceSearchQueryResultRecord", b =>
                 {
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.PlaceRecord", "Place")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.PlaceRecord", "Place")
                         .WithMany()
                         .HasForeignKey("PlaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.PlaceSearchQueryRecord", "Query")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.PlaceSearchQueryRecord", "Query")
                         .WithMany("Results")
                         .HasForeignKey("QueryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1013,15 +1013,15 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Query");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PlaceTagRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PlaceTagRecord", b =>
                 {
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.PlaceRecord", "Place")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.PlaceRecord", "Place")
                         .WithMany("PlaceTags")
                         .HasForeignKey("PlaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.TagRecord", "Tag")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.TagRecord", "Tag")
                         .WithMany("PlaceTags")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1032,9 +1032,9 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Tag");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PrivacyConsentEventRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PrivacyConsentEventRecord", b =>
                 {
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.UserRecord", "User")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.UserRecord", "User")
                         .WithMany("PrivacyConsentEvents")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1043,16 +1043,16 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.RolePermissionRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.RolePermissionRecord", b =>
                 {
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.PermissionRecord", "Permission")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.PermissionRecord", "Permission")
                         .WithMany("RolePermissions")
                         .HasForeignKey("PermissionKey")
                         .HasPrincipalKey("Key")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.RoleRecord", "RoleRef")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.RoleRecord", "RoleRef")
                         .WithMany("RolePermissions")
                         .HasForeignKey("Role")
                         .HasPrincipalKey("Key")
@@ -1064,9 +1064,9 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("RoleRef");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.UserRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.UserRecord", b =>
                 {
-                    b.HasOne("YepPet.Infrastructure.Persistence.Entities.RoleRecord", "RoleRef")
+                    b.HasOne("Zuppeto.Infrastructure.Persistence.Entities.RoleRecord", "RoleRef")
                         .WithMany("Users")
                         .HasForeignKey("Role")
                         .HasPrincipalKey("Key")
@@ -1076,32 +1076,32 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("RoleRef");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.CountryRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.CountryRecord", b =>
                 {
                     b.Navigation("Cities");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.FavoriteListRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.FavoriteListRecord", b =>
                 {
                     b.Navigation("Entries");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.FeatureRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.FeatureRecord", b =>
                 {
                     b.Navigation("PlaceFeatures");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.MenuRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.MenuRecord", b =>
                 {
                     b.Navigation("MenuRoles");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PermissionRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PermissionRecord", b =>
                 {
                     b.Navigation("RolePermissions");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PlaceRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PlaceRecord", b =>
                 {
                     b.Navigation("FavoriteEntries");
 
@@ -1112,12 +1112,12 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Reviews");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.PlaceSearchQueryRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.PlaceSearchQueryRecord", b =>
                 {
                     b.Navigation("Results");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.RoleRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.RoleRecord", b =>
                 {
                     b.Navigation("MenuRoles");
 
@@ -1126,12 +1126,12 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.TagRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.TagRecord", b =>
                 {
                     b.Navigation("PlaceTags");
                 });
 
-            modelBuilder.Entity("YepPet.Infrastructure.Persistence.Entities.UserRecord", b =>
+            modelBuilder.Entity("Zuppeto.Infrastructure.Persistence.Entities.UserRecord", b =>
                 {
                     b.Navigation("FavoriteList");
 

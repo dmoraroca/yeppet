@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
-using YepPet.Application.Validation;
+using Zuppeto.Application.Validation;
 
-namespace YepPet.Api.Validation;
+namespace Zuppeto.Api.Validation;
 
 internal static class ValidationProblemExtensions
 {

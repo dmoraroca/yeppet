@@ -1,4 +1,4 @@
-namespace YepPet.Application.Places;
+namespace Zuppeto.Application.Places;
 
 /// <summary>
 /// External source for place discovery candidates (e.g., Google Places).

@@ -3,10 +3,10 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using YepPet.Application.Auth;
-using YepPet.Domain.Users;
+using Zuppeto.Application.Auth;
+using Zuppeto.Domain.Users;
 
-namespace YepPet.Infrastructure.Auth;
+namespace Zuppeto.Infrastructure.Auth;
 
 internal sealed class JwtAccessTokenIssuer(IOptions<AuthOptions> options) : IAccessTokenIssuer
 {

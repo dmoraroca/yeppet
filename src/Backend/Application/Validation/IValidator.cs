@@ -1,4 +1,4 @@
-namespace YepPet.Application.Validation;
+namespace Zuppeto.Application.Validation;
 
 public interface IValidator<in T>
 {

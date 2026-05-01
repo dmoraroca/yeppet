@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Reviews;
-using YepPet.Infrastructure.Persistence.Mappings;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Reviews;
+using Zuppeto.Infrastructure.Persistence.Mappings;
 
-namespace YepPet.Infrastructure.Persistence.Repositories;
+namespace Zuppeto.Infrastructure.Persistence.Repositories;
 
-internal sealed class PlaceReviewRepository(YepPetDbContext dbContext) : IPlaceReviewRepository
+internal sealed class PlaceReviewRepository(ZuppetoDbContext dbContext) : IPlaceReviewRepository
 {
     public async Task<PlaceReview?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {

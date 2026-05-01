@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
-using YepPet.Application.Validation;
+using Zuppeto.Application.Validation;
 
-namespace YepPet.Application.Admin.Validators;
+namespace Zuppeto.Application.Admin.Validators;
 
 public sealed class SaveMenuRequestValidator : IValidator<SaveMenuRequest>
 {

@@ -1,4 +1,4 @@
-namespace YepPet.Application.Places;
+namespace Zuppeto.Application.Places;
 
 public interface IPlaceApplicationService
 {

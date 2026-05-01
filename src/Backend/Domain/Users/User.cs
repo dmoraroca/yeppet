@@ -1,7 +1,7 @@
-using YepPet.Domain.Common;
-using YepPet.Domain.Users.ValueObjects;
+using Zuppeto.Domain.Common;
+using Zuppeto.Domain.Users.ValueObjects;
 
-namespace YepPet.Domain.Users;
+namespace Zuppeto.Domain.Users;
 
 public sealed class User : AggregateRoot<Guid>
 {

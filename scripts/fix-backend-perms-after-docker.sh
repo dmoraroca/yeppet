@@ -15,7 +15,7 @@ echo "Restaurant propietari de src/Backend..."
 sudo chown -R "$(whoami):$(whoami)" src/Backend
 
 echo "dotnet restore + build..."
-dotnet restore YepPet.sln
-dotnet build YepPet.sln -c Debug
+dotnet restore Zuppeto.sln
+dotnet build Zuppeto.sln -c Debug
 
 echo "Fet. Prova Reload Window a Cursor si cal."

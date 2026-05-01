@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace YepPet.Application.Common.Interfaces;
+namespace Zuppeto.Application.Common.Interfaces;
 
 public interface IPermissionService
 {

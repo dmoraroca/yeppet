@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Options;
-using YepPet.Application.Places;
+using Zuppeto.Application.Places;
 
-namespace YepPet.Infrastructure.GooglePlaces;
+namespace Zuppeto.Infrastructure.GooglePlaces;
 
 internal sealed class GooglePlacesSuggestionProvider(
     HttpClient httpClient,

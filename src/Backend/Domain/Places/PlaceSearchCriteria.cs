@@ -1,6 +1,6 @@
-using YepPet.Domain.Common;
+using Zuppeto.Domain.Common;
 
-namespace YepPet.Domain.Places;
+namespace Zuppeto.Domain.Places;
 
 public sealed class PlaceSearchCriteria : ValueObject
 {

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { AuthSession } from '../models/auth-user.model';
 import { AuthStore } from './auth-store.token';
 
-const STORAGE_KEY = 'yeppet-auth-session';
+const STORAGE_KEY = 'zuppeto-auth-session';
 
 @Injectable({ providedIn: 'root' })
 export class BrowserAuthStoreService implements AuthStore {

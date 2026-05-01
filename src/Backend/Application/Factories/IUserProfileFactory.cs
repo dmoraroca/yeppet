@@ -1,6 +1,6 @@
-using YepPet.Domain.Users.ValueObjects;
+using Zuppeto.Domain.Users.ValueObjects;
 
-namespace YepPet.Application.Factories;
+namespace Zuppeto.Application.Factories;
 
 public interface IUserProfileFactory
 {

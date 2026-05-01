@@ -1,6 +1,6 @@
-using YepPet.Application.Events;
+using Zuppeto.Application.Events;
 
-namespace YepPet.Application.Admin.Events;
+namespace Zuppeto.Application.Admin.Events;
 
 public sealed record UserRoleChangedEvent(Guid UserId, string OldRole, string NewRole) : IDomainEvent
 {

@@ -1,7 +1,7 @@
-using YepPet.Domain.Favorites;
-using YepPet.Infrastructure.Persistence.Entities;
+using Zuppeto.Domain.Favorites;
+using Zuppeto.Infrastructure.Persistence.Entities;
 
-namespace YepPet.Infrastructure.Persistence.Mappings;
+namespace Zuppeto.Infrastructure.Persistence.Mappings;
 
 internal static class FavoriteListPersistenceMapper
 {

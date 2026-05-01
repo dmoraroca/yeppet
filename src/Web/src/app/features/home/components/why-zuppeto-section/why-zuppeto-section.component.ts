@@ -5,11 +5,11 @@ import { SectionHeadingComponent } from '../../../../shared/components/section-h
 import { HomeWhyContent } from '../../models/home-content.model';
 
 @Component({
-  selector: 'app-why-yeppet-section',
+  selector: 'app-why-zuppeto-section',
   imports: [GenericInfoCardComponent, SectionHeadingComponent],
-  templateUrl: './why-yeppet-section.component.html',
-  styleUrl: './why-yeppet-section.component.scss'
+  templateUrl: './why-zuppeto-section.component.html',
+  styleUrl: './why-zuppeto-section.component.scss'
 })
-export class WhyYepPetSectionComponent {
+export class WhyZuppetoSectionComponent {
   readonly content = input.required<HomeWhyContent>();
 }

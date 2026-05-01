@@ -22,11 +22,11 @@ export class ContactPageComponent {
   protected readonly channels = [
     {
       title: 'Col·laboracions',
-      body: 'Per col·laboracions, contingut o noves ciutats: partnerships@yeppet.fake'
+      body: 'Per col·laboracions, contingut o noves ciutats: partnerships@zuppeto.fake'
     },
     {
       title: 'Suport de producte',
-      body: 'Per dubtes de navegació, favorits, perfil o cerca: suport@yeppet.fake'
+      body: 'Per dubtes de navegació, favorits, perfil o cerca: suport@zuppeto.fake'
     },
     {
       title: 'Temps de resposta',

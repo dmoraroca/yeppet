@@ -1,23 +1,23 @@
 using Microsoft.Extensions.DependencyInjection;
-using YepPet.Application.Admin;
-using YepPet.Application.Auth;
-using YepPet.Application.Events;
-using YepPet.Application.Factories;
-using YepPet.Application.Favorites;
-using YepPet.Application.Navigation;
-using YepPet.Application.Places;
-using YepPet.Application.Reviews;
-using YepPet.Application.Users;
-using YepPet.Application.Validation;
-using YepPet.Application.Auth.Validators;
-using YepPet.Application.Admin.Validators;
-using YepPet.Application.Admin.Events;
-using YepPet.Application.Admin.Commands;
-using YepPet.Application.Commands;
-using YepPet.Application.Users.Validators;
-using YepPet.Application.Places.Validators;
+using Zuppeto.Application.Admin;
+using Zuppeto.Application.Auth;
+using Zuppeto.Application.Events;
+using Zuppeto.Application.Factories;
+using Zuppeto.Application.Favorites;
+using Zuppeto.Application.Navigation;
+using Zuppeto.Application.Places;
+using Zuppeto.Application.Reviews;
+using Zuppeto.Application.Users;
+using Zuppeto.Application.Validation;
+using Zuppeto.Application.Auth.Validators;
+using Zuppeto.Application.Admin.Validators;
+using Zuppeto.Application.Admin.Events;
+using Zuppeto.Application.Admin.Commands;
+using Zuppeto.Application.Commands;
+using Zuppeto.Application.Users.Validators;
+using Zuppeto.Application.Places.Validators;
 
-namespace YepPet.Application;
+namespace Zuppeto.Application;
 
 public static class DependencyInjection
 {

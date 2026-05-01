@@ -1,8 +1,8 @@
-using YepPet.Domain.Users;
-using YepPet.Domain.Users.ValueObjects;
-using YepPet.Infrastructure.Persistence.Entities;
+using Zuppeto.Domain.Users;
+using Zuppeto.Domain.Users.ValueObjects;
+using Zuppeto.Infrastructure.Persistence.Entities;
 
-namespace YepPet.Infrastructure.Persistence.Mappings;
+namespace Zuppeto.Infrastructure.Persistence.Mappings;
 
 internal static class UserPersistenceMapper
 {

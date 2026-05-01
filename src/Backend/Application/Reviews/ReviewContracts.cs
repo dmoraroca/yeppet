@@ -1,4 +1,4 @@
-namespace YepPet.Application.Reviews;
+namespace Zuppeto.Application.Reviews;
 
 public sealed record PlaceReviewDto(
     Guid Id,

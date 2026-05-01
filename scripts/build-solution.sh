@@ -7,5 +7,5 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-dotnet restore YepPet.sln
-dotnet build YepPet.sln -c Debug "$@"
+dotnet restore Zuppeto.sln
+dotnet build Zuppeto.sln -c Debug "$@"

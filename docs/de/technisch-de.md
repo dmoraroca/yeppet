@@ -94,7 +94,7 @@ Die gemeinsam genutzten Komponenten, die bereits als wirklich wiederverwendbar g
   <span style="color:#c4b5fd;">HP[HomePage]</span>
   <span style="color:#c4b5fd;">HS[HomeHeroSection]</span>
   <span style="color:#c4b5fd;">TC[TrendingCitiesSection]</span>
-  <span style="color:#c4b5fd;">WY[WhyYepPetSection]</span>
+  <span style="color:#c4b5fd;">WY[WhyZuppetoSection]</span>
 
   <span style="color:#93c5fd;">PP[PlacesPage]</span>
   <span style="color:#93c5fd;">PFI[PlaceFilters]</span>
@@ -203,7 +203,7 @@ Hauptbausteine:
 
 - `home-hero-section`
 - `trending-cities-section`
-- `why-yeppet-section`
+- `why-zuppeto-section`
 
 Relevante technische Entscheidungen:
 
@@ -531,8 +531,8 @@ src/Web/src/app/features/places/pages/place-detail-page/place-detail-page.compon
 
 Funktionales Dokument:
 
-- [`funktional-de.md`](/home/dmoraroca/Documents/_DATA/repos/yeppet/docs/de/funktional-de.md)
+- [`funktional-de.md`](/home/dmoraroca/Documents/_DATA/repos/zuppeto/docs/de/funktional-de.md)
 
 Phasen-Dokument:
 
-- [`project-phases.md`](/home/dmoraroca/Documents/_DATA/repos/yeppet/docs/project-phases.md)
+- [`project-phases.md`](/home/dmoraroca/Documents/_DATA/repos/zuppeto/docs/project-phases.md)

@@ -16,7 +16,7 @@ test.beforeAll(async ({ request }) => {
 });
 
 test('account help submenu', async ({ page }) => {
-  await login(page, 'user.e2e@yeppet.local', 'Admin123');
+  await login(page, 'user.e2e@zuppeto.local', 'Admin123');
 
   const primaryNav = page.getByLabel('Primary navigation');
   await primaryNav.locator('summary[aria-label="Compte"]').click();

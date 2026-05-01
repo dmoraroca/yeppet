@@ -1,4 +1,4 @@
-namespace YepPet.Domain.Abstractions;
+namespace Zuppeto.Domain.Abstractions;
 
 public interface IPlaceSearchQueryRepository
 {

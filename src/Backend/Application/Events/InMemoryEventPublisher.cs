@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace YepPet.Application.Events;
+namespace Zuppeto.Application.Events;
 
 public sealed class InMemoryEventPublisher(IServiceProvider services) : IEventPublisher
 {

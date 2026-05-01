@@ -1,6 +1,6 @@
-using YepPet.Domain.Common;
+using Zuppeto.Domain.Common;
 
-namespace YepPet.Domain.Places.ValueObjects;
+namespace Zuppeto.Domain.Places.ValueObjects;
 
 public sealed class Pricing : ValueObject
 {

@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using YepPet.Infrastructure.Persistence.Entities;
+using Zuppeto.Infrastructure.Persistence.Entities;
 
-namespace YepPet.Infrastructure.Persistence;
+namespace Zuppeto.Infrastructure.Persistence;
 
-public sealed class YepPetDbContext(DbContextOptions<YepPetDbContext> options) : DbContext(options)
+public sealed class ZuppetoDbContext(DbContextOptions<ZuppetoDbContext> options) : DbContext(options)
 {
     public DbSet<FeatureRecord> Features => Set<FeatureRecord>();
 
@@ -46,6 +46,6 @@ public sealed class YepPetDbContext(DbContextOptions<YepPetDbContext> options) :
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresExtension("pgcrypto");
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(YepPetDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ZuppetoDbContext).Assembly);
     }
 }

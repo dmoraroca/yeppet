@@ -1,4 +1,4 @@
-namespace YepPet.Application.Reviews;
+namespace Zuppeto.Application.Reviews;
 
 public interface IPlaceReviewApplicationService
 {

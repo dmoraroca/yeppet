@@ -1,4 +1,4 @@
-namespace YepPet.Application.Auth;
+namespace Zuppeto.Application.Auth;
 
 public interface IFacebookOAuthClient
 {

@@ -1,4 +1,4 @@
-namespace YepPet.Infrastructure.GooglePlaces;
+namespace Zuppeto.Infrastructure.GooglePlaces;
 
 public sealed class GooglePlacesOptions
 {

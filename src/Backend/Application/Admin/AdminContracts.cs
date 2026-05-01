@@ -1,4 +1,4 @@
-namespace YepPet.Application.Admin;
+namespace Zuppeto.Application.Admin;
 
 public sealed record AdminUserListItemDto(
     Guid Id,

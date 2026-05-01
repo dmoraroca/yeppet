@@ -1,6 +1,6 @@
-using YepPet.Domain.Common;
+using Zuppeto.Domain.Common;
 
-namespace YepPet.Domain.Reviews;
+namespace Zuppeto.Domain.Reviews;
 
 public sealed class PlaceReviewQuery : ValueObject
 {

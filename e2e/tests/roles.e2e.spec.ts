@@ -16,7 +16,7 @@ test.beforeAll(async ({ request }) => {
 });
 
 test('viewer role navigation', async ({ page }) => {
-  await login(page, 'viewer.e2e@yeppet.local', 'Admin123');
+  await login(page, 'viewer.e2e@zuppeto.local', 'Admin123');
 
   const primaryNav = page.getByLabel('Primary navigation');
   await expect(primaryNav.getByRole('link', { name: 'Inici' })).toBeVisible();
@@ -26,7 +26,7 @@ test('viewer role navigation', async ({ page }) => {
 });
 
 test('user role navigation', async ({ page }) => {
-  await login(page, 'user.e2e@yeppet.local', 'Admin123');
+  await login(page, 'user.e2e@zuppeto.local', 'Admin123');
 
   const primaryNav = page.getByLabel('Primary navigation');
   await expect(primaryNav.getByRole('link', { name: 'Inici' })).toBeVisible();
@@ -36,7 +36,7 @@ test('user role navigation', async ({ page }) => {
 });
 
 test('developer role menu', async ({ page }) => {
-  await login(page, 'developer.e2e@yeppet.local', 'Admin123');
+  await login(page, 'developer.e2e@zuppeto.local', 'Admin123');
 
   const primaryNav = page.getByLabel('Primary navigation');
   await expect(primaryNav.locator('summary', { hasText: /Del desenvolupador/i })).toBeVisible();

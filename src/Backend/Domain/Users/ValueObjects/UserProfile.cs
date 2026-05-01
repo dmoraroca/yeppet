@@ -1,6 +1,6 @@
-using YepPet.Domain.Common;
+using Zuppeto.Domain.Common;
 
-namespace YepPet.Domain.Users.ValueObjects;
+namespace Zuppeto.Domain.Users.ValueObjects;
 
 public sealed class UserProfile : ValueObject
 {

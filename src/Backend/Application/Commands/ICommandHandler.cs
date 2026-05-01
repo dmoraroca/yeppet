@@ -1,4 +1,4 @@
-namespace YepPet.Application.Commands;
+namespace Zuppeto.Application.Commands;
 
 public interface ICommandHandler<in TCommand, TResponse>
     where TCommand : ICommand<TResponse>

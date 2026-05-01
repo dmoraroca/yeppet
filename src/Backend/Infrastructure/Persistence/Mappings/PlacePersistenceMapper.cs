@@ -1,8 +1,8 @@
-using YepPet.Domain.Places;
-using YepPet.Domain.Places.ValueObjects;
-using YepPet.Infrastructure.Persistence.Entities;
+using Zuppeto.Domain.Places;
+using Zuppeto.Domain.Places.ValueObjects;
+using Zuppeto.Infrastructure.Persistence.Entities;
 
-namespace YepPet.Infrastructure.Persistence.Mappings;
+namespace Zuppeto.Infrastructure.Persistence.Mappings;
 
 internal static class PlacePersistenceMapper
 {

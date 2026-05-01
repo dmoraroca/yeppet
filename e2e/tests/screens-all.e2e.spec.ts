@@ -11,14 +11,14 @@ test.beforeAll(async ({ request }) => {
 
 test('pàgina de login (sense sessió)', async ({ page }) => {
   await page.goto('/login');
-  await expect(page.getByRole('heading', { name: /Torna a entrar a YepPet/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Torna a entrar a Zuppeto/ })).toBeVisible();
 });
 
 test('pantalles usuari (USER): inici, llocs, detall, favorits, perfil, notificacions, contacte, ajuda', async ({
   page,
   request
 }) => {
-  await loginViaUi(page, 'user.e2e@yeppet.local', 'Admin123');
+  await loginViaUi(page, 'user.e2e@zuppeto.local', 'Admin123');
 
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Llocs que diuen');
@@ -45,12 +45,12 @@ test('pantalles usuari (USER): inici, llocs, detall, favorits, perfil, notificac
 
   await page.goto('/contacte');
   await expect(
-    page.getByRole('heading', { name: /Una via clara per contactar amb YepPet/i })
+    page.getByRole('heading', { name: /Una via clara per contactar amb Zuppeto/i })
   ).toBeVisible();
 
   await page.goto('/ajuda');
   await expect(
-    page.getByRole('heading', { name: /Com funciona YepPet avui/i })
+    page.getByRole('heading', { name: /Com funciona Zuppeto avui/i })
   ).toBeVisible();
 });
 
@@ -88,7 +88,7 @@ test('pantalles admin (ADMIN): permissions stub, documentació, usuaris, permiso
 });
 
 test('desenvolupador: documentació interna; sense accés a usuaris', async ({ page }) => {
-  await loginViaUi(page, 'developer.e2e@yeppet.local', 'Admin123');
+  await loginViaUi(page, 'developer.e2e@zuppeto.local', 'Admin123');
 
   await page.goto('/admin/documentacio');
   await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();

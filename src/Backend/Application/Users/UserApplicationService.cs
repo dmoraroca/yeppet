@@ -1,9 +1,9 @@
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Users;
-using YepPet.Domain.Users.ValueObjects;
-using YepPet.Application.Factories;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Users;
+using Zuppeto.Domain.Users.ValueObjects;
+using Zuppeto.Application.Factories;
 
-namespace YepPet.Application.Users;
+namespace Zuppeto.Application.Users;
 
 internal sealed class UserApplicationService(
     IUserRepository userRepository,

@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using YepPet.Application.Admin;
+using Zuppeto.Application.Admin;
 
-namespace YepPet.Api.Endpoints;
+namespace Zuppeto.Api.Endpoints;
 
 internal static class EndpointAuthorization
 {

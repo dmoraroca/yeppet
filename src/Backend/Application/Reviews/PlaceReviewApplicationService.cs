@@ -1,7 +1,7 @@
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Reviews;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Reviews;
 
-namespace YepPet.Application.Reviews;
+namespace Zuppeto.Application.Reviews;
 
 internal sealed class PlaceReviewApplicationService(IPlaceReviewRepository reviewRepository) : IPlaceReviewApplicationService
 {

@@ -1,7 +1,7 @@
-using YepPet.Domain.Reviews;
-using YepPet.Infrastructure.Persistence.Entities;
+using Zuppeto.Domain.Reviews;
+using Zuppeto.Infrastructure.Persistence.Entities;
 
-namespace YepPet.Infrastructure.Persistence.Mappings;
+namespace Zuppeto.Infrastructure.Persistence.Mappings;
 
 internal static class PlaceReviewPersistenceMapper
 {

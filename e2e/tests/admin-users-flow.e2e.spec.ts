@@ -5,9 +5,9 @@ test.beforeAll(async ({ request }) => {
   await ensureRoleUsers(request);
 });
 
-test.describe('YepPet - Administració - Manteniment d’usuaris', () => {
+test.describe('Zuppeto - Administració - Manteniment d’usuaris', () => {
   test('flux complet: crear i editar un usuari', async ({ page, request }) => {
-    const tempEmail = `test.e2e.${Date.now()}@yeppet.com`;
+    const tempEmail = `test.e2e.${Date.now()}@zuppeto.com`;
     const tempName = 'Usuari de Prova E2E';
 
     await loginViaUi(page, 'admin@admin.adm', 'Admin123');

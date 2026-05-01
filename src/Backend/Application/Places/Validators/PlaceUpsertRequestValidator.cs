@@ -1,7 +1,7 @@
-using YepPet.Application.Validation;
-using YepPet.Domain.Places;
+using Zuppeto.Application.Validation;
+using Zuppeto.Domain.Places;
 
-namespace YepPet.Application.Places.Validators;
+namespace Zuppeto.Application.Places.Validators;
 
 public sealed class PlaceUpsertRequestValidator : IValidator<PlaceUpsertRequest>
 {

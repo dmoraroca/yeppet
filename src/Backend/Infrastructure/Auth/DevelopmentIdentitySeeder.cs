@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using YepPet.Application.Auth;
-using YepPet.Infrastructure.Persistence;
-using YepPet.Infrastructure.Persistence.Entities;
+using Zuppeto.Application.Auth;
+using Zuppeto.Infrastructure.Persistence;
+using Zuppeto.Infrastructure.Persistence.Entities;
 
-namespace YepPet.Infrastructure.Auth;
+namespace Zuppeto.Infrastructure.Auth;
 
 public sealed class DevelopmentIdentitySeeder(
-    YepPetDbContext dbContext,
+    ZuppetoDbContext dbContext,
     IPasswordHasher passwordHasher)
 {
     private static readonly (string Key, string DisplayName)[] RoleSeeds =
@@ -205,7 +205,7 @@ public sealed class DevelopmentIdentitySeeder(
             email: "admin@admin.adm",
             password: "Admin123",
             role: "Admin",
-            displayName: "Administrador YepPet",
+            displayName: "Administrador Zuppeto",
             city: "Barcelona",
             country: "Espanya",
             bio: "Accés intern per revisar arquitectura, permisos i evolució del producte.",

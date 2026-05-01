@@ -1,6 +1,6 @@
-using YepPet.Application.Validation;
+using Zuppeto.Application.Validation;
 
-namespace YepPet.Application.Auth.Validators;
+namespace Zuppeto.Application.Auth.Validators;
 
 public sealed class GoogleLoginRequestValidator : IValidator<GoogleLoginRequest>
 {

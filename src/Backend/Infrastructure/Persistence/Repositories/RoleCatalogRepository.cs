@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Roles;
-using YepPet.Infrastructure.Persistence.Entities;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Roles;
+using Zuppeto.Infrastructure.Persistence.Entities;
 
-namespace YepPet.Infrastructure.Persistence.Repositories;
+namespace Zuppeto.Infrastructure.Persistence.Repositories;
 
-internal sealed class RoleCatalogRepository(YepPetDbContext dbContext) : IRoleCatalogRepository
+internal sealed class RoleCatalogRepository(ZuppetoDbContext dbContext) : IRoleCatalogRepository
 {
     public async Task<IReadOnlyList<RoleCatalogRow>> ListAsync(CancellationToken cancellationToken = default)
     {

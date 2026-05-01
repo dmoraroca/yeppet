@@ -1,4 +1,4 @@
-namespace YepPet.Application.Events;
+namespace Zuppeto.Application.Events;
 
 public interface IEventPublisher
 {

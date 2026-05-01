@@ -277,6 +277,7 @@ Resum del diagrama:
 
 Rutes reals validades:
 
+- el grup **`/api/places`** (tots els verbs i subrutes, inclòs `external/search`) queda darrere **`RequireAuthorization`** (JWT Bearer); vegeu també `docs/ca/api-ca.md`
 - `GET /api/places`
 - `GET /api/places/{id}`
 - `GET /api/places/cities`
@@ -330,7 +331,7 @@ Resum del diagrama:
 
 ## 2.10 Stack Docker local complet
 
-Per mantenir el mateix criteri de treball que a `escoles-publiques`, `yeppet` ja disposa d'un stack Docker complet de desenvolupament.
+Per mantenir el mateix criteri de treball que a `escoles-publiques`, `Zuppeto` ja disposa d'un stack Docker complet de desenvolupament.
 
 Peces afegides:
 
@@ -358,7 +359,7 @@ Resum del diagrama:
 
 ### 2.10.1 Perfils de Run and Debug a VS Code
 
-Per replicar el patró operatiu d'`escoles-publiques`, `yeppet` incorpora ara configuració nativa de `VS Code` a `.vscode/launch.json` i `.vscode/tasks.json`.
+Per replicar el patró operatiu d'`escoles-publiques`, `Zuppeto` incorpora ara configuració nativa de `VS Code` a `.vscode/launch.json` i `.vscode/tasks.json`.
 
 Perfils disponibles:
 
@@ -400,7 +401,7 @@ Notes tècniques:
 
 Resum del diagrama:
 
-- `launch.json` combina `attach` real de `.NET` a `yeppet-api` i debug web amb Brave
+- `launch.json` combina `attach` real de `.NET` a `zuppeto-api` i debug web amb Brave
 - l'API es depura per `coreclr` + `vsdbg` dins del contenidor
 - `tasks.json` encapsula les ordres `docker compose` per evitar passos manuals
 - el workspace pot aixecar la stack completa o només el servei que toqui, esperant que els serveis quedin llestos abans de depurar
@@ -417,7 +418,7 @@ S'ha incorporat **RabbitMQ** com a servei de desenvolupament i com a **dependèn
 - `src/Backend/Api/appsettings.json` i `appsettings.Development.json`: secció `RabbitMq` (`Enabled`, `HostName`, `Port`, `UserName`, `Password`, `VirtualHost`)
 - `src/Backend/Infrastructure/Infrastructure.csproj`: paquets `RabbitMQ.Client` i `Microsoft.Extensions.Configuration.Binder`
 - `src/Backend/Infrastructure/RabbitMq/RabbitMqOptions.cs`: enllaç amb la configuració
-- `src/Backend/Infrastructure/RabbitMq/RabbitMqDependencyInjection.cs`: registre **condicional** de `RabbitMQ.Client.IConnection` només si `RabbitMq:Enabled` és `true`; nom de connexió client `ClientProvidedName = yeppet-api`
+- `src/Backend/Infrastructure/RabbitMq/RabbitMqDependencyInjection.cs`: registre **condicional** de `RabbitMQ.Client.IConnection` només si `RabbitMq:Enabled` és `true`; nom de connexió client `ClientProvidedName = zuppeto-api`
 - `DependencyInjection.AddInfrastructure`: crida `AddRabbitMq(configuration)`
 
 **Decisió tècnica clau:**
@@ -566,7 +567,7 @@ Sobre la base anterior, la implementació ja incorpora aquestes peces tècniques
 
 Estat actual del flux (referència ràpida):
 
-- `GET /api/places` ja incorpora **fallback Google** quan el catàleg intern està buit i la consulta té prou context (vegeu punts 1–4 de la llista anterior); els candidats externs **no** persisteixen com a files noves de `places`
+- el grup **`/api/places`** exigeix **JWT** (tot el grup amb `RequireAuthorization`); `GET /api/places` incorpora **fallback Google** quan el catàleg intern està buit i la consulta té prou context (vegeu punts 1–4 de la llista anterior); els candidats externs **no** persisteixen com a files noves de `places`
 - **Compliment / retenció**: `GooglePlacesComplianceRetentionHostedService` pot **purgar** snapshots caducats (`place_search_queries`) i, si `GooglePlacesCompliance:Enabled`, **redactar** coordenades de files `places` amb procedència Google/Mixed quan `google_coordinates_cached_until < now` (detall a **§2.11.4**)
 - sense `GooglePlaces:ApiKey`, el preview extern i el fallback de cerca Google retornen llista buida (comportament esperat)
 
@@ -695,7 +696,7 @@ Remissió funcional: `docs/ca/funcional-ca.md` (**§12.5** i **§12.5.1**).
 | `latitude`, `longitude` | Nullables quan la coordenada **no** ha de persistir-se per compliment (vegeu mapper i worker). |
 | `exclude_from_osm_map` | Quan és cert: el producte **no** ha de pintar el pin a la capa OSM; el mapper persisteix `latitude`/`longitude` com a **NULL** en aquest cas (`PlacePersistenceMapper.Apply`). A la lectura cap al domini, si falten coordenades es poden usar valors de fallback només per mantenir invariant del valor objecte `GeoLocation` — la decisió de **mostrar** pin OSM ve dels DTO (`ExcludeFromOsmMap`, etc.). |
 
-Migracions de referència al repositori: `20260427120000_AddPlaceProvenance`; coordenades nullable / compliment OSM: `20260501141000_PlaceGoogleCoordinateRedaction`. El `YepPetDbContextModelSnapshot` ha de coincidir amb el runtime EF.
+Migracions de referència al repositori: `20260427120000_AddPlaceProvenance`; coordenades nullable / compliment OSM: `20260501141000_PlaceGoogleCoordinateRedaction`. El `ZuppetoDbContextModelSnapshot` ha de coincidir amb el runtime EF.
 
 #### Configuració
 
@@ -907,7 +908,7 @@ No consolidem de moment com a compartits:
 
 - `home-hero-section`
 - `trending-cities-section`
-- `why-yeppet-section`
+- `why-zuppeto-section`
 - `place-filters`
 - `favorites-page`
 
@@ -921,7 +922,7 @@ Aquests continuen sent especifics de la seva `feature` fins que aparegui una nec
   <span style="color:#c4b5fd;">HP[HomePage]</span>
   <span style="color:#c4b5fd;">HS[HomeHeroSection]</span>
   <span style="color:#c4b5fd;">TC[TrendingCitiesSection]</span>
-  <span style="color:#c4b5fd;">WY[WhyYepPetSection]</span>
+  <span style="color:#c4b5fd;">WY[WhyZuppetoSection]</span>
 
   <span style="color:#93c5fd;">PP[PlacesPage]</span>
   <span style="color:#93c5fd;">PFI[PlaceFilters]</span>
@@ -1189,7 +1190,7 @@ Aquest punt encara no esta tancat, pero ja te una primera base operativa:
 
 <pre style="background:#020617; color:#e5eef7; border:1px solid #1e293b; border-radius:16px; padding:20px; margin:16px 0; overflow:auto; line-height:1.65;"><code><span style="color:#5eead4; font-weight:700;">flowchart LR</span>
   <span style="color:#93c5fd;">MODEL[Model relacional tancat]</span> --&gt; <span style="color:#c4b5fd;">SQL[010-schema.sql]</span>
-  <span style="color:#c4b5fd;">SQL</span> --&gt; <span style="color:#86efac;">PG[(yeppet-db :5433)]</span>
+  <span style="color:#c4b5fd;">SQL</span> --&gt; <span style="color:#86efac;">PG[(zuppeto-db :5433)]</span>
   <span style="color:#86efac;">PG</span> -.-> <span style="color:#fcd34d;">DBEAVER[Inspeccio a DBeaver]</span>
   <span style="color:#86efac;">PG</span> -.-> <span style="color:#f9a8d4;">EFNEXT[DbContext i mappings pendents]</span></code></pre>
 
@@ -1249,7 +1250,7 @@ Peces principals:
 
 - `home-hero-section`
 - `trending-cities-section`
-- `why-yeppet-section`
+- `why-zuppeto-section`
 
 Decisions tecniques rellevants:
 
@@ -1456,7 +1457,7 @@ Ubicacio:
 La sessio fake es guarda a `localStorage` amb una clau fixa:
 
 ```ts
-const STORAGE_KEY = 'yeppet-auth-user';
+const STORAGE_KEY = 'zuppeto-auth-user';
 ```
 
 Comportament:

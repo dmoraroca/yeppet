@@ -1,7 +1,7 @@
-using YepPet.Application.Admin;
-using YepPet.Domain.Navigation;
+using Zuppeto.Application.Admin;
+using Zuppeto.Domain.Navigation;
 
-namespace YepPet.Application.Factories;
+namespace Zuppeto.Application.Factories;
 
 public sealed class MenuItemDefinitionFactory : IMenuItemDefinitionFactory
 {

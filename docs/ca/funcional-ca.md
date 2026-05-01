@@ -254,7 +254,7 @@ La Fase I va servir per validar la primera forma usable de Zuppeto sense dependr
 
 La base funcional que queda consolidada en aquesta fase es:
 
-- projecte base a `yeppetº`
+- projecte base a `Zuppeto`
 - frontend Angular a `src/Web`
 - `header` i `footer` com a estructura estable de navegacio
 - `home` separada per seccions i no com a una sola peça monolitica
@@ -1737,6 +1737,7 @@ Aquest apartat concreta el que §12.5 resumeix en llenguatge de producte, perqu�
    - Funcionalment: **no** es mostra el pin a OSM com si fos coordenada pròpia; es manté el que diu §12.5 sobre **capa Google** o estats de fitxa clars quan la font és Google.
 
 4. **Cerca de locals (`GET /api/places`)**  
+   - Les crides al grup **`/api/places`** (lectura i cerques associades) van amb **JWT** per evitar consum anònim costós (p. ex. fallback Google); el producte ja orienta l’usuari a **iniciar sessió** per navegar llocs.  
    - Sempre **primer** el catàleg intern de Zuppeto (amb **snapshot de cerca** de curta durada només per rendiment; vegeu tècnic).  
    - Si no hi ha resultats i la consulta té prou context (regles al tècnic), es pot cridar **Google Places** i retornar candidats **només en la resposta HTTP** (identificadors interns deterministes per a la sessió), **sense crear** automàticament una fila nova al catàleg per cada candidat. Donar d’alta o fusionar un local al catàleg és una **acció explícita** (p. ex. administració o flux de creació).
 

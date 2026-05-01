@@ -173,7 +173,7 @@ Aquest model es treballa ja sobre una base de dades de desenvolupament preparada
 
 - `docker-compose.yml`
 - `.env.example`
-- contenidor `yeppet-db`
+- contenidor `zuppeto-db`
 - port extern local `5433` cap al `5432` intern del contenidor
 - script executable `sql/init/010-schema.sql`
 
@@ -195,7 +195,7 @@ Resum del diagrama:
 
 ## Materialitzacio local actual
 
-L'estructura relacional ja existeix a la BBDD local `yeppet` amb:
+L'estructura relacional ja existeix a la BBDD local `zuppeto` amb:
 
 - taules creades al schema `public`
 - restriccions `CHECK`

@@ -1,4 +1,4 @@
-namespace YepPet.Infrastructure.Persistence.Specifications;
+namespace Zuppeto.Infrastructure.Persistence.Specifications;
 
 internal interface IQuerySpecification<T>
 {

@@ -1,5 +1,5 @@
 // Copy to: src/Backend/Infrastructure/Persistence/Entities/CountryRecord.cs
-namespace YepPet.Infrastructure.Persistence.Entities;
+namespace Zuppeto.Infrastructure.Persistence.Entities;
 
 public sealed class CountryRecord
 {

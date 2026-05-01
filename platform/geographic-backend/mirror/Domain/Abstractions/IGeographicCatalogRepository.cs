@@ -1,6 +1,6 @@
-using YepPet.Domain.Geography;
+using Zuppeto.Domain.Geography;
 
-namespace YepPet.Domain.Abstractions;
+namespace Zuppeto.Domain.Abstractions;
 
 public interface IGeographicCatalogRepository
 {

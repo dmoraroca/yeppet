@@ -1,12 +1,12 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
-using YepPet.Application.Admin;
-using YepPet.Application.Results;
-using YepPet.Application.Validation;
-using YepPet.Api.Validation;
+using Zuppeto.Application.Admin;
+using Zuppeto.Application.Results;
+using Zuppeto.Application.Validation;
+using Zuppeto.Api.Validation;
 
-namespace YepPet.Api.Endpoints;
+namespace Zuppeto.Api.Endpoints;
 
 internal static class AdminEndpoints
 {

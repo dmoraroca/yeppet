@@ -147,7 +147,7 @@ Resum del diagrama:
   <span style="color:#c4b5fd;">HP[HomePage]</span>
   <span style="color:#c4b5fd;">HS[HomeHeroSection]</span>
   <span style="color:#c4b5fd;">TC[TrendingCitiesSection]</span>
-  <span style="color:#c4b5fd;">WY[WhyYepPetSection]</span>
+  <span style="color:#c4b5fd;">WY[WhyZuppetoSection]</span>
 
   <span style="color:#93c5fd;">PP[PlacesPage]</span>
   <span style="color:#93c5fd;">PFI[PlaceFilters]</span>
@@ -246,7 +246,7 @@ Peces principals:
 
 - `home-hero-section`
 - `trending-cities-section`
-- `why-yeppet-section`
+- `why-zuppeto-section`
 
 ### 6.2 Places
 
@@ -653,4 +653,4 @@ La feina activa ara mateix correspon a la fase II:
 
 La planificacio detallada i l'estat viu de les fases es manté a:
 
-- [`project-phases.md`](/home/dmoraroca/Documents/_DATA/repos/yeppet/docs/project-phases.md)
+- [`project-phases.md`](/home/dmoraroca/Documents/_DATA/repos/zuppeto/docs/project-phases.md)

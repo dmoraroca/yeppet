@@ -1,4 +1,4 @@
-namespace YepPet.Application.Favorites;
+namespace Zuppeto.Application.Favorites;
 
 public interface IFavoriteListApplicationService
 {

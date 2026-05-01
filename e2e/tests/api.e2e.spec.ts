@@ -35,7 +35,7 @@ test('admin api endpoints respond', async ({ request }) => {
 });
 
 test('user cannot access admin endpoints', async ({ request }) => {
-  const token = await apiLogin(request, 'user.e2e@yeppet.local', 'Admin123');
+  const token = await apiLogin(request, 'user.e2e@zuppeto.local', 'Admin123');
 
   const users = await request.get(`${API_BASE_URL}/api/admin/users`, {
     headers: { Authorization: `Bearer ${token}` }

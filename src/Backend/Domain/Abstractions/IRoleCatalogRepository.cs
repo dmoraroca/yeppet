@@ -1,6 +1,6 @@
-using YepPet.Domain.Roles;
+using Zuppeto.Domain.Roles;
 
-namespace YepPet.Domain.Abstractions;
+namespace Zuppeto.Domain.Abstractions;
 
 public interface IRoleCatalogRepository
 {

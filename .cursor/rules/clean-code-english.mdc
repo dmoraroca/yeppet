@@ -1,9 +1,9 @@
 ---
-description: Clean code — identifiers and code comments in English (YepPet)
+description: Clean code — identifiers and code comments in English (Zuppeto)
 alwaysApply: true
 ---
 
-# Clean code: English in code (YepPet)
+# Clean code: English in code (Zuppeto)
 
 When writing or editing **source code** (C#, TypeScript, SQL in migrations, shell scripts in `scripts/`, etc.):
 

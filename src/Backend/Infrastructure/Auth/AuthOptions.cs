@@ -1,4 +1,4 @@
-namespace YepPet.Infrastructure.Auth;
+namespace Zuppeto.Infrastructure.Auth;
 
 public sealed class AuthOptions
 {
@@ -12,11 +12,11 @@ public sealed class AuthOptions
 
     public sealed class JwtOptions
     {
-        public string Issuer { get; init; } = "YepPet";
+        public string Issuer { get; init; } = "Zuppeto";
 
-        public string Audience { get; init; } = "YepPet.Web";
+        public string Audience { get; init; } = "Zuppeto.Web";
 
-        public string SigningKey { get; init; } = "dev-only-yep-pet-signing-key-change-in-production-123456789";
+        public string SigningKey { get; init; } = "dev-only-zuppeto-signing-key-change-in-production-123456789";
 
         public int ExpiresInMinutes { get; init; } = 480;
     }

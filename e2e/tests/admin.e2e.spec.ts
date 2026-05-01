@@ -33,7 +33,7 @@ test('admin header and account dropdown', async ({ page }, testInfo) => {
   await primaryNav.locator('summary[aria-label="Compte"]').click();
 
   const accountMenu = page.locator('.site-header__account-menu');
-  await expect(accountMenu.getByText('Administrador YepPet')).toBeVisible();
+  await expect(accountMenu.getByText('Administrador Zuppeto')).toBeVisible();
   await expect(accountMenu.getByText('admin@admin.adm')).toBeVisible();
   await expect(accountMenu.getByText('Admin', { exact: true })).toBeVisible();
 
@@ -59,7 +59,7 @@ test('admin users create form', async ({ page }, testInfo) => {
   const submitButton = modal.getByRole('button', { name: 'Crear' });
   await expect(submitButton).toBeDisabled();
 
-  await modal.getByPlaceholder('usuari@domini.com').fill('viewer.auto@yeppet.local');
+  await modal.getByPlaceholder('usuari@domini.com').fill('viewer.auto@zuppeto.local');
   await modal.getByPlaceholder('Contrasenya inicial').fill('Admin123');
   await modal.getByPlaceholder("Nom que veurà l'usuari").fill('Viewer Auto');
   await modal.getByPlaceholder('Ciutat').fill('Barcelona');

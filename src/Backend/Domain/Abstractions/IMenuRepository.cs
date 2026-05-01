@@ -1,6 +1,6 @@
-using YepPet.Domain.Navigation;
+using Zuppeto.Domain.Navigation;
 
-namespace YepPet.Domain.Abstractions;
+namespace Zuppeto.Domain.Abstractions;
 
 public interface IMenuRepository
 {

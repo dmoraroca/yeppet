@@ -3,16 +3,16 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
-using YepPet.Application.Auth;
+using Zuppeto.Application.Auth;
 
-namespace YepPet.Infrastructure.Auth;
+namespace Zuppeto.Infrastructure.Auth;
 
 internal sealed class FacebookOAuthClient(
     HttpClient httpClient,
     IOptions<AuthOptions> options,
     IDataProtectionProvider dataProtectionProvider) : IFacebookOAuthClient
 {
-    private readonly IDataProtector dataProtector = dataProtectionProvider.CreateProtector("YepPet.Auth.Facebook.State");
+    private readonly IDataProtector dataProtector = dataProtectionProvider.CreateProtector("Zuppeto.Auth.Facebook.State");
 
     public bool IsConfigured =>
         !string.IsNullOrWhiteSpace(options.Value.Facebook.AppId) &&

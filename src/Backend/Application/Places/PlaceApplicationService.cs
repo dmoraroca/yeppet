@@ -1,11 +1,11 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Places;
-using YepPet.Domain.Places.ValueObjects;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Places;
+using Zuppeto.Domain.Places.ValueObjects;
 
-namespace YepPet.Application.Places;
+namespace Zuppeto.Application.Places;
 
 internal sealed class PlaceApplicationService : IPlaceApplicationService
 {
@@ -423,23 +423,23 @@ internal sealed class PlaceApplicationService : IPlaceApplicationService
             candidate.ExternalId.Trim(),
             cacheUntil,
             nowUtc,
-            cacheExpired: false,
-            requiresGoogleMapForGoogleCoordinates: true,
-            excludeFromOsmMap: true,
-            acceptsDogs: candidate.PetFriendlyAuto != false,
-            acceptsCats: candidate.PetFriendlyAuto != false,
-            petPolicyLabel: "Google Places (preview)",
-            petPolicyNotes: string.Empty,
-            pricingLabel: "—",
-            ratingAverage: 0m,
-            reviewCount: 0,
-            tags: [],
-            features: []);
+            GoogleCoordinatesCacheExpired: false,
+            RequiresGoogleMapForGoogleCoordinates: true,
+            ExcludeFromOsmMap: true,
+            AcceptsDogs: candidate.PetFriendlyAuto != false,
+            AcceptsCats: candidate.PetFriendlyAuto != false,
+            PetPolicyLabel: "Google Places (preview)",
+            PetPolicyNotes: string.Empty,
+            PricingLabel: "—",
+            RatingAverage: 0m,
+            ReviewCount: 0,
+            Tags: [],
+            Features: []);
     }
 
     private static Guid StablePlaceIdFromGoogleExternalId(string externalId)
     {
-        var payload = Encoding.UTF8.GetBytes($"YepPet.GooglePlaces:{externalId.Trim()}");
+        var payload = Encoding.UTF8.GetBytes($"Zuppeto.GooglePlaces:{externalId.Trim()}");
         Span<byte> hash = stackalloc byte[32];
         SHA256.HashData(payload, hash);
         Span<byte> guidBytes = stackalloc byte[16];

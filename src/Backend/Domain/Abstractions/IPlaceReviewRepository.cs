@@ -1,6 +1,6 @@
-using YepPet.Domain.Reviews;
+using Zuppeto.Domain.Reviews;
 
-namespace YepPet.Domain.Abstractions;
+namespace Zuppeto.Domain.Abstractions;
 
 public interface IPlaceReviewRepository
 {

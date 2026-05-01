@@ -1,6 +1,6 @@
-using YepPet.Application.Events;
+using Zuppeto.Application.Events;
 
-namespace YepPet.Application.Admin.Events;
+namespace Zuppeto.Application.Admin.Events;
 
 public sealed record UserCreatedEvent(Guid UserId, string Email, string Role) : IDomainEvent
 {

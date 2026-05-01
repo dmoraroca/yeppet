@@ -1,4 +1,4 @@
-namespace YepPet.Infrastructure.GooglePlaces;
+namespace Zuppeto.Infrastructure.GooglePlaces;
 
 /// <summary>
 /// Operational retention controls for persisted Google Places-derived coordinates (configure per current Maps Platform terms).

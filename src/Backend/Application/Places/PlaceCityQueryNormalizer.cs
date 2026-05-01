@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace YepPet.Application.Places;
+namespace Zuppeto.Application.Places;
 
 /// <summary>
 /// Builds a safe substring for SQL ILIKE: keeps letters (including diacritics), digits, spaces, hyphen and apostrophe; drops LIKE wildcards.

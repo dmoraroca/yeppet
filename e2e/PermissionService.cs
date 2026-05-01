@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
-using YepPet.Application.Common.Interfaces;
+using Zuppeto.Application.Common.Interfaces;
 
-namespace YepPet.Infrastructure.Services;
+namespace Zuppeto.Infrastructure.Services;
 
 /// <summary>
 /// Implementació base del servei de permisos seguint SOLID.

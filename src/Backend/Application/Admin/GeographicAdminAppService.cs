@@ -1,8 +1,8 @@
-using YepPet.Application.Results;
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Geography;
+using Zuppeto.Application.Results;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Geography;
 
-namespace YepPet.Application.Admin;
+namespace Zuppeto.Application.Admin;
 
 public sealed class GeographicAdminAppService(IGeographicCatalogRepository repository) : IGeographicAdminAppService
 {

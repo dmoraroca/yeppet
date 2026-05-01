@@ -1,14 +1,14 @@
 using Microsoft.EntityFrameworkCore;
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Geography;
-using YepPet.Domain.Places;
-using YepPet.Infrastructure.Persistence.Entities;
-using YepPet.Infrastructure.Persistence.Specifications;
-using YepPet.Infrastructure.Persistence.Mappings;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Geography;
+using Zuppeto.Domain.Places;
+using Zuppeto.Infrastructure.Persistence.Entities;
+using Zuppeto.Infrastructure.Persistence.Specifications;
+using Zuppeto.Infrastructure.Persistence.Mappings;
 
-namespace YepPet.Infrastructure.Persistence.Repositories;
+namespace Zuppeto.Infrastructure.Persistence.Repositories;
 
-internal sealed class PlaceRepository(YepPetDbContext dbContext) : IPlaceRepository
+internal sealed class PlaceRepository(ZuppetoDbContext dbContext) : IPlaceRepository
 {
     public async Task<Place?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {

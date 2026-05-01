@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace YepPet.Application.Validation;
+namespace Zuppeto.Application.Validation;
 
 public static class ValidationHelpers
 {

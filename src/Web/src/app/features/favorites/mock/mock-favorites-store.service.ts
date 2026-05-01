@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { FavoritesStore } from '../services/favorites-store.token';
 
-const STORAGE_KEY = 'yeppet-favorite-ids';
+const STORAGE_KEY = 'zuppeto-favorite-ids';
 const DEFAULT_FAVORITES = ['barcelona-pawtel-gotic', 'berlin-grunhof'];
 
 @Injectable({ providedIn: 'root' })

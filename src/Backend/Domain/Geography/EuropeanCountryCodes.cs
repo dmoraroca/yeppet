@@ -1,4 +1,4 @@
-namespace YepPet.Domain.Geography;
+namespace Zuppeto.Domain.Geography;
 
 /// <summary>
 /// ISO 3166-1 alpha-2 codes for countries in the geographic Europe region, aligned with

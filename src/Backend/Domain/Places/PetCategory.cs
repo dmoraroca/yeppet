@@ -1,4 +1,4 @@
-namespace YepPet.Domain.Places;
+namespace Zuppeto.Domain.Places;
 
 public enum PetCategory
 {

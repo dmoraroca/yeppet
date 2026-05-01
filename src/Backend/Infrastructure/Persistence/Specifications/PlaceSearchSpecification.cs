@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using YepPet.Domain.Places;
-using YepPet.Infrastructure.Persistence.Entities;
+using Zuppeto.Domain.Places;
+using Zuppeto.Infrastructure.Persistence.Entities;
 
-namespace YepPet.Infrastructure.Persistence.Specifications;
+namespace Zuppeto.Infrastructure.Persistence.Specifications;
 
 internal sealed class PlaceSearchSpecification(PlaceSearchCriteria criteria) : IQuerySpecification<PlaceRecord>
 {

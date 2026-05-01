@@ -1,9 +1,11 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
-using YepPet.Application.Users;
-using YepPet.Application.Validation;
-using YepPet.Api.Validation;
+using Zuppeto.Application.Users;
+using Zuppeto.Application.Validation;
+using Zuppeto.Api.Validation;
 
-namespace YepPet.Api.Endpoints;
+namespace Zuppeto.Api.Endpoints;
 
 internal static class UserEndpoints
 {
@@ -14,7 +16,7 @@ internal static class UserEndpoints
         group.MapGet("/{id:guid}", GetByIdAsync);
         group.MapGet("/by-email/{email}", GetByEmailAsync);
         group.MapPost("/", RegisterAsync);
-        group.MapPut("/{id:guid}/profile", UpdateProfileAsync);
+        group.MapPut("/{id:guid}/profile", UpdateProfileAsync).RequireAuthorization();
 
         return app;
     }
@@ -53,13 +55,20 @@ internal static class UserEndpoints
         return TypedResults.Created($"/api/users/{userId}", userId);
     }
 
-    private static async Task<Results<NoContent, ValidationProblem>> UpdateProfileAsync(
+    private static async Task<Results<NoContent, ForbidHttpResult, ValidationProblem>> UpdateProfileAsync(
         Guid id,
+        ClaimsPrincipal principal,
         UserProfileUpdateRequest request,
         IValidator<UserProfileUpdateRequest> validator,
         IUserApplicationService service,
         CancellationToken cancellationToken)
     {
+        var userId = principal.GetCurrentUserId();
+        if (userId is null || userId.Value != id)
+        {
+            return TypedResults.Forbid();
+        }
+
         var normalized = request with { Id = id };
         var validation = validator.Validate(normalized);
         if (!validation.IsValid)

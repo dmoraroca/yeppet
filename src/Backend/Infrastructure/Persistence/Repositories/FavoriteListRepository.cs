@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Favorites;
-using YepPet.Infrastructure.Persistence.Mappings;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Favorites;
+using Zuppeto.Infrastructure.Persistence.Mappings;
 
-namespace YepPet.Infrastructure.Persistence.Repositories;
+namespace Zuppeto.Infrastructure.Persistence.Repositories;
 
-internal sealed class FavoriteListRepository(YepPetDbContext dbContext) : IFavoriteListRepository
+internal sealed class FavoriteListRepository(ZuppetoDbContext dbContext) : IFavoriteListRepository
 {
     public async Task<FavoriteList?> GetByOwnerAsync(Guid ownerUserId, CancellationToken cancellationToken = default)
     {

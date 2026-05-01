@@ -1,6 +1,6 @@
-using YepPet.Application.Validation;
+using Zuppeto.Application.Validation;
 
-namespace YepPet.Application.Places.Validators;
+namespace Zuppeto.Application.Places.Validators;
 
 public sealed class PlaceCitySearchRequestValidator : IValidator<PlaceCitySearchRequest>
 {

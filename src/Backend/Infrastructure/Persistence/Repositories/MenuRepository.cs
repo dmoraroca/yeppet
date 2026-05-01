@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Navigation;
-using YepPet.Infrastructure.Persistence.Entities;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Navigation;
+using Zuppeto.Infrastructure.Persistence.Entities;
 
-namespace YepPet.Infrastructure.Persistence.Repositories;
+namespace Zuppeto.Infrastructure.Persistence.Repositories;
 
-internal sealed class MenuRepository(YepPetDbContext dbContext) : IMenuRepository
+internal sealed class MenuRepository(ZuppetoDbContext dbContext) : IMenuRepository
 {
     public async Task<IReadOnlyCollection<MenuItemDefinition>> GetDefinitionsAsync(CancellationToken cancellationToken = default)
     {

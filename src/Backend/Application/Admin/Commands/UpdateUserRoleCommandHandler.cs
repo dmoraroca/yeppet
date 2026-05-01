@@ -1,12 +1,12 @@
-using YepPet.Application.Commands;
-using YepPet.Application.Admin.Events;
-using YepPet.Application.Events;
-using YepPet.Application.Results;
-using YepPet.Application.Users;
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Users;
+using Zuppeto.Application.Commands;
+using Zuppeto.Application.Admin.Events;
+using Zuppeto.Application.Events;
+using Zuppeto.Application.Results;
+using Zuppeto.Application.Users;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Users;
 
-namespace YepPet.Application.Admin.Commands;
+namespace Zuppeto.Application.Admin.Commands;
 
 public sealed class UpdateUserRoleCommandHandler(
     IUserRepository userRepository,

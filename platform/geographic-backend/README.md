@@ -23,7 +23,7 @@ dotnet ef database update --project src/Backend/Infrastructure --startup-project
 ## Pas 3: compilar
 
 ```bash
-dotnet build YepPet.sln
+dotnet build Zuppeto.sln
 ```
 
 Després d’instal·lar el backend, el frontend (`src/Web`) ofereix les pantalles `/admin/paisos` i `/admin/ciutats` que consumeixen `/api/admin/countries` i `/api/admin/cities`.

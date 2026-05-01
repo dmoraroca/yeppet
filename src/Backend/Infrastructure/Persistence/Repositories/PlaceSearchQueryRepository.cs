@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using YepPet.Domain.Abstractions;
-using YepPet.Infrastructure.Persistence.Entities;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Infrastructure.Persistence.Entities;
 
-namespace YepPet.Infrastructure.Persistence.Repositories;
+namespace Zuppeto.Infrastructure.Persistence.Repositories;
 
-internal sealed class PlaceSearchQueryRepository(YepPetDbContext dbContext) : IPlaceSearchQueryRepository
+internal sealed class PlaceSearchQueryRepository(ZuppetoDbContext dbContext) : IPlaceSearchQueryRepository
 {
     public async Task<IReadOnlyList<Guid>?> TryGetFreshPlaceIdsAsync(
         IPlaceSearchQueryRepository.SearchSnapshotKey key,

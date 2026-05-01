@@ -1,9 +1,9 @@
 ---
-description: Format obligatori dels missatges de commit YepPet (número + fase + resum)
+description: Format obligatori dels missatges de commit Zuppeto (número + fase + resum)
 alwaysApply: true
 ---
 
-# Missatges de commit (YepPet)
+# Missatges de commit (Zuppeto)
 
 **Sempre** utilitza aquest format, en una sola línia (títol del commit):
 

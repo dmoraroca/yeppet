@@ -1,6 +1,6 @@
-using YepPet.Domain.Abstractions;
+using Zuppeto.Domain.Abstractions;
 
-namespace YepPet.Application.Navigation;
+namespace Zuppeto.Application.Navigation;
 
 internal sealed class NavigationApplicationService(IMenuRepository menuRepository) : INavigationApplicationService
 {

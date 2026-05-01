@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Permissions;
-using YepPet.Infrastructure.Persistence.Entities;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Permissions;
+using Zuppeto.Infrastructure.Persistence.Entities;
 
-namespace YepPet.Infrastructure.Persistence.Repositories;
+namespace Zuppeto.Infrastructure.Persistence.Repositories;
 
-internal sealed class RolePermissionRepository(YepPetDbContext dbContext) : IRolePermissionRepository
+internal sealed class RolePermissionRepository(ZuppetoDbContext dbContext) : IRolePermissionRepository
 {
     public async Task<IReadOnlyCollection<PermissionDefinition>> GetDefinitionsAsync(CancellationToken cancellationToken = default)
     {

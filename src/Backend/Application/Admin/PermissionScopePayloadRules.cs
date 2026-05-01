@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace YepPet.Application.Admin;
+namespace Zuppeto.Application.Admin;
 
 /// <summary>
 /// Normalizes and validates JSON stored in <c>permissions.scope_payload</c> for menu/page/action scopes.

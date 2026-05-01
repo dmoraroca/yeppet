@@ -1,8 +1,8 @@
 using Google.Apis.Auth;
 using Microsoft.Extensions.Options;
-using YepPet.Application.Auth;
+using Zuppeto.Application.Auth;
 
-namespace YepPet.Infrastructure.Auth;
+namespace Zuppeto.Infrastructure.Auth;
 
 internal sealed class GoogleIdTokenVerifier(IOptions<AuthOptions> options) : IGoogleIdTokenVerifier
 {

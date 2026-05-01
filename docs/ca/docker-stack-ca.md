@@ -2,7 +2,7 @@
 
 ## Objectiu
 
-Aquest document descriu el stack Docker local de `yeppet` per treballar amb web, API i base de dades en un únic entorn de desenvolupament.
+Aquest document descriu el stack Docker local de `Zuppeto` per treballar amb web, API i base de dades en un únic entorn de desenvolupament.
 
 ## Serveis
 
@@ -69,7 +69,7 @@ Perfils:
 
 Tasques:
 
-- `wait api ready` comprova `http://127.0.0.1:5211/health/db` des de l'amfitrió (script `.vscode/wait-api-ready.sh`), sense `docker exec`; si `yeppet-api` ha sortit, mostra logs del contenidor
+- `wait api ready` comprova `http://127.0.0.1:5211/health/db` des de l'amfitrió (script `.vscode/wait-api-ready.sh`), sense `docker exec`; si `zuppeto-api` ha sortit, mostra logs del contenidor
 - `docker up all`
 - `docker up db`
 - `docker up api`
@@ -84,7 +84,7 @@ Tasques:
 Notes de llançament:
 
 - `Docker: Stack completa (Attach)` no depura `db`; arrenca `db` per dependència i fa `attach` només a `api` i `web`
-- l'API es depura amb `vsdbg` dins del contenidor `yeppet-api`
+- l'API es depura amb `vsdbg` dins del contenidor `zuppeto-api`
 - el perfil `Docker: API + Swagger (Attach)` combina `attach` real a l'API i obertura de `Swagger`
 - la web es depura amb Brave via `pwa-chrome` i `runtimeExecutable`
 - els perfils esperen que `api` i `web` estiguin llestos abans de l'attach

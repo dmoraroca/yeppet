@@ -1,4 +1,4 @@
-namespace YepPet.Application.Results;
+namespace Zuppeto.Application.Results;
 
 public sealed class Result<T>
 {

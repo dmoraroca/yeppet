@@ -1,7 +1,7 @@
 import { HomeCity, HomeHeroContent, HomeWhyContent } from '../models/home-content.model';
 
 export const HOME_HERO_FAKE: HomeHeroContent = {
-  eyebrow: 'YepPet · Descoberta pet-friendly',
+  eyebrow: 'Zuppeto · Descoberta pet-friendly',
   titleStart: 'Llocs que diuen',
   titleHighlight: 'SÍ',
   titleEnd: 'a les mascotes.',
@@ -52,7 +52,7 @@ export const HOME_TRENDING_CITIES_FAKE: HomeCity[] = [
 ];
 
 export const HOME_WHY_FAKE: HomeWhyContent = {
-  eyebrow: 'Per què YepPet',
+  eyebrow: 'Per què Zuppeto',
   title: 'Una experiència pensada per reduir fricció, no només per llistar llocs.',
   reasons: [
     'No més trucades per confirmar si accepten mascotes.',

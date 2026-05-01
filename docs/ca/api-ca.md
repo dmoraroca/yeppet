@@ -41,6 +41,8 @@ Resum del diagrama:
 
 ### Places
 
+Tot el grup **`/api/places`** (lectures i cerques externes incloses) exigeix **`Authorization: Bearer <JWT>`** per limitar consum anònim (p. ex. fallback Google). Els escrits **`POST` / `PUT`** sobre aquest grup també requereixen permís **`action.places.manage`** (mateix criteri que el manteniment admin de llocs).
+
 - `GET /api/places`
 - `GET /api/places/cities`
 - `GET /api/places/{id}`

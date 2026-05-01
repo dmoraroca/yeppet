@@ -1,4 +1,4 @@
-namespace YepPet.Application.Commands;
+namespace Zuppeto.Application.Commands;
 
 public interface ICommand<out TResponse>
 {

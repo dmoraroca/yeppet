@@ -1,4 +1,4 @@
-namespace YepPet.Domain.Permissions;
+namespace Zuppeto.Domain.Permissions;
 
 public sealed record PermissionDefinition(
     string Key,

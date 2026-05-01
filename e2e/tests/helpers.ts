@@ -28,9 +28,12 @@ export async function loginViaUi(page: Page, email: string, password: string): P
   ).toBeVisible();
 }
 
-/** Primer lloc del catàleg públic (per provar detall). */
+/** Primer lloc del catàleg (JWT obligatori al grup `/api/places`). */
 export async function fetchFirstPlaceId(request: APIRequestContext): Promise<string | null> {
-  const response = await request.get(`${API_BASE_URL}/api/places`);
+  const token = await apiLogin(request, 'user.e2e@zuppeto.local', 'Admin123');
+  const response = await request.get(`${API_BASE_URL}/api/places`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
   if (!response.ok()) {
     return null;
   }
@@ -84,21 +87,21 @@ export async function ensureRoleUsers(request: APIRequestContext) {
   const adminToken = await apiLogin(request, 'admin@admin.adm', 'Admin123');
 
   await ensureUser(request, adminToken, {
-    email: 'viewer.e2e@yeppet.local',
+    email: 'viewer.e2e@zuppeto.local',
     password: 'Admin123',
     role: 'Viewer',
     displayName: 'Viewer E2E'
   });
 
   await ensureUser(request, adminToken, {
-    email: 'user.e2e@yeppet.local',
+    email: 'user.e2e@zuppeto.local',
     password: 'Admin123',
     role: 'User',
     displayName: 'User E2E'
   });
 
   await ensureUser(request, adminToken, {
-    email: 'developer.e2e@yeppet.local',
+    email: 'developer.e2e@zuppeto.local',
     password: 'Admin123',
     role: 'Developer',
     displayName: 'Developer E2E'

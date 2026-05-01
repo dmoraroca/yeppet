@@ -1,6 +1,6 @@
-using YepPet.Domain.Permissions;
+using Zuppeto.Domain.Permissions;
 
-namespace YepPet.Domain.Abstractions;
+namespace Zuppeto.Domain.Abstractions;
 
 public interface IRolePermissionRepository
 {

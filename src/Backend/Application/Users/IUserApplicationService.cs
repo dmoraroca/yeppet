@@ -1,4 +1,4 @@
-namespace YepPet.Application.Users;
+namespace Zuppeto.Application.Users;
 
 public interface IUserApplicationService
 {

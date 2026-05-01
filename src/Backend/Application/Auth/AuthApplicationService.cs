@@ -1,9 +1,9 @@
-using YepPet.Application.Users;
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Users;
-using YepPet.Domain.Users.ValueObjects;
+using Zuppeto.Application.Users;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Users;
+using Zuppeto.Domain.Users.ValueObjects;
 
-namespace YepPet.Application.Auth;
+namespace Zuppeto.Application.Auth;
 
 internal sealed class AuthApplicationService(
     IUserRepository userRepository,

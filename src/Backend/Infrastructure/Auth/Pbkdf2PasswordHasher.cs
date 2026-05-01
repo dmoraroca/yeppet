@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
-using YepPet.Application.Auth;
+using Zuppeto.Application.Auth;
 
-namespace YepPet.Infrastructure.Auth;
+namespace Zuppeto.Infrastructure.Auth;
 
 internal sealed class Pbkdf2PasswordHasher : IPasswordHasher
 {

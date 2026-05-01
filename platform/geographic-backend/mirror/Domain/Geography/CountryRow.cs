@@ -1,4 +1,4 @@
-namespace YepPet.Domain.Geography;
+namespace Zuppeto.Domain.Geography;
 
 public sealed record CountryRow(
     Guid Id,

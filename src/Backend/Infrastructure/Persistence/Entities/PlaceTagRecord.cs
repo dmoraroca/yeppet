@@ -1,4 +1,4 @@
-namespace YepPet.Infrastructure.Persistence.Entities;
+namespace Zuppeto.Infrastructure.Persistence.Entities;
 
 public sealed class PlaceTagRecord
 {

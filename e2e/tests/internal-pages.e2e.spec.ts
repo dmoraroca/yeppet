@@ -21,13 +21,13 @@ test('unauthenticated cannot access internal documentation', async ({ page }) =>
 });
 
 test('developer can access internal documentation', async ({ page }) => {
-  await login(page, 'developer.e2e@yeppet.local', 'Admin123');
+  await login(page, 'developer.e2e@zuppeto.local', 'Admin123');
   await page.goto('/admin/documentacio');
   await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();
 });
 
 test('developer cannot access admin users page', async ({ page }) => {
-  await login(page, 'developer.e2e@yeppet.local', 'Admin123');
+  await login(page, 'developer.e2e@zuppeto.local', 'Admin123');
   await page.goto('/admin/usuaris');
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Llocs que diuen');

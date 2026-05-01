@@ -3,9 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using YepPet.Infrastructure.Persistence;
+using Zuppeto.Infrastructure.Persistence;
 
-namespace YepPet.Infrastructure.GooglePlaces;
+namespace Zuppeto.Infrastructure.GooglePlaces;
 
 /// <summary>
 /// Periodically removes expired internal search snapshots and redacts expired Google-sourced coordinate caches.
@@ -22,7 +22,7 @@ internal sealed class GooglePlacesComplianceRetentionHostedService(
             try
             {
                 using var scope = scopeFactory.CreateScope();
-                var db = scope.ServiceProvider.GetRequiredService<YepPetDbContext>();
+                var db = scope.ServiceProvider.GetRequiredService<ZuppetoDbContext>();
                 var now = DateTimeOffset.UtcNow;
 
                 var deletedQueries = await db.Database.ExecuteSqlInterpolatedAsync(

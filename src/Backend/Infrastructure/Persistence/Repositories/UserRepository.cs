@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Users;
-using YepPet.Infrastructure.Persistence.Entities;
-using YepPet.Infrastructure.Persistence.Mappings;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Users;
+using Zuppeto.Infrastructure.Persistence.Entities;
+using Zuppeto.Infrastructure.Persistence.Mappings;
 
-namespace YepPet.Infrastructure.Persistence.Repositories;
+namespace Zuppeto.Infrastructure.Persistence.Repositories;
 
-internal sealed class UserRepository(YepPetDbContext dbContext) : IUserRepository
+internal sealed class UserRepository(ZuppetoDbContext dbContext) : IUserRepository
 {
     public async Task<IReadOnlyCollection<User>> ListAsync(CancellationToken cancellationToken = default)
     {

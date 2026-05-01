@@ -1,5 +1,5 @@
 -- Catàleg geogràfic (països / ciutats): permisos, rols, taula menus i menu_roles.
--- Executa amb el mateix usuari que la app (p. ex. psql o client gràfic) contra la BBDD YepPet.
+-- Executa amb el mateix usuari que la app (p. ex. psql o client gràfic) contra la BBDD Zuppeto.
 -- Idempotent: només inserta si encara no existeix.
 --
 -- IMPORTANT: En arrencar l’API, `DevelopmentIdentitySeeder` esborra i torna a crear `menu_roles`

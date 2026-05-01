@@ -3,17 +3,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using YepPet.Application.Auth;
-using YepPet.Application.Places;
-using YepPet.Domain.Abstractions;
-using YepPet.Infrastructure.Auth;
-using YepPet.Infrastructure.GeoNames;
-using YepPet.Infrastructure.GooglePlaces;
-using YepPet.Infrastructure.Persistence;
-using YepPet.Infrastructure.Persistence.Repositories;
-using YepPet.Infrastructure.RabbitMq;
+using Zuppeto.Application.Auth;
+using Zuppeto.Application.Places;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Infrastructure.Auth;
+using Zuppeto.Infrastructure.GeoNames;
+using Zuppeto.Infrastructure.GooglePlaces;
+using Zuppeto.Infrastructure.Persistence;
+using Zuppeto.Infrastructure.Persistence.Repositories;
+using Zuppeto.Infrastructure.RabbitMq;
 
-namespace YepPet.Infrastructure;
+namespace Zuppeto.Infrastructure;
 
 public static class DependencyInjection
 {
@@ -22,8 +22,8 @@ public static class DependencyInjection
         IConfiguration configuration,
         IHostEnvironment hostEnvironment)
     {
-        var connectionString = configuration.GetConnectionString("YepPet")
-            ?? "Host=localhost;Port=5433;Database=yeppet;Username=app;Password=app";
+        var connectionString = configuration.GetConnectionString("Zuppeto")
+            ?? "Host=localhost;Port=5433;Database=zuppeto;Username=app;Password=app";
         var expiresInMinutes = int.TryParse(configuration["Auth:Jwt:ExpiresInMinutes"], out var parsedExpiresInMinutes)
             ? parsedExpiresInMinutes
             : 480;
@@ -32,10 +32,10 @@ public static class DependencyInjection
             FrontendBaseUrl = configuration["Auth:FrontendBaseUrl"] ?? "http://localhost:4200",
             Jwt = new AuthOptions.JwtOptions
             {
-                Issuer = configuration["Auth:Jwt:Issuer"] ?? "YepPet",
-                Audience = configuration["Auth:Jwt:Audience"] ?? "YepPet.Web",
+                Issuer = configuration["Auth:Jwt:Issuer"] ?? "Zuppeto",
+                Audience = configuration["Auth:Jwt:Audience"] ?? "Zuppeto.Web",
                 SigningKey = configuration["Auth:Jwt:SigningKey"]
-                    ?? "dev-only-yep-pet-signing-key-change-in-production-123456789",
+                    ?? "dev-only-zuppeto-signing-key-change-in-production-123456789",
                 ExpiresInMinutes = expiresInMinutes
             },
             Google = new AuthOptions.GoogleOptions
@@ -83,7 +83,7 @@ public static class DependencyInjection
         services.Configure<GooglePlacesComplianceOptions>(
             configuration.GetSection(GooglePlacesComplianceOptions.SectionName));
         services.AddHostedService<GooglePlacesComplianceRetentionHostedService>();
-        services.AddDbContext<YepPetDbContext>((sp, options) =>
+        services.AddDbContext<ZuppetoDbContext>((sp, options) =>
         {
             options.UseNpgsql(connectionString);
             if (hostEnvironment.IsDevelopment())

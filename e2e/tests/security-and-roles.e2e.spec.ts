@@ -5,7 +5,7 @@ test.beforeAll(async ({ request }) => {
   await ensureRoleUsers(request);
 });
 
-test.describe('YepPet - Seguretat i control d’accessos (Fase IV)', () => {
+test.describe('Zuppeto - Seguretat i control d’accessos (Fase IV)', () => {
   test('JP-011/012: l’administrador veu el menú «Del administrador» i enllaços interns', async ({ page }) => {
     await loginViaUi(page, 'admin@admin.adm', 'Admin123');
 
@@ -19,7 +19,7 @@ test.describe('YepPet - Seguretat i control d’accessos (Fase IV)', () => {
   });
 
   test('JP-018: l’usuari estàndard no té accés a la zona interna d’admin', async ({ page }) => {
-    await loginViaUi(page, 'user.e2e@yeppet.local', 'Admin123');
+    await loginViaUi(page, 'user.e2e@zuppeto.local', 'Admin123');
 
     await expect(page.getByLabel('Primary navigation').locator('summary', { hasText: /Del administrador/i })).not.toBeVisible();
 
@@ -29,7 +29,7 @@ test.describe('YepPet - Seguretat i control d’accessos (Fase IV)', () => {
   });
 
   test('JP-015: el rol Viewer no veu el menú d’administració i pot navegar a Llocs', async ({ page }) => {
-    await loginViaUi(page, 'viewer.e2e@yeppet.local', 'Admin123');
+    await loginViaUi(page, 'viewer.e2e@zuppeto.local', 'Admin123');
 
     await expect(page.getByLabel('Primary navigation').locator('summary', { hasText: /Del administrador/i })).not.toBeVisible();
 

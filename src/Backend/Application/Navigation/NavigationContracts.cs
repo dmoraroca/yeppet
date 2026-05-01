@@ -1,4 +1,4 @@
-namespace YepPet.Application.Navigation;
+namespace Zuppeto.Application.Navigation;
 
 public sealed record NavigationMenuItemDto(
     string Key,

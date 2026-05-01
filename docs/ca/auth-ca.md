@@ -44,7 +44,7 @@ Aquest document recull la base real d'autenticació de la Fase IV i el tancament
 
 ## Credencial local de desenvolupament
 
-- fitxer local: `config/google/yeppet-dev.json`
+- fitxer local: `config/google/zuppeto-dev.json`
 - estat de versionat: ignorat per `git`
 - ús actual: font local de referència per al `ClientId` de desenvolupament
 - el `Client secret` queda fora del frontend i no forma part del flux actual de `Google Identity Services`

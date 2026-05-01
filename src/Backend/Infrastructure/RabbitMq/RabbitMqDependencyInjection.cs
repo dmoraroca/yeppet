@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 
-namespace YepPet.Infrastructure.RabbitMq;
+namespace Zuppeto.Infrastructure.RabbitMq;
 
 public static class RabbitMqDependencyInjection
 {
@@ -29,7 +29,7 @@ public static class RabbitMqDependencyInjection
                 Password = options.Password,
                 VirtualHost = string.IsNullOrEmpty(options.VirtualHost) ? "/" : options.VirtualHost,
                 DispatchConsumersAsync = true,
-                ClientProvidedName = "yeppet-api"
+                ClientProvidedName = "zuppeto-api"
             };
 
             return factory.CreateConnection();

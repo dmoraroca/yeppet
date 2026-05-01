@@ -1,18 +1,18 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using YepPet.Application.Admin;
-using YepPet.Application.Places;
-using YepPet.Application.Validation;
-using YepPet.Api.Validation;
+using Zuppeto.Application.Admin;
+using Zuppeto.Application.Places;
+using Zuppeto.Application.Validation;
+using Zuppeto.Api.Validation;
 
-namespace YepPet.Api.Endpoints;
+namespace Zuppeto.Api.Endpoints;
 
 internal static class PlaceEndpoints
 {
     public static IEndpointRouteBuilder MapPlaceEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/places").WithTags("Places");
+        var group = app.MapGroup("/api/places").RequireAuthorization().WithTags("Places");
         var adminGroup = app.MapGroup("/api/admin/places").RequireAuthorization().WithTags("Places");
 
         group.MapGet("/", SearchAsync);
@@ -104,12 +104,19 @@ internal static class PlaceEndpoints
         return place is null ? TypedResults.NotFound() : TypedResults.Ok(place);
     }
 
-    private static async Task<Results<Created<Guid>, ValidationProblem>> SaveAsync(
+    private static async Task<Results<Created<Guid>, ForbidHttpResult, ValidationProblem>> SaveAsync(
+        ClaimsPrincipal principal,
         PlaceUpsertRequest request,
         IValidator<PlaceUpsertRequest> validator,
         IPlaceApplicationService service,
+        IAdminApplicationService adminService,
         CancellationToken cancellationToken)
     {
+        if (!await principal.HasPermissionAsync(adminService, "action.places.manage", cancellationToken))
+        {
+            return TypedResults.Forbid();
+        }
+
         var validation = validator.Validate(request);
         if (!validation.IsValid)
         {
@@ -120,13 +127,20 @@ internal static class PlaceEndpoints
         return TypedResults.Created($"/api/places/{id}", id);
     }
 
-    private static async Task<Results<Ok<Guid>, ValidationProblem>> UpdateAsync(
+    private static async Task<Results<Ok<Guid>, ForbidHttpResult, ValidationProblem>> UpdateAsync(
         Guid id,
+        ClaimsPrincipal principal,
         PlaceUpsertRequest request,
         IValidator<PlaceUpsertRequest> validator,
         IPlaceApplicationService service,
+        IAdminApplicationService adminService,
         CancellationToken cancellationToken)
     {
+        if (!await principal.HasPermissionAsync(adminService, "action.places.manage", cancellationToken))
+        {
+            return TypedResults.Forbid();
+        }
+
         var normalized = request with { Id = id };
         var validation = validator.Validate(normalized);
         if (!validation.IsValid)

@@ -1,6 +1,6 @@
-using YepPet.Domain.Common;
+using Zuppeto.Domain.Common;
 
-namespace YepPet.Domain.Favorites;
+namespace Zuppeto.Domain.Favorites;
 
 public sealed class FavoriteList : AggregateRoot<Guid>
 {

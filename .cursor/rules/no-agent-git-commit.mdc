@@ -3,7 +3,7 @@ description: L'agent no ha de fer commit ni push; només proposar el missatge pe
 alwaysApply: true
 ---
 
-# Git: cap commit ni push des de l'agent (YepPet)
+# Git: cap commit ni push des de l'agent (Zuppeto)
 
 1. **No executis** `git commit`, `git push`, `git tag` ni cap operació que escrigui a l'historial remot o local del repositori, **tret** que l'usuari ho demani **explícitament** en aquest fil.
 

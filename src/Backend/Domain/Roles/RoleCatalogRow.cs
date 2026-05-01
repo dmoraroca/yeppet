@@ -1,4 +1,4 @@
-namespace YepPet.Domain.Roles;
+namespace Zuppeto.Domain.Roles;
 
 public sealed record RoleCatalogRow(
     Guid Id,

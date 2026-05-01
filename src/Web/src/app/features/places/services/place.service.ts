@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { catchError, of } from 'rxjs';
 import { firstValueFrom } from 'rxjs';
 
 import { API_BASE_URL } from '../../../core/config/api.config';
+import { AuthService } from '../../auth/services/auth.service';
 import { FavoritesService } from '../../favorites/services/favorites.service';
 import { PetFilter, Place, PlaceFilters, PlaceType } from '../models/place.model';
 import { PLACE_TYPE_LABELS } from '../mock/places.fake';
@@ -19,12 +20,21 @@ const DEFAULT_FILTERS: PlaceFilters = {
 @Injectable({ providedIn: 'root' })
 export class PlaceService {
   private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
   private readonly favoritesService = inject(FavoritesService);
   private readonly placesState = signal<Place[]>([]);
   private readonly loadedState = signal(false);
 
   constructor() {
-    this.reload();
+    effect(() => {
+      if (!this.authService.isAuthenticated()) {
+        this.placesState.set([]);
+        this.loadedState.set(false);
+        return;
+      }
+
+      this.reload();
+    });
   }
 
   readonly hasLoaded = computed(() => this.loadedState());

@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Geography;
-using YepPet.Infrastructure.Persistence.Entities;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Geography;
+using Zuppeto.Infrastructure.Persistence.Entities;
 
-namespace YepPet.Infrastructure.Persistence.Repositories;
+namespace Zuppeto.Infrastructure.Persistence.Repositories;
 
-internal sealed class GeographicCatalogRepository(YepPetDbContext dbContext) : IGeographicCatalogRepository
+internal sealed class GeographicCatalogRepository(ZuppetoDbContext dbContext) : IGeographicCatalogRepository
 {
     public async Task<IReadOnlyList<CountryRow>> ListCountriesAsync(CancellationToken cancellationToken = default)
     {

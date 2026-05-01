@@ -1,4 +1,4 @@
-namespace YepPet.Infrastructure.GeoNames;
+namespace Zuppeto.Infrastructure.GeoNames;
 
 public sealed class GeoNamesOptions
 {

@@ -6,9 +6,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using YepPet.Application.Auth;
+using Zuppeto.Application.Auth;
 
-namespace YepPet.Infrastructure.Auth;
+namespace Zuppeto.Infrastructure.Auth;
 
 internal sealed class LinkedInOAuthClient(
     HttpClient httpClient,

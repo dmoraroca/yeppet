@@ -1,7 +1,7 @@
-using YepPet.Domain.Abstractions;
-using YepPet.Domain.Favorites;
+using Zuppeto.Domain.Abstractions;
+using Zuppeto.Domain.Favorites;
 
-namespace YepPet.Application.Favorites;
+namespace Zuppeto.Application.Favorites;
 
 internal sealed class FavoriteListApplicationService(IFavoriteListRepository favoriteListRepository) : IFavoriteListApplicationService
 {

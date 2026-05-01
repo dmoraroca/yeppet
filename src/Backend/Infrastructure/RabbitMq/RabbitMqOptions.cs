@@ -1,4 +1,4 @@
-namespace YepPet.Infrastructure.RabbitMq;
+namespace Zuppeto.Infrastructure.RabbitMq;
 
 public sealed class RabbitMqOptions
 {

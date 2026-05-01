@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using YepPet.Infrastructure.Persistence;
+using Zuppeto.Infrastructure.Persistence;
 
 #nullable disable
 
 namespace Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(YepPetDbContext))]
+    [DbContext(typeof(ZuppetoDbContext))]
     [Migration("20260416121500_AddPermissionScopePayload")]
     public partial class AddPermissionScopePayload : Migration
     {

@@ -1,6 +1,6 @@
-using YepPet.Domain.Users;
+using Zuppeto.Domain.Users;
 
-namespace YepPet.Application.Auth;
+namespace Zuppeto.Application.Auth;
 
 public interface IAccessTokenIssuer
 {

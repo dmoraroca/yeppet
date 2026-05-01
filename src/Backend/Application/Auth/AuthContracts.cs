@@ -1,6 +1,6 @@
-using YepPet.Application.Users;
+using Zuppeto.Application.Users;
 
-namespace YepPet.Application.Auth;
+namespace Zuppeto.Application.Auth;
 
 public sealed record LoginRequest(string Email, string Password);
 
