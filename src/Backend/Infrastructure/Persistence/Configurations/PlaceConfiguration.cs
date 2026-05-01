@@ -60,12 +60,15 @@ public sealed class PlaceConfiguration : IEntityTypeConfiguration<PlaceRecord>
 
         builder.Property(place => place.Latitude)
             .HasColumnName("latitude")
-            .HasPrecision(9, 6)
-            .IsRequired();
+            .HasPrecision(9, 6);
 
         builder.Property(place => place.Longitude)
             .HasColumnName("longitude")
-            .HasPrecision(9, 6)
+            .HasPrecision(9, 6);
+
+        builder.Property(place => place.ExcludeFromOsmMap)
+            .HasColumnName("exclude_from_osm_map")
+            .HasDefaultValue(false)
             .IsRequired();
 
         builder.Property(place => place.AcceptsDogs)

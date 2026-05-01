@@ -86,6 +86,12 @@ export class PlaceDetailPageComponent {
   }
 
   protected get placeAsArray() {
-    return this.place() ? [this.place()!] : [];
+    const currentPlace = this.place();
+
+    if (!currentPlace || currentPlace.excludeFromOsmMap) {
+      return [];
+    }
+
+    return [currentPlace];
   }
 }

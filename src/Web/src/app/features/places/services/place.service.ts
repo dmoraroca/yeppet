@@ -147,6 +147,7 @@ export class PlaceService {
       lastGoogleSyncAt: place.lastGoogleSyncAt,
       googleCoordinatesCacheExpired: place.googleCoordinatesCacheExpired,
       requiresGoogleMapForGoogleCoordinates: place.requiresGoogleMapForGoogleCoordinates,
+      excludeFromOsmMap: place.excludeFromOsmMap ?? false,
       acceptsDogs: place.acceptsDogs,
       acceptsCats: place.acceptsCats,
       rating: place.ratingAverage,
@@ -213,6 +214,7 @@ interface PlaceApiSummaryDto {
   lastGoogleSyncAt?: string | null;
   googleCoordinatesCacheExpired?: boolean;
   requiresGoogleMapForGoogleCoordinates?: boolean;
+  excludeFromOsmMap?: boolean;
   acceptsDogs: boolean;
   acceptsCats: boolean;
   petPolicyLabel: string;

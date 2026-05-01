@@ -6,8 +6,14 @@ namespace YepPet.Infrastructure.Persistence.Mappings;
 
 internal static class PlacePersistenceMapper
 {
+    private static readonly decimal WithheldLatitudeFallback = 40.25m;
+    private static readonly decimal WithheldLongitudeFallback = -3.7m;
+
     public static Place ToDomain(PlaceRecord record)
     {
+        var excludeFromOsmMap = record.ExcludeFromOsmMap || record.Latitude is null || record.Longitude is null;
+        var latitude = record.Latitude ?? WithheldLatitudeFallback;
+        var longitude = record.Longitude ?? WithheldLongitudeFallback;
         var place = new Place(
             record.Id,
             record.Name,
@@ -20,7 +26,7 @@ internal static class PlacePersistenceMapper
                 record.City,
                 record.Country,
                 record.Neighborhood ?? string.Empty),
-            new GeoLocation(record.Latitude, record.Longitude),
+            new GeoLocation(latitude, longitude),
             new PetPolicy(
                 record.AcceptsDogs,
                 record.AcceptsCats,
@@ -31,7 +37,8 @@ internal static class PlacePersistenceMapper
             ParseDataProvenance(record.DataProvenance),
             record.GooglePlaceId,
             record.GoogleCoordinatesCachedUntil,
-            record.LastGoogleSyncAt);
+            record.LastGoogleSyncAt,
+            excludeFromOsmMap);
 
         place.ReplaceTags(
             record.PlaceTags
@@ -63,8 +70,18 @@ internal static class PlacePersistenceMapper
         record.City = place.Address.City;
         record.Country = place.Address.Country;
         record.Neighborhood = place.Address.Neighborhood;
-        record.Latitude = place.Location.Latitude;
-        record.Longitude = place.Location.Longitude;
+        if (place.ExcludeFromOsmMap)
+        {
+            record.Latitude = null;
+            record.Longitude = null;
+        }
+        else
+        {
+            record.Latitude = place.Location.Latitude;
+            record.Longitude = place.Location.Longitude;
+        }
+
+        record.ExcludeFromOsmMap = place.ExcludeFromOsmMap;
         record.AcceptsDogs = place.PetPolicy.AcceptsDogs;
         record.AcceptsCats = place.PetPolicy.AcceptsCats;
         record.PetPolicyLabel = place.PetPolicy.Label;

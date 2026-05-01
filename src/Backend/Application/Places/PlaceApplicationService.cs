@@ -1,3 +1,6 @@
+using System.Security.Cryptography;
+using System.Text;
+using Microsoft.Extensions.Options;
 using YepPet.Domain.Abstractions;
 using YepPet.Domain.Places;
 using YepPet.Domain.Places.ValueObjects;
@@ -10,19 +13,25 @@ internal sealed class PlaceApplicationService : IPlaceApplicationService
     private readonly IPlaceSearchQueryRepository placeSearchQueryRepository;
     private readonly IExternalCitySuggestionProvider externalCitySuggestionProvider;
     private readonly IExternalPlaceSuggestionProvider externalPlaceSuggestionProvider;
+    private readonly IOptions<GooglePlacesIntegrationOptions> googlePlacesIntegrationOptions;
     private static readonly TimeSpan SearchSnapshotTtl = TimeSpan.FromHours(12);
 
     public PlaceApplicationService(
         IPlaceRepository placeRepository,
         IPlaceSearchQueryRepository placeSearchQueryRepository,
         IExternalCitySuggestionProvider externalCitySuggestionProvider,
-        IExternalPlaceSuggestionProvider externalPlaceSuggestionProvider)
+        IExternalPlaceSuggestionProvider externalPlaceSuggestionProvider,
+        IOptions<GooglePlacesIntegrationOptions> googlePlacesIntegrationOptions)
     {
         this.placeRepository = placeRepository;
         this.placeSearchQueryRepository = placeSearchQueryRepository;
         this.externalCitySuggestionProvider = externalCitySuggestionProvider;
         this.externalPlaceSuggestionProvider = externalPlaceSuggestionProvider;
+        this.googlePlacesIntegrationOptions = googlePlacesIntegrationOptions;
     }
+
+    private int CoordinateCacheRetentionDays =>
+        Math.Clamp(googlePlacesIntegrationOptions.Value.CoordinateCacheRetentionDays, 1, 366);
 
     public async Task<PlaceDetailDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -58,13 +67,37 @@ internal sealed class PlaceApplicationService : IPlaceApplicationService
 
         var places = await placeRepository.SearchAsync(criteria, cancellationToken);
         var ordered = places.ToArray();
-        await placeSearchQueryRepository.SaveSnapshotAsync(
-            searchSnapshotKey,
-            ordered.Select(item => item.Id).ToArray(),
-            nowUtc,
-            SearchSnapshotTtl,
+        if (ordered.Length > 0)
+        {
+            await placeSearchQueryRepository.SaveSnapshotAsync(
+                searchSnapshotKey,
+                ordered.Select(item => item.Id).ToArray(),
+                nowUtc,
+                SearchSnapshotTtl,
+                cancellationToken);
+            return ordered.Select(ToSummaryDto).ToArray();
+        }
+
+        if (!ShouldAttemptGooglePlacesFallback(request))
+        {
+            return [];
+        }
+
+        var externalCandidates = await externalPlaceSuggestionProvider.SearchPlacesAsync(
+            new PlaceExternalSearchRequest(
+                request.SearchText?.Trim(),
+                request.City?.Trim(),
+                request.Type?.Trim(),
+                15),
             cancellationToken);
-        return ordered.Select(ToSummaryDto).ToArray();
+
+        var petCategory = ParsePetCategory(request.PetCategory);
+        var mapped = externalCandidates
+            .Where(candidate => MatchesExternalPetHint(candidate, petCategory))
+            .Select(candidate => ToSyntheticGooglePlacesSummaryDto(candidate, request, nowUtc))
+            .ToArray();
+
+        return mapped;
     }
 
     public async Task<IReadOnlyCollection<PlaceSearchHistoryDto>> GetRecentSearchesAsync(
@@ -146,6 +179,9 @@ internal sealed class PlaceApplicationService : IPlaceApplicationService
     public async Task<Guid> SaveAsync(PlaceUpsertRequest request, CancellationToken cancellationToken = default)
     {
         var placeId = request.Id ?? Guid.NewGuid();
+        var nowUtc = DateTimeOffset.UtcNow;
+
+        var existing = await placeRepository.GetByIdAsync(placeId, cancellationToken);
 
         var place = new Place(
             placeId,
@@ -158,12 +194,14 @@ internal sealed class PlaceApplicationService : IPlaceApplicationService
             new GeoLocation(request.Latitude, request.Longitude),
             new PetPolicy(request.AcceptsDogs, request.AcceptsCats, request.PetPolicyLabel, request.PetPolicyNotes),
             new Pricing(request.PricingLabel),
-            new RatingSnapshot(request.RatingAverage, request.ReviewCount));
+            new RatingSnapshot(request.RatingAverage, request.ReviewCount),
+            excludeFromOsmMap: existing?.ExcludeFromOsmMap ?? false);
 
         place.ReplaceTags(request.Tags);
         place.ReplaceFeatures(request.Features);
 
-        var existing = await placeRepository.GetByIdAsync(placeId, cancellationToken);
+        ApplyGoogleMetadataFromUpsert(place, request, existing, nowUtc);
+
         if (existing is null)
         {
             await placeRepository.AddAsync(place, cancellationToken);
@@ -174,6 +212,55 @@ internal sealed class PlaceApplicationService : IPlaceApplicationService
         }
 
         return placeId;
+    }
+
+    /// <summary>
+    /// Applies Google linkage from the upsert payload, preserves stored linkage on benign edits,
+    /// or clears it when the caller explicitly sets provenance to Internal.
+    /// </summary>
+    private void ApplyGoogleMetadataFromUpsert(
+        Place place,
+        PlaceUpsertRequest request,
+        Place? existing,
+        DateTimeOffset nowUtc)
+    {
+        var requestGoogleId = request.GooglePlaceId?.Trim();
+        if (!string.IsNullOrWhiteSpace(requestGoogleId))
+        {
+            var provenance = ParseUpsertDataProvenance(request.DataProvenance);
+            var cachedUntil = request.GoogleCoordinatesCachedUntil ?? nowUtc.AddDays(CoordinateCacheRetentionDays);
+            var lastSync = request.LastGoogleSyncAt ?? nowUtc;
+            place.SetDataProvenance(provenance, requestGoogleId, cachedUntil, lastSync);
+            return;
+        }
+
+        if (string.Equals(request.DataProvenance?.Trim(), nameof(PlaceDataProvenance.Internal), StringComparison.OrdinalIgnoreCase))
+        {
+            place.SetDataProvenance(PlaceDataProvenance.Internal, null, null, null);
+            return;
+        }
+
+        if (existing?.DataProvenance is PlaceDataProvenance.GooglePlaces or PlaceDataProvenance.Mixed
+            && !string.IsNullOrWhiteSpace(existing.GooglePlaceId))
+        {
+            place.SetDataProvenance(
+                existing.DataProvenance,
+                existing.GooglePlaceId,
+                existing.GoogleCoordinatesCachedUntil,
+                existing.LastGoogleSyncAt);
+        }
+    }
+
+    private static PlaceDataProvenance ParseUpsertDataProvenance(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return PlaceDataProvenance.Internal;
+        }
+
+        return Enum.TryParse<PlaceDataProvenance>(value.Trim(), ignoreCase: true, out var parsed)
+            ? parsed
+            : PlaceDataProvenance.Internal;
     }
 
     public Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
@@ -203,6 +290,7 @@ internal sealed class PlaceApplicationService : IPlaceApplicationService
             place.LastGoogleSyncAt,
             cacheExpired,
             requiresGoogleMap,
+            place.ExcludeFromOsmMap,
             place.PetPolicy.AcceptsDogs,
             place.PetPolicy.AcceptsCats,
             place.PetPolicy.Label,
@@ -236,6 +324,7 @@ internal sealed class PlaceApplicationService : IPlaceApplicationService
             place.LastGoogleSyncAt,
             cacheExpired,
             requiresGoogleMap,
+            place.ExcludeFromOsmMap,
             place.PetPolicy.AcceptsDogs,
             place.PetPolicy.AcceptsCats,
             place.PetPolicy.Label,
@@ -284,6 +373,79 @@ internal sealed class PlaceApplicationService : IPlaceApplicationService
         return string.IsNullOrWhiteSpace(petCategory)
             ? PetCategory.All
             : Enum.Parse<PetCategory>(petCategory, ignoreCase: true);
+    }
+
+    /// <summary>
+    /// Avoid uncached Google traffic when the caller has no meaningful discovery inputs.
+    /// </summary>
+    private static bool ShouldAttemptGooglePlacesFallback(PlaceSearchRequest request)
+    {
+        var searchText = request.SearchText?.Trim() ?? string.Empty;
+        var city = request.City?.Trim() ?? string.Empty;
+
+        return searchText.Length >= 2 || city.Length >= 2;
+    }
+
+    private static bool MatchesExternalPetHint(PlaceExternalCandidateDto candidate, PetCategory petCategory)
+    {
+        if (petCategory == PetCategory.All)
+        {
+            return true;
+        }
+
+        return candidate.PetFriendlyAuto != false;
+    }
+
+    private PlaceSummaryDto ToSyntheticGooglePlacesSummaryDto(
+        PlaceExternalCandidateDto candidate,
+        PlaceSearchRequest request,
+        DateTimeOffset nowUtc)
+    {
+        var typeLabel = ParsePlaceType(request.Type)?.ToString() ?? PlaceType.Service.ToString();
+        var cacheUntil = nowUtc.AddDays(CoordinateCacheRetentionDays);
+
+        return new PlaceSummaryDto(
+            StablePlaceIdFromGoogleExternalId(candidate.ExternalId),
+            candidate.Name.Trim(),
+            typeLabel,
+            $"Resultat extern · {candidate.Name.Trim()}",
+            string.IsNullOrWhiteSpace(candidate.Address)
+                ? $"{candidate.City}, {candidate.Country}".Trim()
+                : candidate.Address.Trim(),
+            string.Empty,
+            candidate.Address.Trim(),
+            candidate.City.Trim(),
+            candidate.Country.Trim(),
+            string.Empty,
+            candidate.Latitude,
+            candidate.Longitude,
+            nameof(PlaceDataProvenance.GooglePlaces),
+            candidate.ExternalId.Trim(),
+            cacheUntil,
+            nowUtc,
+            cacheExpired: false,
+            requiresGoogleMapForGoogleCoordinates: true,
+            excludeFromOsmMap: true,
+            acceptsDogs: candidate.PetFriendlyAuto != false,
+            acceptsCats: candidate.PetFriendlyAuto != false,
+            petPolicyLabel: "Google Places (preview)",
+            petPolicyNotes: string.Empty,
+            pricingLabel: "—",
+            ratingAverage: 0m,
+            reviewCount: 0,
+            tags: [],
+            features: []);
+    }
+
+    private static Guid StablePlaceIdFromGoogleExternalId(string externalId)
+    {
+        var payload = Encoding.UTF8.GetBytes($"YepPet.GooglePlaces:{externalId.Trim()}");
+        Span<byte> hash = stackalloc byte[32];
+        SHA256.HashData(payload, hash);
+        Span<byte> guidBytes = stackalloc byte[16];
+        hash[..16].CopyTo(guidBytes);
+
+        return new Guid(guidBytes);
     }
 
     /// <summary>

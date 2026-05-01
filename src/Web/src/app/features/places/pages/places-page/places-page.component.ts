@@ -51,6 +51,7 @@ export class PlacesPageComponent {
   protected readonly cities = computed(() => this.placeService.getAvailableCities());
   protected readonly types = this.placeService.getAvailableTypes();
   protected readonly places = computed(() => this.placeService.getPlaces(this.filters()));
+  protected readonly mapPlaces = computed(() => this.places().filter((place) => !place.excludeFromOsmMap));
   protected readonly selectedPlaceId = this.selectedPlaceIdState.asReadonly();
   protected readonly selectedPlace = computed(() => {
     const selectedPlaceId = this.selectedPlaceId();

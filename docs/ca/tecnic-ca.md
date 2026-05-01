@@ -551,23 +551,24 @@ Sobre la base anterior, la implementació ja incorpora aquestes peces tècniques
   - `place_search_query_results`
 - migració aplicada: `AddPlaceSearchQueryCache`
 - resolució de cerca a `PlaceApplicationService` amb patró:
-  1. prova de cache fresca per clau normalitzada
-  2. fallback a repositori de `places`
-  3. persistència de snapshot de resultats per reutilització
+  1. prova de **snapshot fresc** (`place_search_queries` / `place_search_query_results`) per clau normalitzada (TTL aplicació: **12 h** — `SearchSnapshotTtl`)
+  2. si no hi ha snapshot vàlid: consulta al repositori de `places`
+  3. si hi ha resultats interns: **persistència** d’un nou snapshot amb TTL **12 h**
+  4. si **no** hi ha resultats interns **i** la petició té prou text (`searchText` o `city`, mínim **2** caràcters vàlid): **fallback** a `GooglePlacesSuggestionProvider`; els candidats es mapen a `PlaceSummaryDto` amb IDs deterministes derivats del `place_id` Google, **sense** `INSERT` a `places`; marcadors DTO indiquen caché de coordenades fins `now + CoordinateCacheRetentionDays` i **exclusió OSM**
 - endpoint públic per observació de consultes recents:
   - `GET /api/places/searches/recent?limit=...`
 - connector extern base per locals:
   - `IExternalPlaceSuggestionProvider`
   - `GooglePlacesSuggestionProvider`
-  - opció de configuració `GooglePlaces` (`BaseUrl`, `ApiKey`, `TimeoutSeconds`)
+  - opció de configuració `GooglePlaces` (`BaseUrl`, `ApiKey`, `TimeoutSeconds`, `CoordinateCacheRetentionDays` — per defecte **30**, compartit entre capa d’aplicació i infraestructura via la mateixa secció JSON)
 - endpoint de preview extern (sense ingestió automàtica al catàleg principal):
   - `GET /api/places/external/search?query=...&city=...&type=...&limit=...`
 
-Limitacions actuals d'aquest tram (pendent del següent increment):
+Estat actual del flux (referència ràpida):
 
-- el preview extern retorna candidats però encara no fusiona automàticament aquests resultats dins el flux principal de `GET /api/places`
-- la revalidació periòdica (jobs per TTL/prioritat) queda pendent de cablejar
-- sense `GooglePlaces:ApiKey`, el preview extern respon llista buida (comportament esperat)
+- `GET /api/places` ja incorpora **fallback Google** quan el catàleg intern està buit i la consulta té prou context (vegeu punts 1–4 de la llista anterior); els candidats externs **no** persisteixen com a files noves de `places`
+- **Compliment / retenció**: `GooglePlacesComplianceRetentionHostedService` pot **purgar** snapshots caducats (`place_search_queries`) i, si `GooglePlacesCompliance:Enabled`, **redactar** coordenades de files `places` amb procedència Google/Mixed quan `google_coordinates_cached_until < now` (detall a **§2.11.4**)
+- sense `GooglePlaces:ApiKey`, el preview extern i el fallback de cerca Google retornen llista buida (comportament esperat)
 
 Exemple de wiring d'endpoint (API):
 
@@ -597,9 +598,17 @@ Exemple de configuració (appsettings):
 "GooglePlaces": {
   "BaseUrl": "https://maps.googleapis.com/maps/api/place/",
   "ApiKey": "",
-  "TimeoutSeconds": 6
+  "TimeoutSeconds": 6,
+  "CoordinateCacheRetentionDays": 30
+},
+"GooglePlacesCompliance": {
+  "Enabled": false,
+  "RunIntervalMinutes": 360
 }
 ```
+
+- `CoordinateCacheRetentionDays`: **clampa aplicació** entre **1** i **366** (`PlaceApplicationService`). S’usa per a la data `googleCoordinatesCachedUntil` dels resums sintètics de Google i, per defecte, per als upserts amb metadades Google si no s’indiquen dates explícites.
+- `GooglePlacesCompliance`: només la part **Enabled** activa l’`UPDATE` de redacció de coordenades caducades; `RunIntervalMinutes` és el període mínim entre execucions del hosted service (mínim efectiu **5** minuts al codi).
 
 Diagrama tècnic del tram implementat:
 
@@ -671,24 +680,63 @@ Compliment i contingut visual (resum tecnic):
 
 ### 2.11.4 Persistència: procedència de dades i metadates Google a `places`
 
-Objectiu tècnic: donar suport al criteri funcional de **dues capes** (catàleg intern vs dades Google) i a la **traçabilitat** d’identificadors i caché, sense barrejar conceptes a la mateixa columna de negoci.
+Objectiu tècnic: donar suport al criteri funcional de **dues capes** (catàleg intern vs dades Google), la **traçabilitat** (`place_id`, dates), la **caducitat de coordenades** i la **redacció automàtica** opcional, sense barrejar conceptes a la mateixa columna de negoci.
 
-**Base de dades (PostgreSQL), taula `places`:**
+Remissió funcional: `docs/ca/funcional-ca.md` (**§12.5** i **§12.5.1**).
 
-- `data_provenance` — text (p. ex. valor per defecte `Internal` al catàleg).
-- `google_place_id` — opcional; **índex únic parcial** quan no és null (`ux_places_google_place_id`), alineat amb `PlaceConfiguration` i el model EF.
-- `google_coordinates_cached_until` — opcional; caducitat de caché de coordenades d’origen Google quan apliqui.
-- `last_google_sync_at` — opcional; traça d’última sincronització amb font Google.
+#### Columnes rellevants (`places`)
 
-**Migració** (nom calibrat al repositori): `20260427120000_AddPlaceProvenance` amb fitxer `Designer` alineat amb `YepPetDbContextModelSnapshot` (el snapshot ha de reflectir el mateix model que el runtime EF; altrament `dotnet ef database update` a l’arrencada pot avisar de canvis de model pendents o fallar).
+| Camp (BD / EF) | Rol |
+|----------------|-----|
+| `data_provenance` | `Internal`, `GooglePlaces`, `Mixed`, etc. (`PlaceDataProvenance`). |
+| `google_place_id` | Identificador estable de Google (**conservar** per refrescar coordenades després de la finestra de caché). Índex únic parcial quan no és null (`ux_places_google_place_id`). |
+| `google_coordinates_cached_until` | Límit temporal operatiu de la caché de coordenades d’origen Google (nullable). |
+| `last_google_sync_at` | Darrer instant de sincronització amb Google (nullable). |
+| `latitude`, `longitude` | Nullables quan la coordenada **no** ha de persistir-se per compliment (vegeu mapper i worker). |
+| `exclude_from_osm_map` | Quan és cert: el producte **no** ha de pintar el pin a la capa OSM; el mapper persisteix `latitude`/`longitude` com a **NULL** en aquest cas (`PlacePersistenceMapper.Apply`). A la lectura cap al domini, si falten coordenades es poden usar valors de fallback només per mantenir invariant del valor objecte `GeoLocation` — la decisió de **mostrar** pin OSM ve dels DTO (`ExcludeFromOsmMap`, etc.). |
 
-**Codi (resum d’ubicacions):**
+Migracions de referència al repositori: `20260427120000_AddPlaceProvenance`; coordenades nullable / compliment OSM: `20260501141000_PlaceGoogleCoordinateRedaction`. El `YepPetDbContextModelSnapshot` ha de coincidir amb el runtime EF.
 
-- Domini: `PlaceDataProvenance`, `Place` (incloent mètode `SetDataProvenance` on escaigui).
-- Infraestructura: `PlaceRecord`, `PlaceConfiguration`, `PlacePersistenceMapper`.
-- Aplicació / API: DTOs de lloc (resum i detall) i càlculs derivats a `PlaceApplicationService` (p. ex. expiració de caché, requisit de mostrar mapa Google quan apliqui). El front pot exposar propietats opcionals al model `place` i al servei HTTP corresponent.
+#### Configuració
 
-Remissió funcional: `docs/ca/funcional-ca.md` (**§12.5**).
+- **`GooglePlaces`** (`GooglePlacesOptions` a Infrastructure, `GooglePlacesIntegrationOptions` a Application): mateixa secció JSON. Camps habituals: `BaseUrl`, `ApiKey`, `TimeoutSeconds`, **`CoordinateCacheRetentionDays`** (per defecte **30**).  
+  - Registre: `Program.cs` fa `Configure<GooglePlacesIntegrationOptions>(configuration.GetSection(...))` abans de `AddApplication()`.
+- **`GooglePlacesCompliance`**: `GooglePlacesComplianceOptions` — `Enabled`, `RunIntervalMinutes`.
+
+#### Aplicació (upsert, validació, resums sintètics)
+
+- **`PlaceUpsertRequest`** (opcional al final del record): `DataProvenance`, `GooglePlaceId`, `GoogleCoordinatesCachedUntil`, `LastGoogleSyncAt`.
+- **`PlaceUpsertRequestValidator`**: si hi ha `GooglePlaceId`, la procedència ha de ser **GooglePlaces** o **Mixed**; si la procedència és una d’aquestes dues, **`GooglePlaceId` és obligatori**.
+- **`PlaceApplicationService.SaveAsync`**:  
+  - Carrega el local existent **abans** de construir l’agregat per preservar **`ExcludeFromOsmMap`** en updates.  
+  - Si el cos porta `GooglePlaceId`, aplica `SetDataProvenance` amb dates per defecte (`CachedUntil` = ara + `CoordinateCacheRetentionDays` si no ve al cos; `LastGoogleSyncAt` = ara si no ve al cos).  
+  - Si **no** porta identificador Google però el registre ja en tenia (Google/Mixed), **reaplica** les metadades existents per no perdre el vincle en una edició.  
+  - Si el cos indica **explícitament** procedència **`Internal`** (string), neteja Google (`SetDataProvenance(Internal, null, null, null)`).
+- **Resums sintètics de cerca Google**: `googleCoordinatesCachedUntil` dels DTO = `UtcNow + CoordinateCacheRetentionDays` (mateixa política que l’upsert per defecte).
+
+#### Domini i persistència
+
+- `Place.SetDataProvenance`: si procedència és **GooglePlaces** o **Mixed**, `googlePlaceId` no pot ser buit (regla de domini).
+- `PlacePersistenceMapper.ToDomain`: deriva `excludeFromOsmMap` també quan `Latitude`/`Longitude` són null al registre.
+
+#### Hosted service de compliment (`GooglePlacesComplianceRetentionHostedService`)
+
+En cada cicle (interval configurable):
+
+1. **`DELETE FROM place_search_queries WHERE expires_at_utc < now`** — elimina snapshots de cerca caducats (independentment de `GooglePlacesCompliance:Enabled`).
+2. Si **`GooglePlacesCompliance:Enabled`**, executa un **`UPDATE places`** sobre files amb `data_provenance IN ('GooglePlaces','Mixed')`, `google_coordinates_cached_until IS NOT NULL` i **`google_coordinates_cached_until < now`**, posant:  
+   `latitude = NULL`, `longitude = NULL`, `exclude_from_osm_map = TRUE`, `google_coordinates_cached_until = NULL`, `last_google_sync_at = NULL`.  
+   **No** modifica `google_place_id` ni `data_provenance` — es mantenen per permetre una nova sincronització via API.
+
+#### DTOs i flags per al client
+
+- `PlaceSummaryDto` / `PlaceDetailDto` inclouen `GooglePlaceId`, dates de caché/sync, `GoogleCoordinatesCacheExpired`, `RequiresGoogleMapForGoogleCoordinates`, `ExcludeFromOsmMap` (càlcul a `PlaceApplicationService.ComputeGoogleCoordinateFlags`).
+
+#### Resum d’ubicacions al codi
+
+- Domini: `PlaceDataProvenance`, `Place`, `SetDataProvenance`.
+- Infraestructura: `PlaceRecord`, `PlaceConfiguration`, `PlacePersistenceMapper`, `GooglePlacesSuggestionProvider`, `GooglePlacesComplianceRetentionHostedService`.
+- Aplicació / API: `PlaceContracts`, `PlaceUpsertRequestValidator`, `PlaceApplicationService`, `GooglePlacesIntegrationOptions`, `PlaceEndpoints`.
 
 ### 2.11.5 Menús d’administració: API, esborrat, seed `Negoci` / `Tècnic`, client
 

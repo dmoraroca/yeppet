@@ -9,4 +9,9 @@ public sealed class GooglePlacesOptions
     public string ApiKey { get; set; } = string.Empty;
 
     public int TimeoutSeconds { get; set; } = 6;
+
+    /// <summary>
+    /// Advertised Google coordinate cache retention in days (same JSON keys as application integration options).
+    /// </summary>
+    public int CoordinateCacheRetentionDays { get; set; } = 30;
 }

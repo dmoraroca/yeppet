@@ -15,6 +15,7 @@ import {
   AdminMenuCatalog,
   AdminMenuDefinition,
   AdminPlaceDto,
+  AdminPlaceUpsertRequest,
   AdminService,
   AdminUserListItem,
   CityAdminDto,
@@ -225,6 +226,14 @@ export class AdminConsolePageComponent {
     reviewCount: string;
     tags: string;
     features: string;
+    /** Draft: '' means omit Google payload (new → Internal; edit → preserve existing link). */
+    dataProvenance: string;
+    googlePlaceId: string;
+    /** Snapshot from API for display only (not posted). */
+    googleMetaCachedUntil?: string;
+    googleMetaLastSync?: string;
+    googleMetaExcludeFromOsm?: boolean;
+    googleMetaCacheExpired?: boolean;
   }>({
     name: '',
     type: 'Cafe',
@@ -245,8 +254,13 @@ export class AdminConsolePageComponent {
     ratingAverage: '0',
     reviewCount: '0',
     tags: '',
-    features: ''
+    features: '',
+    dataProvenance: '',
+    googlePlaceId: ''
   });
+
+  /** Options for admin Google linkage (aligned with backend `PlaceDataProvenance`). */
+  protected readonly placeDataProvenanceSelectValues = ['', 'Internal', 'GooglePlaces', 'Mixed'] as const;
 
   constructor() {
     merge(of<void>(undefined), this.router.events.pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd)))
@@ -1841,7 +1855,9 @@ export class AdminConsolePageComponent {
       ratingAverage: '0',
       reviewCount: '0',
       tags: '',
-      features: ''
+      features: '',
+      dataProvenance: '',
+      googlePlaceId: ''
     });
     this.placeModalOpen.set(true);
   }
@@ -1870,7 +1886,13 @@ export class AdminConsolePageComponent {
       ratingAverage: place.ratingAverage.toString(),
       reviewCount: place.reviewCount.toString(),
       tags: place.tags.join(', '),
-      features: place.features.join(', ')
+      features: place.features.join(', '),
+      dataProvenance: place.dataProvenance ?? '',
+      googlePlaceId: place.googlePlaceId ?? '',
+      googleMetaCachedUntil: place.googleCoordinatesCachedUntil ?? undefined,
+      googleMetaLastSync: place.lastGoogleSyncAt ?? undefined,
+      googleMetaExcludeFromOsm: place.excludeFromOsmMap,
+      googleMetaCacheExpired: place.googleCoordinatesCacheExpired
     });
     this.placeModalOpen.set(true);
   }
@@ -1920,7 +1942,13 @@ export class AdminConsolePageComponent {
       ratingAverage: original.ratingAverage.toString(),
       reviewCount: original.reviewCount.toString(),
       tags: original.tags.join(', '),
-      features: original.features.join(', ')
+      features: original.features.join(', '),
+      dataProvenance: original.dataProvenance ?? '',
+      googlePlaceId: original.googlePlaceId ?? '',
+      googleMetaCachedUntil: original.googleCoordinatesCachedUntil ?? undefined,
+      googleMetaLastSync: original.lastGoogleSyncAt ?? undefined,
+      googleMetaExcludeFromOsm: original.excludeFromOsmMap,
+      googleMetaCacheExpired: original.googleCoordinatesCacheExpired
     });
     this.placeDetailEditMode.set(false);
   }
@@ -2005,6 +2033,8 @@ export class AdminConsolePageComponent {
     pricingLabel: string;
     ratingAverage: string;
     reviewCount: string;
+    dataProvenance: string;
+    googlePlaceId: string;
   }): string | null {
     if (!place.name.trim()) return 'El nom del lloc és obligatori.';
     if (!place.type.trim()) return 'El tipus del lloc és obligatori.';
@@ -2032,6 +2062,15 @@ export class AdminConsolePageComponent {
     const reviewCount = Number.parseInt(place.reviewCount, 10);
     if (!Number.isFinite(reviewCount) || reviewCount < 0) return 'El nombre de ressenyes no pot ser negatiu.';
 
+    const dp = place.dataProvenance?.trim() ?? '';
+    const gid = place.googlePlaceId?.trim() ?? '';
+    if (gid && dp !== 'GooglePlaces' && dp !== 'Mixed') {
+      return 'Si hi ha Google Place ID, cal triar procedència «GooglePlaces» o «Mixed».';
+    }
+    if ((dp === 'GooglePlaces' || dp === 'Mixed') && !gid) {
+      return 'Amb procedència Google Places o mixta cal omplir el Google Place ID.';
+    }
+
     return null;
   }
 
@@ -2057,29 +2096,9 @@ export class AdminConsolePageComponent {
     reviewCount: string;
     tags: string;
     features: string;
-  }): {
-    id?: string;
-    name: string;
-    type: string;
-    shortDescription: string;
-    description: string;
-    coverImageUrl: string;
-    addressLine1: string;
-    city: string;
-    country: string;
-    neighborhood: string;
-    latitude: number;
-    longitude: number;
-    acceptsDogs: boolean;
-    acceptsCats: boolean;
-    petPolicyLabel: string;
-    petPolicyNotes: string;
-    pricingLabel: string;
-    ratingAverage: number;
-    reviewCount: number;
-    tags: string[];
-    features: string[];
-  } | null {
+    dataProvenance: string;
+    googlePlaceId: string;
+  }): AdminPlaceUpsertRequest | null {
     const latitude = this.parseOptionalNumber(place.latitude);
     const longitude = this.parseOptionalNumber(place.longitude);
     const ratingAverage = this.parseOptionalNumber(place.ratingAverage);
@@ -2089,7 +2108,7 @@ export class AdminConsolePageComponent {
       return null;
     }
 
-    return {
+    const payload: AdminPlaceUpsertRequest = {
       id: place.id,
       name: place.name.trim(),
       type: place.type.trim(),
@@ -2112,6 +2131,46 @@ export class AdminConsolePageComponent {
       tags: this.splitCsv(place.tags),
       features: this.splitCsv(place.features)
     };
+
+    this.applyGoogleLinkageToUpsertPayload(place, payload);
+    return payload;
+  }
+
+  /**
+   * Mirrors backend rules: omit keys to preserve existing Google metadata on update;
+   * send `Internal` to clear linkage; send GooglePlaces/Mixed + place id to set or refresh link.
+   */
+  private applyGoogleLinkageToUpsertPayload(
+    draft: { dataProvenance: string; googlePlaceId: string },
+    payload: AdminPlaceUpsertRequest
+  ): void {
+    const dp = draft.dataProvenance?.trim() ?? '';
+    const gid = draft.googlePlaceId?.trim() ?? '';
+
+    if (dp === 'Internal') {
+      payload.dataProvenance = 'Internal';
+      return;
+    }
+
+    if (dp === 'GooglePlaces' || dp === 'Mixed') {
+      payload.dataProvenance = dp;
+      payload.googlePlaceId = gid;
+    }
+  }
+
+  protected googleProvenanceOptionLabel(value: string): string {
+    switch (value) {
+      case '':
+        return 'Sense canvi (nou: catàleg intern; edició: manté vincle Google si existeix)';
+      case 'Internal':
+        return 'Intern — elimina vincle Google';
+      case 'GooglePlaces':
+        return 'Google Places';
+      case 'Mixed':
+        return 'Mixt (intern + Google)';
+      default:
+        return value || '—';
+    }
   }
 
   private async loadGeographicCountries(): Promise<void> {

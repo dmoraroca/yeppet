@@ -1,4 +1,5 @@
 using YepPet.Application.Validation;
+using YepPet.Domain.Places;
 
 namespace YepPet.Application.Places.Validators;
 
@@ -90,6 +91,33 @@ public sealed class PlaceUpsertRequestValidator : IValidator<PlaceUpsertRequest>
         if (request.ReviewCount < 0)
         {
             result.Add(nameof(request.ReviewCount), "El nombre de ressenyes no pot ser negatiu.");
+        }
+
+        PlaceDataProvenance? parsedProvenance = null;
+        if (!string.IsNullOrWhiteSpace(request.DataProvenance))
+        {
+            if (!Enum.TryParse<PlaceDataProvenance>(request.DataProvenance.Trim(), ignoreCase: true, out var pv))
+            {
+                result.Add(nameof(request.DataProvenance), "La procedència de dades no és vàlida.");
+            }
+            else
+            {
+                parsedProvenance = pv;
+            }
+        }
+
+        var hasGooglePlaceId = !string.IsNullOrWhiteSpace(request.GooglePlaceId);
+
+        if (hasGooglePlaceId && parsedProvenance is not (PlaceDataProvenance.GooglePlaces or PlaceDataProvenance.Mixed))
+        {
+            result.Add(
+                nameof(request.DataProvenance),
+                "Si s’indica Google Place ID, la procedència ha de ser GooglePlaces o Mixed.");
+        }
+
+        if (parsedProvenance is PlaceDataProvenance.GooglePlaces or PlaceDataProvenance.Mixed && !hasGooglePlaceId)
+        {
+            result.Add(nameof(request.GooglePlaceId), "El Google Place ID és obligatori quan la procedència és Google Places o mixta.");
         }
 
         return result;

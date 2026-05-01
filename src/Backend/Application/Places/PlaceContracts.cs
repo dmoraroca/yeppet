@@ -65,7 +65,11 @@ public sealed record PlaceUpsertRequest(
     decimal RatingAverage,
     int ReviewCount,
     IReadOnlyCollection<string> Tags,
-    IReadOnlyCollection<string> Features);
+    IReadOnlyCollection<string> Features,
+    string? DataProvenance = null,
+    string? GooglePlaceId = null,
+    DateTimeOffset? GoogleCoordinatesCachedUntil = null,
+    DateTimeOffset? LastGoogleSyncAt = null);
 
 public sealed record PlaceSummaryDto(
     Guid Id,
@@ -86,6 +90,7 @@ public sealed record PlaceSummaryDto(
     DateTimeOffset? LastGoogleSyncAt,
     bool GoogleCoordinatesCacheExpired,
     bool RequiresGoogleMapForGoogleCoordinates,
+    bool ExcludeFromOsmMap,
     bool AcceptsDogs,
     bool AcceptsCats,
     string PetPolicyLabel,
@@ -115,6 +120,7 @@ public sealed record PlaceDetailDto(
     DateTimeOffset? LastGoogleSyncAt,
     bool GoogleCoordinatesCacheExpired,
     bool RequiresGoogleMapForGoogleCoordinates,
+    bool ExcludeFromOsmMap,
     bool AcceptsDogs,
     bool AcceptsCats,
     string PetPolicyLabel,

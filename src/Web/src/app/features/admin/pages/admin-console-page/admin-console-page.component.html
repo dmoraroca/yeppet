@@ -1614,6 +1614,54 @@
             <label class="admin-console-form admin-console-form--readonly"><span>Descripció curta <strong class="admin-console-required">*</strong></span><textarea rows="2" [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().shortDescription" (ngModelChange)="editablePlace.set({ ...editablePlace(), shortDescription: $event })"></textarea></label>
             <label class="admin-console-form admin-console-form--readonly"><span>Descripció <strong class="admin-console-required">*</strong></span><textarea rows="4" [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().description" (ngModelChange)="editablePlace.set({ ...editablePlace(), description: $event })"></textarea></label>
             <label class="admin-console-form admin-console-form--readonly"><span>Notes política mascotes</span><textarea rows="3" [readonly]="!placeIsNew() && !placeDetailEditMode()" [ngModel]="editablePlace().petPolicyNotes" (ngModelChange)="editablePlace.set({ ...editablePlace(), petPolicyNotes: $event })"></textarea></label>
+
+            <div class="admin-console-form admin-console-form--readonly" style="grid-column: 1 / -1">
+              <p class="admin-console-kicker">Google Places (compliment)</p>
+              <p style="margin: 0 0 12px; font-size: 0.9rem; opacity: 0.9">
+                Mantén el <strong>Place ID</strong> quan el local ve de Google per poder renovar coordenades després del període de caché.
+                «Sense canvi» no envia aquests camps: el servidor conserva el vincle en edicions normals.
+              </p>
+              @if (!placeIsNew()) {
+                <ul style="margin: 0 0 12px; padding-left: 1.2rem; font-size: 0.9rem">
+                  @if (editablePlace().googleMetaCachedUntil) {
+                    <li>Caché coordenades fins (UTC): {{ editablePlace().googleMetaCachedUntil }}</li>
+                  }
+                  @if (editablePlace().googleMetaLastSync) {
+                    <li>Darrera sync Google (UTC): {{ editablePlace().googleMetaLastSync }}</li>
+                  }
+                  @if (editablePlace().googleMetaExcludeFromOsm !== undefined) {
+                    <li>Exclòs del mapa OSM: {{ editablePlace().googleMetaExcludeFromOsm ? 'sí' : 'no' }}</li>
+                  }
+                  @if (editablePlace().googleMetaCacheExpired !== undefined) {
+                    <li>Caché coordenades caducada: {{ editablePlace().googleMetaCacheExpired ? 'sí' : 'no' }}</li>
+                  }
+                </ul>
+              }
+              <label>
+                <span>Procedència</span>
+                <select
+                  [disabled]="!placeIsNew() && !placeDetailEditMode()"
+                  [ngModel]="editablePlace().dataProvenance"
+                  (ngModelChange)="editablePlace.set({ ...editablePlace(), dataProvenance: $event })"
+                >
+                  @for (opt of placeDataProvenanceSelectValues; track opt) {
+                    <option [value]="opt">{{ googleProvenanceOptionLabel(opt) }}</option>
+                  }
+                </select>
+              </label>
+              <label>
+                <span>Google Place ID</span>
+                <input
+                  type="text"
+                  [readonly]="!placeIsNew() && !placeDetailEditMode()"
+                  [ngModel]="editablePlace().googlePlaceId"
+                  (ngModelChange)="editablePlace.set({ ...editablePlace(), googlePlaceId: $event })"
+                  placeholder="p. ex. ChIJ…"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+              </label>
+            </div>
           </div>
           <div class="admin-console-modal__footer">
             <div class="admin-console-modal__footer-band">

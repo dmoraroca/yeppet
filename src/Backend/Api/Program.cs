@@ -6,6 +6,7 @@ using Serilog;
 using Serilog.Events;
 using YepPet.Infrastructure.Auth;
 using YepPet.Application;
+using YepPet.Application.Places;
 using YepPet.Api.Endpoints;
 using YepPet.Infrastructure;
 
@@ -122,6 +123,8 @@ builder.Host.UseSerilog((context, services, loggerConfiguration) =>
             outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}");
 });
 
+builder.Services.Configure<GooglePlacesIntegrationOptions>(
+    builder.Configuration.GetSection(GooglePlacesIntegrationOptions.SectionName));
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddProblemDetails();

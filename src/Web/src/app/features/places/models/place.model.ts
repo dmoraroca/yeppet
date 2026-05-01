@@ -22,6 +22,7 @@ export interface Place {
   lastGoogleSyncAt?: string | null;
   googleCoordinatesCacheExpired?: boolean;
   requiresGoogleMapForGoogleCoordinates?: boolean;
+  excludeFromOsmMap?: boolean;
   acceptsDogs: boolean;
   acceptsCats: boolean;
   rating: number;

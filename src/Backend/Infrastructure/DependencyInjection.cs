@@ -80,6 +80,9 @@ public static class DependencyInjection
         services.AddDataProtection();
         services.Configure<GeoNamesOptions>(configuration.GetSection(GeoNamesOptions.SectionName));
         services.Configure<GooglePlacesOptions>(configuration.GetSection(GooglePlacesOptions.SectionName));
+        services.Configure<GooglePlacesComplianceOptions>(
+            configuration.GetSection(GooglePlacesComplianceOptions.SectionName));
+        services.AddHostedService<GooglePlacesComplianceRetentionHostedService>();
         services.AddDbContext<YepPetDbContext>((sp, options) =>
         {
             options.UseNpgsql(connectionString);

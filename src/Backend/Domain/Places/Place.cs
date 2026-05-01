@@ -23,7 +23,8 @@ public sealed class Place : AggregateRoot<Guid>
         PlaceDataProvenance dataProvenance = PlaceDataProvenance.Internal,
         string? googlePlaceId = null,
         DateTimeOffset? googleCoordinatesCachedUntil = null,
-        DateTimeOffset? lastGoogleSyncAt = null) : base(id)
+        DateTimeOffset? lastGoogleSyncAt = null,
+        bool excludeFromOsmMap = false) : base(id)
     {
         Rename(name);
         UpdateDescriptions(shortDescription, description);
@@ -35,6 +36,7 @@ public sealed class Place : AggregateRoot<Guid>
         Pricing = pricing;
         Rating = rating;
         SetDataProvenance(dataProvenance, googlePlaceId, googleCoordinatesCachedUntil, lastGoogleSyncAt);
+        ExcludeFromOsmMap = excludeFromOsmMap;
     }
 
     public string Name { get; private set; } = string.Empty;
@@ -64,16 +66,21 @@ public sealed class Place : AggregateRoot<Guid>
     public PlaceDataProvenance DataProvenance { get; private set; } = PlaceDataProvenance.Internal;
 
     /// <summary>
-    /// Google Places <c>place_id</c> when the record is linked to Google Places content.
+    /// Google Places <c>place_id</c> for this record. Keep it stored so Places Details can refresh coordinates after the cache window.
     /// </summary>
     public string? GooglePlaceId { get; private set; }
 
     /// <summary>
-    /// Upper bound for caching Google-sourced coordinates (operational compliance control).
+    /// Upper bound for caching Google-sourced coordinates; past this instant, refresh coordinates via Places API using <see cref="GooglePlaceId"/>.
     /// </summary>
     public DateTimeOffset? GoogleCoordinatesCachedUntil { get; private set; }
 
     public DateTimeOffset? LastGoogleSyncAt { get; private set; }
+
+    /// <summary>
+    /// When true, persisted coordinates must not be rendered on the OpenStreetMap layer (Google compliance routing).
+    /// </summary>
+    public bool ExcludeFromOsmMap { get; private set; }
 
     public void Rename(string name)
     {

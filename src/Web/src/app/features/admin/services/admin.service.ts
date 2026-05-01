@@ -268,6 +268,13 @@ export interface AdminPlaceDto {
   reviewCount: number;
   tags: string[];
   features: string[];
+  /** Mirrors API `PlaceSummaryDto` / `PlaceDetailDto` (camelCase JSON). */
+  dataProvenance?: string | null;
+  googlePlaceId?: string | null;
+  googleCoordinatesCachedUntil?: string | null;
+  lastGoogleSyncAt?: string | null;
+  googleCoordinatesCacheExpired?: boolean;
+  excludeFromOsmMap?: boolean;
 }
 
 export interface AdminPlaceUpsertRequest {
@@ -292,6 +299,10 @@ export interface AdminPlaceUpsertRequest {
   reviewCount: number;
   tags: string[];
   features: string[];
+  dataProvenance?: string;
+  googlePlaceId?: string;
+  googleCoordinatesCachedUntil?: string;
+  lastGoogleSyncAt?: string;
 }
 
 @Injectable({

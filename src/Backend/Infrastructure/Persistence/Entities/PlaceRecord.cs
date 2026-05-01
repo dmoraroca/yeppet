@@ -22,9 +22,11 @@ public sealed class PlaceRecord
 
     public string? Neighborhood { get; set; }
 
-    public decimal Latitude { get; set; }
+    public decimal? Latitude { get; set; }
 
-    public decimal Longitude { get; set; }
+    public decimal? Longitude { get; set; }
+
+    public bool ExcludeFromOsmMap { get; set; }
 
     public bool AcceptsDogs { get; set; }
 

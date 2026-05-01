@@ -1717,9 +1717,34 @@ Objectiu: compatibilitat amb l'esperit dels termes d'us de `Google Maps Platform
 - **Mapa OSM (actual) = capa "Zuppeto"**: el mapa amb `OpenStreetMap` mostra **només** el que el producte tracta com a coordenades **pròpies** o del cataleg intern (no com a re-presentacio d'un servei "mirall" de Google).
 - **Contingut Google = capa "Google"**: quan un local es basa en dades de `Google Places`, el producte ofereix una **experiencia de mapa/ fitxa d'acord amb el que exigeix Google** (incloent, si escau, atribucio visible i el paquet d'UI que imposi el cas: mapa Google o elements de brand/powered-by segons el disseny tancat).
 - **No "barrejar" en la mateixa capa de mapa sense regles**: no es reprojecta el pin de Google sobre el mapa OSM com a solucio per defecte; es separa en dues visualitzacions o en estats de producte clars.
-- **Caché i coordenades**: el que es pugui emmagatzemar de Google es fa amb **cicles de refresh** (no com a "base permanent sense control"), especialment per coordenades; el identificador estable (`place_id` / clau de procedencia) i la traça de sync son part del disseny. Els detalls de període i camp es concretaran al tecnic segons el ToS vigent.
-- **Model de dades intern**: el catàleg pot persistir **procedència de dades** (p. ex. intern vs integració Google), **identificador de lloc Google** quan apliqui, i **metadades de caché o sincronització** de coordenades, per alinear la UI (dues capes de mapa, expiració, etc.) amb aquestes regles. El disseny de columnes, migració i DTOs està a `docs/ca/tecnic-ca.md` (**§2.11.4**).
+- **Caché i coordenades**: les coordenades obtingudes via Google es tracten com a **caché amb caducitat**, no com a geoposició “permanent” del catàleg Zuppeto. Passada la finestra operativa, cal **renovar** amb la API de Google (utilitzant el `place_id` guardat) o mostrar el local sense tractar-lo com a pin propi a OSM. El desglossament (dies, neteja automàtica, cerca, administració) és al **§12.5.1**; camps i codi al `tecnic-ca.md` (**§2.11.4**).
+- **Model de dades intern**: el catàleg pot persistir **procedència de dades** (p. ex. intern vs integració Google / mixt), **`google_place_id`** quan apliqui, **dates de caducitat de caché de coordenades**, **darrera sincronització amb Google** i indicadors per **excloure el pin del mapa OSM** quan les regles de compliment ho exigeixin. Això alinea la UI (dues capes, expiració, mapa Google quan calgui) amb aquest document.
 - **Contingut mostrat "tal qual"** quan la font es Google: no es reescriu el nom/adreces/categories d'origen Google com si fossin creades per `Zuppeto`; la capa de valor de `Zuppeto` (pet friendly, comunitat, IA) es mostra a banda o clarament etiquetada.
+
+### 12.5.1 Retenció, `place_id` i cerca (comportament acordat)
+
+Aquest apartat concreta el que §12.5 resumeix en llenguatge de producte, perquè **no hi hagi dubte** sobre el cicle de vida de les dades Google al voltant dels locals.
+
+1. **Finestra de temps de la caché de coordenades (orientativa)**  
+   - El producte assumeix per defecte una finestra de l’ordre de **30 dies** per considerar “vigents” les coordenades emmagatzemades que depenen de Google (valor configurable al servidor; vegeu `CoordinateCacheRetentionDays` al tècnic).  
+   - Aquest número és una **regla operativa interna** alineada amb l’esperit dels termes de Google: ha de **revisar-se** quan canvïin els ToS o les polítiques aplicables. **No** substitueix assessorament legal.
+
+2. **`google_place_id` obligatori en catàleg si hi ha vincle Google**  
+   - Si un local persistit té procedència **Google Places** o **mixta**, ha d’existir el **`google_place_id`** (identificador estable de Google). Serveix per tornar a consultar la API (p. ex. Places Details) i **refrescar coordenades** després de la caducitat de la caché, sense tractar coordenades velles com a veritat única.
+
+3. **Després de caducar la caché de coordenades**  
+   - Amb el manteniment automàtic activat (`GooglePlacesCompliance`, vegeu tècnic), el sistema pot **eliminar les coordenades persistides** associades a aquella caché caducada i marcar el local com **no representable al mapa OSM** (capa Zuppeto), **sense esborrar** el `google_place_id` ni la procedència: així es pot **tornar a sincronitzar** quan calgui.  
+   - Funcionalment: **no** es mostra el pin a OSM com si fos coordenada pròpia; es manté el que diu §12.5 sobre **capa Google** o estats de fitxa clars quan la font és Google.
+
+4. **Cerca de locals (`GET /api/places`)**  
+   - Sempre **primer** el catàleg intern de Zuppeto (amb **snapshot de cerca** de curta durada només per rendiment; vegeu tècnic).  
+   - Si no hi ha resultats i la consulta té prou context (regles al tècnic), es pot cridar **Google Places** i retornar candidats **només en la resposta HTTP** (identificadors interns deterministes per a la sessió), **sense crear** automàticament una fila nova al catàleg per cada candidat. Donar d’alta o fusionar un local al catàleg és una **acció explícita** (p. ex. administració o flux de creació).
+
+5. **Snapshots de consultes**  
+   - Les dades de snapshot de cerca **caduquen** i es poden purgar; **no** són una còpia permanent del directori Google ni substitueixen el catàleg propi.
+
+6. **Altes i edicions (admin / API d’upsert)**  
+   - Qui crea o actualitza un local pot enviar procedència i identificador Google quan escaigui. Si **no** envia aquests camps però el local **ja** tenia vincle Google, el sistema **preserva** les metadades per no perdre el `place_id` en una edició banal. Si el client envia **explícitament** procedència **Internal** sense identificador Google, es pot **treure** el vincle (detall de validació al tècnic).
 
 ### 12.6 Diferenciacio funcional Free vs PRO
 
